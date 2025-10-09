@@ -25,7 +25,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Events from './pages/Events';
 import Navigation from './components/layout/Navigation';
 import CreateEvent from './pages/CreateEvents';
-
+import RegisterUser from './pages/RegisterUser';
 
 function App() {
   return (
@@ -34,6 +34,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Events />} />
           <Route path="/create" element={<CreateEvent />} />
+          <Route path="/register" element={<RegisterUser />} />
         </Routes>
     </BrowserRouter>
   );

@@ -8,6 +8,7 @@ export default function Navigation() {
     }}>
       <Link to="/">Eventos</Link>
       <Link to="/create">Crear Evento</Link>
+      <Link to="/register">Registrar Usuario</Link>
     </nav>
   );
 }
