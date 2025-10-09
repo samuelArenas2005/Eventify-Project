@@ -25,17 +25,15 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Events from './pages/Events';
 import Navigation from './components/layout/Navigation';
 import CreateEvent from './pages/CreateEvents';
-
+import Landing from '../src/pages/Landing.jsx';
 
 function App() {
   return (
-    <BrowserRouter>
-       <Navigation />
-        <Routes>
-          <Route path="/" element={<Events />} />
-          <Route path="/create" element={<CreateEvent />} />
-        </Routes>
-    </BrowserRouter>
+    <div>
+    <Navigation />
+    <Landing/>
+    <h1>Puto</h1>
+    </div>
   );
 }
 

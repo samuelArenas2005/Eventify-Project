@@ -1,0 +1,143 @@
+/* 🎨 Variables globales */
+:root {
+    --fondo-nav: #ffffff;
+    --icon-color: #222;
+    --fondo-menu: #ffffff;
+    --texto-menu: #333;
+    --hover-menu: #f0f0f0;
+  }
+  
+  /* 🌙 Modo oscuro */
+  body.modo-oscuro {
+    --fondo-nav: #0f172a;
+    --icon-color: #e2e8f0;
+    --fondo-menu: #1e293b;
+    --texto-menu: #e2e8f0;
+    --hover-menu: #334155;
+    background-color: #0f172a;
+    color: #f8fafc;
+  }
+  
+  /* 🧭 Barra de navegación principal */
+  .NavBar {
+    width: 100%;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    background-color: var(--fondo-nav, #ffffff);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+  }
+  
+  /* Logo con degradado */
+  .NavBarLogo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: linear-gradient(90deg, #ff6ad5, #8a63f4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* Sección derecha */
+  .NavIcons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  /* Íconos generales */
+  .NavIcons i {
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--icon-color, #222);
+    transition: transform 0.2s, color 0.3s;
+  }
+  
+  .NavIcons i:hover {
+    transform: scale(1.1);
+    color: #8a63f4;
+  }
+  
+  /* Badge notificaciones */
+  .badge {
+    background: #8a63f4;
+    color: white;
+    font-size: 0.7rem;
+    border-radius: 50%;
+    padding: 2px 6px;
+    position: absolute;
+    margin-left: 0;
+    margin-top: -10px;
+  }
+  
+  /* Perfil */
+  .perfil i {
+    color: #0b72b9;
+    font-size: 1.4rem;
+  }
+  
+  /* Menú hamburguesa: visible SIEMPRE */
+  .menuHamburguesa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.4rem;
+    color: var(--icon-color, #222);
+    transition: transform 0.2s, color 0.3s;
+    z-index: 200;
+    margin-right: 3rem;
+  }
+  
+  .menuHamburguesa:hover {
+    transform: scale(1.1);
+    color: #8a63f4;
+  }
+  
+  /* Menú desplegable */
+  .menuLinks {
+    position: absolute;
+    top: 60px;
+    right: 15px;
+    background: var(--fondo-menu);
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 0.5rem 0;
+    width: 180px;
+    animation: slideDown 0.3s ease forwards;
+    z-index: 999; /* que esté encima */
+  }
+  
+  /* Items del menú */
+  .menuLinks li {
+    padding: 0.7rem 1rem;
+  }
+  
+  .menuLinks li a {
+    text-decoration: none;
+    color: var(--texto-menu);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .menuLinks li:hover {
+    background-color: var(--hover-menu);
+  }
+  
+  /* Animación de entrada */
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Mostrar siempre el perfil */
+  .perfil {
+    display: flex;
+    align-items: center;
+  }
+  
