@@ -20,7 +20,7 @@ function App() {
 }
 
 export default App; */
-
+import { Toaster } from 'react-hot-toast';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Events from './pages/Events';
 import Navigation from './components/layout/Navigation';
@@ -31,6 +31,7 @@ function App() {
   return (
     <BrowserRouter>
        <Navigation />
+       <Toaster position="top-center" reverseOrder={false} />
         <Routes>
           <Route path="/" element={<Events />} />
           <Route path="/create" element={<CreateEvent />} />
