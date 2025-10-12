@@ -9,5 +9,5 @@ router.register(r'events', EventViewSet, basename='event')
 router.register(r'attendees', EventAttendeeViewSet, basename='eventattendee')
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('/', include(router.urls)),
 ]
