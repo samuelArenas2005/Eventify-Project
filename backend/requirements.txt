@@ -1,0 +1,8 @@
+# Core Django
+Django==5.0.6
+
+# Django REST Framework for API development
+djangorestframework==3.15.2
+
+# CORS handling for frontend-backend communication
+django-cors-headers==4.4.0
