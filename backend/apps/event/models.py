@@ -98,7 +98,7 @@ class Event(models.Model):
     categories = models.ManyToManyField(
         Category,
         related_name='events',
-        blank=True
+        blank=False  
     )
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -161,5 +161,27 @@ class EventAttendee(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.event.title}"
+
+class EventImage(models.Model):
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        related_name='images'
+    )
+    image = models.ImageField(
+        upload_to='events/images/',
+        blank=False,
+        null=False
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Event Image'
+        verbose_name_plural = 'Event Images'
+
+    def __str__(self):
+        return f"Image for event: {self.event.title}"
 
 

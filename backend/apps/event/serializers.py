@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event, Category, EventAttendee
+from .models import Event, Category, EventAttendee, EventImage
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -24,19 +24,26 @@ class EventAttendeeSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['created_at', 'updated_at']
 
+class EventImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventImage
+        fields = ['id', 'image', 'created_at']
+        read_only_fields = ['created_at']
+
 class EventListSerializer(serializers.ModelSerializer):
     creator = UserBasicSerializer(read_only=True)
     categories = CategorySerializer(many=True, read_only=True)
     attendees_count = serializers.SerializerMethodField()
+    images = EventImageSerializer(many=True, read_only=True)  # Add this line
 
     class Meta:
         model = Event
         fields = [
             'id', 'title', 'description', 'main_image', 
             'start_date', 'end_date', 'address', 
-            'location_info',
-            'capacity', 'status', 'creator', 
-            'categories', 'attendees_count',
+            'location_info', 'capacity', 'status', 
+            'creator', 'categories', 'attendees_count',
+            'images', 
             'created_at', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
@@ -55,13 +62,25 @@ class EventDetailSerializer(EventListSerializer):
         fields = EventListSerializer.Meta.fields + ['attendees']
 
 class EventCreateUpdateSerializer(serializers.ModelSerializer):
+    images = serializers.ListField(
+        child=serializers.ImageField(),
+        write_only=True,
+        required=False
+    )
+    categories = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        many=True,
+        required=True, 
+        write_only=False
+    )
+
     class Meta:
         model = Event
         fields = [
             'title', 'description', 'main_image',
             'start_date', 'end_date', 'address',
-            'location_info',
-            'capacity', 'status', 'categories'
+            'location_info', 'capacity', 'status', 
+            'categories', 'images' 
         ]
 
     def validate(self, data):
@@ -71,9 +90,30 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "end_date": "End date must be after start date"
                 })
+        if not data.get('categories', []):
+            raise serializers.ValidationError({
+                "categories": "At least one category must be specified"
+            })
         return data
 
     def create(self, validated_data):
+        images_data = validated_data.pop('images', [])
         user = self.context['request'].user
         validated_data['creator'] = user
-        return super().create(validated_data)
+        event = super().create(validated_data)
+        
+        # Create event images
+        for image in images_data:
+            EventImage.objects.create(event=event, image=image)
+        
+        return event
+
+    def update(self, instance, validated_data):
+        images_data = validated_data.pop('images', [])
+        event = super().update(instance, validated_data)
+        
+        # Add new images
+        for image in images_data:
+            EventImage.objects.create(event=event, image=image)
+            
+        return event

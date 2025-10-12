@@ -4,13 +4,14 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .models import Event, Category, EventAttendee
+from .models import Event, Category, EventAttendee, EventImage
 from .serializers import (
     CategorySerializer,
     EventListSerializer,
     EventDetailSerializer,
     EventCreateUpdateSerializer,
-    EventAttendeeSerializer
+    EventAttendeeSerializer,
+    EventImageSerializer
 )
 
 
@@ -41,9 +42,13 @@ class EventViewSet(viewsets.ModelViewSet):
         return (
             Event.objects
                  .select_related('creator')
-                 .prefetch_related('categories')
                  .prefetch_related(
-                     Prefetch('eventattendee_set', queryset=EventAttendee.objects.select_related('user'))
+                     'categories',
+                     'images',  # Add prefetch for images
+                     Prefetch(
+                         'eventattendee_set',
+                         queryset=EventAttendee.objects.select_related('user')
+                     )
                  )
                  .annotate(attendees_count=Count('attendees'))
         )
@@ -85,6 +90,40 @@ class EventViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except EventAttendee.DoesNotExist:
             return Response({'detail': 'Not attending'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'])
+    def add_images(self, request, pk=None):
+        """Add multiple images to an event"""
+        event = self.get_object()
+        images = request.FILES.getlist('images')
+        
+        created_images = []
+        for image in images:
+            event_image = EventImage.objects.create(
+                event=event,
+                image=image
+            )
+            created_images.append(event_image)
+
+        serializer = EventImageSerializer(created_images, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['delete'])
+    def remove_image(self, request, pk=None):
+        """Remove a specific image from an event"""
+        try:
+            image_id = request.data.get('image_id')
+            image = EventImage.objects.get(
+                id=image_id,
+                event_id=pk
+            )
+            image.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except EventImage.DoesNotExist:
+            return Response(
+                {'detail': 'Image not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
