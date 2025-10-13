@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+
 /* 🎨 Variables globales */
 :root {
     --fondo-nav: #ffffff;
@@ -5,6 +8,8 @@
     --fondo-menu: #ffffff;
     --texto-menu: #333;
     --hover-menu: #f0f0f0;
+    --fuente-base: 'Poppins', sans-serif;
+    font-family: var(--fuente-base);
   }
   
   /* 🌙 Modo oscuro */
@@ -16,6 +21,7 @@
     --hover-menu: #334155;
     background-color: #0f172a;
     color: #f8fafc;
+    font-family: var(--fuente-base);
   }
   
   /* 🧭 Barra de navegación principal */
@@ -30,6 +36,8 @@
     background-color: var(--fondo-nav, #ffffff);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     z-index: 100;
+    padding-bottom: 4px;
+    margin-bottom: 32px;
   }
   
   /* Logo con degradado */

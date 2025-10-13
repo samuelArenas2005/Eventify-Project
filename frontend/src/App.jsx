@@ -32,7 +32,6 @@ function App() {
     <div>
     <Navigation />
     <Landing/>
-    <h1>Puto</h1>
     </div>
   );
 }
