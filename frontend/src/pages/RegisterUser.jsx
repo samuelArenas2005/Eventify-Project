@@ -10,6 +10,19 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import backgroundImage from '../assets/register_background.png'; // Add this import at the top
+import { 
+    User2, 
+    Phone, 
+    Mail, 
+    Lock, 
+    IdCard, 
+    GraduationCap, 
+    Building2, 
+    UserRoundCog
+} from 'lucide-react';
+import { Link as RouterLink } from 'react-router-dom';
+import Link from '@mui/material/Link';
 
 const roles = [
     { value: 'Estudiante', label: 'Estudiante' },
@@ -18,10 +31,10 @@ const roles = [
     { value: 'Externo', label: 'Externo' },
 ];
 const RegisterUser = () => {
-   
+
     const { register, handleSubmit, reset, setValue, control, watch, formState: { errors } } = useForm();
     const rol = watch('rol');
-    
+
     // Restringe el input de teléfono para que no podamos escribir numeros
     const handleTelefonoChange = (e) => {
         const value = e.target.value.replace(/\D/g, '');
@@ -41,7 +54,7 @@ const RegisterUser = () => {
 
     const onSubmit = (data) => {
         // Validaciones para cada campo
-         if (!data.nombre || !data.apellido || !data.email || !data.telefono || !data.password || !data.rol || !data.identificacion) {
+        if (!data.nombre || !data.apellido || !data.email || !data.telefono || !data.password || !data.rol || !data.identificacion) {
             toast.error('Todos los campos son obligatorios');
             return;
         }
@@ -65,7 +78,7 @@ const RegisterUser = () => {
             toast.error('El N° de identificación no puede estar vacío');
             return;
         }
-            //ifs para exigir codigo institucional a profesores y estudiantes
+        //ifs para exigir codigo institucional a profesores y estudiantes
         if (rol === 'Estudiante' || rol === 'Profesor') {
             if (!data.codigo) {
                 toast.error('Debes proporcionar un código institucional');
@@ -87,10 +100,10 @@ const RegisterUser = () => {
         } else if ((rol === 'Funcionario' || rol === 'Externo') && data.codigo) {
             // funcionarios y externos no ingresaran codigo
             toast.error('Los roles Funcionario y Externo no deben ingresar código institucional');
-    return;
+            return;
         }
         // aqui imprimo todo en la consola, denle inspeccionar para ver el registro exitoso
-        console.log('Datos recibidos:', data); 
+        console.log('Datos recibidos:', data);
         toast.success('¡Registro exitoso!');
         reset();
     };
@@ -100,44 +113,77 @@ const RegisterUser = () => {
             sx={{
                 minHeight: '100vh',
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: 'flex-end',
                 alignItems: 'center',
-                background: 'linear-gradient(135deg, #0B72B9 50%, #e1e7f5 100%)',
+                background: `url(${backgroundImage})`,
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'cover'
             }}
         >
             <Box
                 sx={{
-                    background: 'linear-gradient(135deg, #fff 80%, #f3eaff 100%)',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 80%, rgba(243, 234, 255, 0.8) 100%)',
                     borderRadius: 'var(--border-radius-lg)',
-                    boxShadow: '0 8px 32px 0 rgba(11, 114, 185, 0.10), 0 1.5px 8px 0 rgba(0,0,0,0.04)',
+                    boxShadow: '0 5px 32px 5px rgba(11, 115, 185, 0.27), 0 1.5px 5px 0px rgba(194, 70, 180, 0.32)',
+                    backdropFilter: 'blur(8px)',
                     p: 5,
-                    minWidth: 350,
-                    maxWidth: 400,
-                    width: '100%',
+                    minWidth: 300,
+                    maxWidth: 450,
+                    width: '90%',
+                    marginRight: '2rem',
+                    marginY: 'auto',
+                    alignSelf: 'center',
                 }}
             >
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Stack spacing={3}>
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                alignSelf: 'flex-start',
-                                fontWeight: 'bold',
-                                mb: 1,
-                                color: 'var(--color-secondary)',
-                                fontSize: '2.5rem',
-                                letterSpacing: '1px',
-                            }}
-                        >
-                            Registrate para participar en eventos!
-                        </Typography>
+                        <>
+                            <Typography
+                                variant="h1"
+                                sx={{
+                                    alignSelf: 'center',
+                                    fontWeight: 'bold',
+                                    mb: 1,
+                                    color: 'var(--text-primary)',
+                                    fontSize: '1.8rem',
+                                    letterSpacing: '1px',
+                                }}
+                            >
+                                Crear una cuenta
+                            </Typography>
+                            <Typography 
+                                variant="body2" 
+                                align="center" 
+                                sx={{ mb: 2 }}
+                            >
+                                ¿Ya tienes cuenta?{' '}
+                                <Link 
+                                    component={RouterLink} 
+                                    to="/login" 
+                                    sx={{ 
+                                        color: 'var(--color-secondary)',
+                                        textDecoration: 'none',
+                                        '&:hover': {
+                                            textDecoration: 'underline'
+                                        }
+                                    }}
+                                >
+                                    Inicia sesión
+                                </Link>
+                            </Typography>
+                        </>
                         <Stack direction="row" spacing={2}>
                             <TextField
                                 label="Nombre"
+                                size='medium'
                                 fullWidth
                                 {...register('nombre', { required: true })}
                                 error={!!errors.nombre}
                                 helperText={errors.nombre ? 'Este campo no puede estar vacío' : ''}
+                                InputProps={{
+                                    startAdornment: <User2 size={20} style={{ marginRight: '8px', color: '#666' }} />,
+                                }}
                                 sx={{
                                     '& .MuiInputBase-input::placeholder': {
                                         color: 'var(--color-placeholder)',
@@ -151,6 +197,9 @@ const RegisterUser = () => {
                                 {...register('apellido', { required: true })}
                                 error={!!errors.apellido}
                                 helperText={errors.apellido ? 'Este campo no puede estar vacío' : ''}
+                                InputProps={{
+                                    startAdornment: <User2 size={20} style={{ marginRight: '8px', color: '#666' }} />,
+                                }}
                                 sx={{
                                     '& .MuiInputBase-input::placeholder': {
                                         color: 'var(--color-placeholder)',
@@ -159,7 +208,7 @@ const RegisterUser = () => {
                                 }}
                             />
                         </Stack>
-                        
+
                         <Stack direction="row" spacing={2}>
                             <FormControl fullWidth error={!!errors.rol}>
                                 <InputLabel id="rol-label">Rol</InputLabel>
@@ -169,10 +218,11 @@ const RegisterUser = () => {
                                     defaultValue=""
                                     rules={{ required: true }}
                                     render={({ field }) => (
-                                        <Select 
+                                        <Select
                                             {...field}
                                             labelId="rol-label"
                                             label="Rol"
+                                            startAdornment={<UserRoundCog size={20} style={{ marginRight: '8px', color: '#666' }} />}
                                         >
                                             {roles.map((option) => (
                                                 <MenuItem key={option.value} value={option.value}>
@@ -189,6 +239,9 @@ const RegisterUser = () => {
                                 {...register('codigo')}
                                 onChange={handleCodigoChange}
                                 placeholder="Código institucional"
+                                InputProps={{
+                                    startAdornment: <GraduationCap size={20} style={{ marginRight: '8px', color: '#666' }} />,
+                                }}
                                 sx={{
                                     '& .MuiInputBase-input::placeholder': {
                                         color: 'var(--color-placeholder)',
@@ -197,14 +250,17 @@ const RegisterUser = () => {
                                 }}
                             />
                         </Stack>
-                       
+
                         <TextField
                             label="N° de identificación"
                             fullWidth
                             {...register('identificacion', { required: true })}
                             error={!!errors.identificacion}
                             helperText={errors.identificacion ? 'Este campo no puede estar vacío' : ''}
-                            onChange={handleIdentificacionChange}                           
+                            onChange={handleIdentificacionChange}
+                            InputProps={{
+                                startAdornment: <IdCard size={20} style={{ marginRight: '8px', color: '#666' }} />,
+                            }}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
                                     color: 'var(--color-placeholder)',
@@ -212,21 +268,7 @@ const RegisterUser = () => {
                                 }
                             }}
                         />
-                        <TextField
-                            label="Correo"
-                            type="email"
-                            fullWidth
-                            {...register('email', { required: true })}
-                            error={!!errors.email}
-                            helperText={errors.email ? 'Este campo no puede estar vacío' : ''}
-                            placeholder="tu@email.com"
-                            sx={{
-                                '& .MuiInputBase-input::placeholder': {
-                                    color: 'var(--color-placeholder)',
-                                    opacity: 1,
-                                }
-                            }}
-                        />
+
                         <TextField
                             label="Teléfono"
                             type="tel"
@@ -235,6 +277,9 @@ const RegisterUser = () => {
                             error={!!errors.telefono}
                             helperText={errors.telefono ? 'Este campo no puede estar vacío' : ''}
                             onChange={handleTelefonoChange}
+                            InputProps={{
+                                startAdornment: <Phone size={20} style={{ marginRight: '8px', color: '#666' }} />,
+                            }}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
                                     color: 'var(--color-placeholder)',
@@ -242,6 +287,26 @@ const RegisterUser = () => {
                                 }
                             }}
                         />
+
+                        <TextField
+                            label="Correo"
+                            type="email"
+                            fullWidth
+                            {...register('email', { required: true })}
+                            error={!!errors.email}
+                            helperText={errors.email ? 'Este campo no puede estar vacío' : ''}
+                            placeholder="tu@email.com"
+                            InputProps={{
+                                startAdornment: <Mail size={20} style={{ marginRight: '8px', color: '#666' }} />,
+                            }}
+                            sx={{
+                                '& .MuiInputBase-input::placeholder': {
+                                    color: 'var(--color-placeholder)',
+                                    opacity: 1,
+                                }
+                            }}
+                        />
+
                         <TextField
                             label="Contraseña"
                             type="password"
@@ -250,9 +315,12 @@ const RegisterUser = () => {
                             error={!!errors.password}
                             helperText={
                                 errors.password
-                                ? 'Este campo no puede estar vacío'
-                                : 'Mínimo 6 dígitos'
-                             }
+                                    ? 'Este campo no puede estar vacío'
+                                    : 'Mínimo 6 dígitos'
+                            }
+                            InputProps={{
+                                startAdornment: <Lock size={20} style={{ marginRight: '8px', color: '#666' }} />,
+                            }}
                             sx={{
                                 '& .MuiInputBase-input::placeholder': {
                                     color: 'var(--color-placeholder)',
@@ -268,14 +336,14 @@ const RegisterUser = () => {
                                 mt: 2,
                                 background: 'var(--color-primary)',
                                 color: 'var(--color-white)',
-                                fontWeight: 700,
+                                fontWeight: 400,
                                 fontSize: '1.1rem',
-                                borderRadius: 'var(--border-radius-md)',
-                                padding: '12px 0',
-                                boxShadow: '0 2px 8px rgba(185, 11, 11, 0.08)',
+                                borderRadius: 'var(--border-radius-lg)',
+                                padding: '12px 20',
+                                boxShadow: '0 10px 8px rgba(57, 140, 170, 0.34)',
                                 textTransform: 'none',
                                 '&:hover': {
-                                    background: 'var(--color-secondary)',
+                                    
                                 },
                             }}
                         >
