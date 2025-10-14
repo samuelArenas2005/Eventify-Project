@@ -1,10 +1,10 @@
 import { Toaster } from 'react-hot-toast';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Events from './pages/Events';
-import Navigation from './components/layout/Navigation';
 
-import CreateEvent from './pages/CreateEvents';
-import RegisterUser from './pages/RegisterUser';
+import Navigation from './components/layout/Navigation';
+import Landing from './pages/Landing/Landing'
+import Login from './pages/login'
+
 
 function App() {
   return (
@@ -16,16 +16,7 @@ function App() {
           element={
             <>
               <Navigation />
-              <Events />
-            </>
-          }
-        />
-        <Route
-          path="/create"
-          element={
-            <>
-              <Navigation />
-              <CreateEvent />
+              <Landing />
             </>
           }
         />
@@ -34,6 +25,14 @@ function App() {
           element={
             <>
               <RegisterUser />
+            </>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <>
+              <Login />
             </>
           }
         />

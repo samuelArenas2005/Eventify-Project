@@ -18,7 +18,6 @@ import {
     Lock, 
     IdCard, 
     GraduationCap, 
-    Building2, 
     UserRoundCog
 } from 'lucide-react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -176,7 +175,6 @@ const RegisterUser = () => {
                         <Stack direction="row" spacing={2}>
                             <TextField
                                 label="Nombre"
-                                size='medium'
                                 fullWidth
                                 {...register('nombre', { required: true })}
                                 error={!!errors.nombre}

@@ -32,6 +32,7 @@ function Landing() {
         
       <h1>Hello world</h1>
       <p>Bienvenido a Eventify 🎉</p>
+      <img src="http://127.0.0.1:8000/media/events/Captura_de_pantalla_2025-10-13_153855.png" alt="" />
     </section>
   );
 }
