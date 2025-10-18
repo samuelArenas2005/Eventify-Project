@@ -1,9 +1,13 @@
+import React from 'react';
+
 import { Toaster } from 'react-hot-toast';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import Navigation from './components/layout/Navigation';
 import Landing from './pages/Landing/Landing'
 import Login from './pages/login'
+import Dashboard from './pages/Dashboard/Dashboard';
+import RegisterUser from './pages/RegisterUser';
 
 
 function App() {
@@ -33,6 +37,15 @@ function App() {
           element={
             <>
               <Login />
+            </>
+          }
+        />
+         <Route
+          path="/dashboard"
+          element={
+            <>
+               <Navigation />
+              <Dashboard />
             </>
           }
         />

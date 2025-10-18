@@ -339,10 +339,7 @@ const RegisterUser = () => {
                                 borderRadius: 'var(--border-radius-lg)',
                                 padding: '12px 20',
                                 boxShadow: '0 10px 8px rgba(57, 140, 170, 0.34)',
-                                textTransform: 'none',
-                                '&:hover': {
-                                    
-                                },
+                                textTransform: 'none'
                             }}
                         >
                             Registrarse

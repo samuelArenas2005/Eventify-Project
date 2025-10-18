@@ -1,0 +1,247 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.dashboardContainer {
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+  background-color: #F9FAFB;
+  color: #111827;
+}
+
+/* --- Perfil (Sin cambios) --- */
+.profileHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+.profileInitials {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: #EDE9FE;
+  color: #E11D9E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-right: 1.5rem;
+  flex-shrink: 0;
+}
+.profileInfo h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px 0;
+}
+.profileInfo p {
+  font-size: 1rem;
+  color: #6B7280;
+  margin: 0;
+}
+.profileTags {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+.profileTags span {
+  background-color: #E0E7FF;
+  color: #E11D9E;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.profileActions {
+  margin-left: auto;
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+.actionButton:hover {
+  background-color: #F9FAFB;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Estadísticas (Sin cambios) --- */
+.statsSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+.statCard {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid #E5E7EB;
+}
+.statInfo span {
+  font-size: 0.95rem;
+  color: #6B7280;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.statInfo strong {
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1;
+}
+.statIcon {
+  padding: 0.9rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.iconEvents {
+  background-color: #F3E8FF;
+  color: #9333EA;
+}
+.iconCreated {
+  background-color: #EDE9FE;
+  color: #7C3AED;
+}
+.iconRating {
+  background-color: #F5D0FE;
+  color: #C026D3;
+}
+
+/* --- Tabs (Sin cambios) --- */
+.tabsNav {
+  display: flex;
+  gap: 2.5rem;
+  border-bottom: 2px solid #E5E7EB;
+  margin-bottom: 2rem;
+}
+.tabButton {
+  background: none;
+  border: none;
+  padding: 0.8rem 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6B7280;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+.tabButton:hover {
+  color: #0B72B9
+}
+.tabButton.active {
+  color: #0B72B9;
+  font-weight: 600;
+}
+.tabButton.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #0B72B9;
+}
+
+/* --- ¡NUEVO! Encabezado de Contenido --- */
+.contentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem; /* Aumentado para más espacio */
+  flex-wrap: wrap; /* Para pantallas pequeñas */
+  gap: 1rem;
+}
+
+.contentTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0; /* Quitamos margen para alinear bien */
+}
+
+.viewOptions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.filterButton:hover {
+  background-color: #F9FAFB;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+
+.layoutButton {
+  background: none;
+  border: none;
+  border-radius: 6px; /* Bordes internos */
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6B7280; /* Color de icono inactivo */
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.layoutButton:hover {
+  color: #111827;
+}
+
+.layoutButton.active {
+  background-color: #FFFFFF; /* Fondo blanco activo */
+  color: #4F46E5; /* Color primario */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.eventList {
+  display: flex;
+  justify-content:center;
+}
+
+/* Modificador para vista Grid */
+.eventList.grid {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 2rem; /* Espacio entre tarjetas, horizontal y vertical */
+  /* ¡Ya no hay 'justify-content' que las estire! */
+}

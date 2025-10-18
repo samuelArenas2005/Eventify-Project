@@ -15,15 +15,6 @@ class UserBasicSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email']
 
-class EventAttendeeSerializer(serializers.ModelSerializer):
-    user = UserBasicSerializer(read_only=True)
-    event = serializers.PrimaryKeyRelatedField(read_only=True)
-
-    class Meta:
-        model = EventAttendee
-        fields = '__all__'
-        read_only_fields = ['created_at', 'updated_at']
-
 class EventImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventImage
@@ -50,6 +41,15 @@ class EventListSerializer(serializers.ModelSerializer):
 
     def get_attendees_count(self, obj):
         return obj.attendees.count()
+    
+class EventAttendeeSerializer(serializers.ModelSerializer):
+    user = UserBasicSerializer(read_only=True)
+    event = EventListSerializer(read_only=True)
+
+    class Meta:
+        model = EventAttendee
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
 
 class EventDetailSerializer(EventListSerializer):
     attendees = EventAttendeeSerializer(
@@ -60,6 +60,8 @@ class EventDetailSerializer(EventListSerializer):
 
     class Meta(EventListSerializer.Meta):
         fields = EventListSerializer.Meta.fields + ['attendees']
+
+
 
 class EventCreateUpdateSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
@@ -117,3 +119,5 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
             EventImage.objects.create(event=event, image=image)
             
         return event
+
+

@@ -1,6 +1,6 @@
 # views.py
 from django.db.models import Count, Prefetch
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -36,9 +36,6 @@ class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        # Agrego algunos optimizadores simples:
-        # select_related para creator, prefetch para categories y los asistentes (user)
-        # y anoto el conteo de asistentes (útil si decides usarlo).
         return (
             Event.objects
                  .select_related('creator')
@@ -134,3 +131,50 @@ class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EventAttendeeSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+class ConfirmedAttendeesByUserList(generics.ListAPIView):
+    serializer_class = EventAttendeeSerializer
+    permission_classes = [permissions.AllowAny]  # para pruebas
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        if not user_id:
+            return EventAttendee.objects.none()
+
+        return (
+            EventAttendee.objects
+            .select_related('user', 'event')
+            .filter(user__id=user_id, status='CONFIRMED')
+        )
+        
+        
+class PendingAttendeesByUserList(generics.ListAPIView):
+    serializer_class = EventAttendeeSerializer
+    permission_classes = [permissions.AllowAny]  # para pruebas
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        if not user_id:
+            return EventAttendee.objects.none()
+
+        return (
+            EventAttendee.objects
+            .select_related('user', 'event')
+            .filter(user__id=user_id, status='PENDING')
+        )
+        
+class EventsByCreatorList(generics.ListAPIView):
+    """
+    Lista eventos creados por un usuario dado (creator = user).
+    URL ejemplo: /api/events/by-creator/3/
+    """
+    serializer_class = EventListSerializer
+    permission_classes = [permissions.AllowAny]  # Cambia a IsAuthenticated si lo necesitas
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        if not user_id:
+            return Event.objects.none()
+
+        qs = Event.objects.filter(creator__id=user_id).order_by('-start_date')
+        #qs = qs.select_related('creator').prefetch_related('categories', 'images')
+        return qs

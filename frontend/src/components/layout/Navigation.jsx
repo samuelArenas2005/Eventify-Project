@@ -70,6 +70,7 @@ export default function Navigation() {
           <li>Inicio</li>
           <li>Eventos</li>
           <li>Calendario</li>
+          <li>Dashboard</li>
           <li>Crear Evento</li>
         </ul>
       )}

@@ -1,0 +1,243 @@
+
+
+.cardContainer {
+  /* Tamaño escalado (antes 300px) */
+  width: 360px; 
+  /* Radio escalado (antes 26px) */
+  border-radius: 31px; 
+  background-color: #fff;
+  /* Sombra escalada (antes 6px 12px) */
+  box-shadow: 0px 7px 14px rgba(0, 0, 0, 0.1); 
+  /* Padding escalado (antes 15px) */
+  padding: 18px; 
+  display: flex;
+  flex-direction: column;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  /* Transición añadida para el hover */
+  transition: translate 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
+  
+}
+
+/* --- NUEVO EFECTO HOVER --- */
+.cardContainer:hover {
+  box-shadow: 0px 8px 16px rgba(11, 114, 185, 0.25); 
+  translate: 0 -1px;
+}
+
+.imageWrapper {
+  width: 100%;
+  position: relative;
+  cursor: pointer;
+  /* Margen escalado (antes 15px) */
+  margin-bottom: 18px; 
+  /* Añadido para contener el zoom de la imagen */
+  overflow: hidden; 
+  /* Radio escalado para que coincida con la imagen */
+  border-radius: 14px; 
+}
+
+.eventImage {
+  width: 100%;
+  /* Altura escalada (antes 128px) */
+  height: 154px; 
+  object-fit: cover;
+  /* Radio escalado (antes 12px) */
+  border-radius: 14px; 
+  /* Sombra escalada (antes 2px 4px 4px) */
+  box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.1); 
+  /* Transición añadida para el zoom en hover */
+  transition: transform 0.8s ease-in-out; 
+}
+
+
+.cardContainer:hover .eventTitle {
+  color: #0B72B9; /* Pequeño zoom a la imagen */
+}
+
+.categoryTag {
+  position: absolute;
+  /* Posición escalada (antes 10px) */
+  top: 12px; 
+  left: 12px; 
+  /* Radio escalado (antes 20px) */
+  border-radius: 24px; 
+  /* Padding escalado (antes 6px 14px) */
+  padding: 7px 17px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+
+.categoryText {
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  /* Fuente escalada (antes 10px) */
+  font-size: 12px; 
+}
+
+.contentWrapper {
+  /* Padding escalado (antes 5px) */
+  padding: 0 6px; 
+}
+
+.titleHeartContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Margen escalado (antes 8px) */
+  margin-bottom: 10px; 
+}
+
+.eventTitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 19px;
+  color: #111827;
+  margin: 0;
+  cursor: pointer;
+  transition: color 1s ease;
+  position: relative; 
+  display: inline-block; 
+}
+
+.eventTitle::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  left: 0;
+  bottom: -2px;
+  transition: width 0.3s ease-in-out;
+}
+
+.eventTitle:hover::after {
+  width: 100%;
+}
+
+
+.heartIcon {
+  color: #6B7280;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.heartIcon:hover {
+  color: red;
+  transform: scale(1.1);
+}
+
+.heartActive {
+  color: red;
+  animation: heartPop 0.3s ease-in-out;
+  fill: #e11d48 !important;
+  stroke: "none"  !important
+}
+
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.eventDescription {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  /* Fuente escalada (antes 10px) */
+  font-size: 12px; 
+  color: #111827;
+  /* Margen escalado (antes 15px) */
+  margin-bottom: 18px; 
+  line-height: 1.4;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  /* Margen escalado (antes 8px) */
+  margin-bottom: 10px; 
+}
+
+.detailIcon {
+  color: #6B7280;
+  /* Margen escalado (antes 8px) */
+  margin-right: 10px; 
+  /* Tamaño escalado (antes 14px) */
+  min-width: 17px; 
+}
+
+.detailText {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  /* Fuente escalada (antes 10px) */
+  font-size: 12px; 
+  color: #6B7280;
+}
+
+.organizerSection {
+  /* Márgenes escalados (antes 15px y 20px) */
+  margin-top: 18px; 
+  margin-bottom: 24px; 
+  text-align: right;
+  font-family: 'Poppins', sans-serif;
+  /* Fuente escalada (antes 10px) */
+  font-size: 12px; 
+}
+
+.organizerText {
+  font-weight: 400;
+  color: #6B7280;
+}
+
+.organizerName {
+  font-weight: 400;
+  color: #00C2B3;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+
+.organizerName::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  background: #00C2B3;
+  left: 0;
+  bottom: -2px;
+  transition: width 0.3s ease-in-out;
+}
+
+.organizerName:hover::after {
+  width: 100%;
+}
+
+.registerButton {
+  width: 271px; 
+  height: 43px; 
+  border-radius: 19px; 
+  background-color: #0B72B9;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 14px; 
+  border: none;
+  cursor: pointer;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15); 
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  display: block;
+  margin: 0 auto;
+  margin-top: auto;
+}
+
+.registerButton:hover {
+  transform: scale(1.03);
+  /* Sombra escalada (antes 4px 12px) */
+  box-shadow: 0px 0px 8px #00C2B3; 
+}
+
+
+
