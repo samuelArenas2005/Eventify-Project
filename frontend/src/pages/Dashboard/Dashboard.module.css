@@ -81,6 +81,18 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+.createButton{
+  text-decoration: none;
+  border:none;
+  color: var(--color-white);
+  background-color: var(--color-primary);
+}
+
+.createButton:hover {
+  background-color: var(--color-primary);
+  box-shadow: 0 0px 5px var(--color-primary);
+}
+
 /* --- Estadísticas (Sin cambios) --- */
 .statsSection {
   display: grid;

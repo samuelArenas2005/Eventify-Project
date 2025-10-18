@@ -8,6 +8,7 @@ import Landing from './pages/Landing/Landing'
 import Login from './pages/login'
 import Dashboard from './pages/Dashboard/Dashboard';
 import RegisterUser from './pages/RegisterUser';
+import CreateEventPage from './pages/CreateEvent/CreateEventPage';
 
 
 function App() {
@@ -46,6 +47,15 @@ function App() {
             <>
                <Navigation />
               <Dashboard />
+            </>
+          }
+        />
+        <Route
+          path="/createEvent"
+          element={
+            <>
+               <Navigation />
+              <CreateEventPage />
             </>
           }
         />

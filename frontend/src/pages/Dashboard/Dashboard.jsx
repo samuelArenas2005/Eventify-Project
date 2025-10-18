@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
+import { Link } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 import EventCard from '../../components/UI/EventCard/EventCard';
-import { Edit, Settings, Calendar, User, Star, Filter, LayoutGrid, List } from 'lucide-react';
+import { Edit, Settings, Calendar, User, Star, Filter,CirclePlus,Plus} from 'lucide-react';
 import { getRegisteredEvents,getPendingEvents,getCreatedEvent } from './GetEventsData';
 
 const historyData = [];
@@ -44,6 +45,7 @@ const UserProfileDashboard = () => {
     let title = '';
     let data = [];
     let emptyMessage = '';
+    let type = ''
 
     switch (activeTab) {
       case 'registrados':
@@ -60,6 +62,7 @@ const UserProfileDashboard = () => {
         title = `Mis Eventos (${myEventsData.length})`;
         data = myEventsData;
         emptyMessage = 'No has creado ningún evento.';
+        type = 'myevent'
         break;
       case 'historial':
         title = `Historial (${historyData.length})`;
@@ -75,6 +78,11 @@ const UserProfileDashboard = () => {
         <div className={styles.contentHeader}>
           <h2 className={styles.contentTitle}>{title}</h2>
           <div className={styles.viewOptions}>
+            {type == 'myevent' ? 
+            <Link to="/createEvent" className={`${styles.actionButton} ${styles.createButton}`}>
+              <Plus size={16} /> 
+            </Link>
+            :null}
             <button className={styles.filterButton} onClick={handleFilterClick}>
               <Filter size={16} />
               Filtrar
@@ -109,12 +117,16 @@ const UserProfileDashboard = () => {
           </div>
         </div>
         <div className={styles.profileActions}>
+          <Link to="/createEvent" className={`${styles.actionButton} ${styles.createButton}`}>
+            <CirclePlus size={16} /> Crear Evento
+          </Link>
           <button className={styles.actionButton}>
             <Edit size={16} /> Editar Perfil
           </button>
           <button className={styles.actionButton}>
             <Settings size={16} /> Configuración
           </button>
+          
         </div>
       </header>
 
