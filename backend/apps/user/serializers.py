@@ -18,6 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
             'phone',
             'rol',
             'avatar',
+            'codigo',
+            'cedula',
             'is_active',
             'is_admin'
         )
@@ -49,6 +51,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'last_name',
             'phone',
             'rol',
+            'codigo',
+            'cedula',
             'avatar'
         )
 

@@ -92,6 +92,34 @@ class User(AbstractUser):
         null=True
     )
     
+    # Nuevo: validador para cédula (solo dígitos) y campo obligatorio
+    cedula_validator = RegexValidator(
+        regex=r'^\d+$',
+        message='La cédula debe contener solo dígitos'
+    )
+    cedula = models.CharField(
+        validators=[cedula_validator],
+        max_length=25,
+        unique=True,
+        blank=False,
+        null=False,
+        error_messages={
+            'unique': ('Ya existe un usuario con esta cédula.'),
+        },
+    )
+    
+    # Nuevo: código institucional (opcional, puede ser nulo)
+    codigo_validator = RegexValidator(
+        regex=r'^\d*$',
+        message='El código institucional debe contener solo dígitos'
+    )
+    codigo = models.CharField(
+        validators=[codigo_validator],
+        max_length=20,
+        blank=True,
+        null=True,
+    )
+    
     is_admin = models.BooleanField(
         default=False,
         help_text='Designates whether this user has admin privileges.',
