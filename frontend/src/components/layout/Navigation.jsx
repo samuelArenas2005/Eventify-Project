@@ -2,78 +2,88 @@ import React, { useState, useEffect } from "react";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
 
-export default function Navigation() {
+export default function Navigation({ user, logout, login }) {
   const [temaOscuro, setTemaOscuro] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Cambiar tema claro/oscuro
-  const toggleTema = () => {
-    setTemaOscuro(!temaOscuro);
-  };
+  const toggleTema = () => setTemaOscuro((v) => !v);
+  const toggleMenuHamburguesa = () => setMenuOpen((v) => !v);
 
   useEffect(() => {
-    if (temaOscuro) {
-      document.body.classList.add("modo-oscuro");
-    } else {
-      document.body.classList.remove("modo-oscuro");
-    }
+    if (temaOscuro) document.body.classList.add("modo-oscuro");
+    else document.body.classList.remove("modo-oscuro");
   }, [temaOscuro]);
 
-  // Abrir/cerrar menú hamburguesa
-  const toggleMenuHamburguesa = () => {
-    setMenuOpen(!menuOpen);
-  };
+  function LoggedInControls() {
+    return (
+      <>
+        <div className="NavIcons">
+          <div className="IconoTema" onClick={toggleTema}>
+            {temaOscuro ? (
+              <i className="fa-regular fa-sun"></i>
+            ) : (
+              <i className="fa-regular fa-moon"></i>
+            )}
+          </div>
+
+          <div className="notificaciones">
+            <i className="fa-regular fa-bell"></i>
+            <span className="badge">3</span>
+          </div>
+
+          <div className="perfil">
+            <i className="fa-solid fa-circle-user"></i>
+          </div>
+
+          <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
+            {!menuOpen ? (
+              <i className="fa-solid fa-bars"></i>
+            ) : (
+              <i className="fa-solid fa-square-xmark fa-spin"></i>
+            )}
+          </div>
+        </div>
+
+        {menuOpen && (
+          <ul className="menuLinks">
+            <li>
+              <Link to="/">Inicio</Link>
+            </li>
+            <li>
+              <Link to="/events">Eventos</Link>
+            </li>
+            <li>
+              <Link to="/calendar">Calendario</Link>
+            </li>
+            <li>
+              <Link to="/dashboard">Dashboard</Link>
+            </li>
+            <li>
+              <Link to="/createEvent">Crear Evento</Link>
+            </li>
+            <li>
+              <Link to="/createEvent">Crear Evento</Link>
+            </li>
+            <li>
+              <button onClick={logout}>logout</button>
+            </li>
+          </ul>
+        )}
+      </>
+    );
+  }
+
+  function LoggedOutControls() {
+    return <button onClick={login}>Login</button>;
+  }
 
   return (
     <nav className="NavBar">
-      {/* Logo */}
-      <div className="NavBarLogo">Eventify</div>
+      <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+        <div className="NavBarLogo">Eventify</div>
+      </Link>
 
-      {/* Sección de íconos */}
-      <div className="NavIcons">
-        {/* Modo claro/oscuro */}
-        <div className="IconoTema" onClick={toggleTema}>
-          {temaOscuro ? (
-            <i className="fa-regular fa-sun"></i>
-          ) : (
-            <i className="fa-regular fa-moon"></i>
-          )}
-        </div>
-
-        {/* Notificaciones */}
-        <div className="notificaciones">
-          <i className="fa-regular fa-bell"></i>
-          <span className="badge">3</span>
-        </div>
-
-        {/* Perfil */}
-        <div className="perfil">
-          <i className="fa-solid fa-circle-user"></i>
-        </div>
-
-        {/* Menú hamburguesa */}
-        <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
-          {!menuOpen ? (
-            <div>
-            <i className="fa-solid fa-bars"></i>
-            
-            </div>
-          ) : (
-            <i className="fa-solid fa-square-xmark fa-spin"></i>
-          )}
-        </div>
-      </div>
-
-      {/* Menú desplegable */}
-      {menuOpen && (
-        <ul className="menuLinks">
-          <li>Inicio</li>
-          <li>Eventos</li>
-          <li>Calendario</li>
-          <li>Dashboard</li>
-          <li>Crear Evento</li>
-        </ul>
-      )}
+      {user ? <LoggedInControls /> : <LoggedOutControls />}
     </nav>
   );
 }

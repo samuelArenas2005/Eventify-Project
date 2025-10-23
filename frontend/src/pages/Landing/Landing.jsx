@@ -9,22 +9,22 @@ function Landing() {
       <div className='discover'>
         <h1 className='discover-title'>Descubre y Crea Eventos Increíbles</h1>
         <p>Únete a la comunidad universitaria más activa. Encuentra eventos que te inspiren y organiza experiencias memorables</p>
-        <button className='explore-button'>Explora eventos <i class="fa-solid fa-arrow-right" color='--fondo-menu'></i></button>
+        <button className='explore-button'>Explora eventos <i ClassName="fa-solid fa-arrow-right" color='--fondo-menu'></i></button>
         <button className='create-button'>Crea eventos</button>
       </div>
       <div className='estadisticas'>
         <div className='eventos-mes'>
-        <i class="fa-solid fa-calendar"></i>
+        <i className="fa-solid fa-calendar"></i>
         <h2>24</h2>
         Eventos este mes
         </div>
         <div className='personas-total'>
-        <i class="fa-solid fa-people-group"></i>
+        <i className="fa-solid fa-people-group"></i>
         <h2>1,847</h2>
         Estudiantes participando
         </div>
         <div className='calificacion'>
-        <i class="fa-solid fa-star"></i>
+        <i className="fa-solid fa-star"></i>
         <h2>4.7</h2>
         Calificación promedio
         </div>
