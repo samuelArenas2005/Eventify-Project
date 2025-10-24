@@ -1,37 +1,33 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 
-import { Toaster } from 'react-hot-toast';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from "react-hot-toast";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Navigation from './components/layout/Navigation';
-import Landing from './pages/Landing/Landing'
-import Login from './pages/login'
-import Dashboard from './pages/Dashboard/Dashboard';
-import RegisterUser from './pages/RegisterUser';
-import CreateEventPage from './pages/CreateEvent/CreateEventPage';
-import { ProtectedRoute } from './components/Auth/ProtectedRoute';
-
+import Navigation from "./components/layout/Navigation";
+import Landing from "./pages/Landing/Landing";
+import Login from "./pages/login";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import RegisterUser from "./pages/RegisterUser";
+import CreateEventPage from "./pages/CreateEvent/CreateEventPage";
+import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
+import Analytics from "./pages/Analytics/Analytics";
 
 function App() {
-
-  const [user, setUser] = useState(null)
-    //Codigo donde se hace la peticion
+  const [user, setUser] = useState(null);
 
   const login = () => {
-    setUser({
-      id: 1,
-      name: 'Jhon'
-    })
-  }
+    const userData = { id: 1, name: "Jhon", is_admin: false };
+    setUser(userData);
+  };
 
   const logout = () => {
-    setUser(null)
-  }
+    setUser(null);
+  };
 
   return (
     <BrowserRouter>
       <Toaster position="top-center" reverseOrder={false} />
-      <Navigation user={user} logout={logout} login={login}/>
+      <Navigation user={user} logout={logout} login={login} />
       <Routes>
         <Route
           path="/"
@@ -57,20 +53,31 @@ function App() {
             </>
           }
         />
+        //Aqui van las rutas que solo dependen del usuario
+        <Route element={<ProtectedRoute isAllowed={!!user} />}>
+          <Route
+            path="/dashboard"
+            element={
+              <>
+                <Dashboard />
+              </>
+            }
+          />
+          <Route
+            path="/createEvent"
+            element={
+              <>
+                <CreateEventPage />
+              </>
+            }
+          />
+        </Route>
         <Route
-          path="/dashboard"
+          path={"/analytics"}
           element={
-            <ProtectedRoute user={user}>
-              <Dashboard />
+            <ProtectedRoute isAllowed={user ? user.is_admin : false} redirectTo="/dashboard">
+              <Analytics />
             </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/createEvent"
-          element={
-            <>
-              <CreateEventPage />
-            </>
           }
         />
       </Routes>
@@ -79,4 +86,3 @@ function App() {
 }
 
 export default App;
-
