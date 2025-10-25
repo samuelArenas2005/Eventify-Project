@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import (IsAuthenticated, AllowAny)
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -32,26 +32,26 @@ class CustomTokenRefreshView(TokenRefreshView):
             access_token = tokens['access']
 
             res = Response()
-            res.data = {'refreshed': True}
-            return res  # ← Añade esto
-
+            res.data = {'success': True}
             res.set_cookie("access_token", value=access_token, httponly=True, secure=True, samesite='None', path='/')
+            return res  # ← Añade esto
         except:
-            return Response({"refreshed": False, "error": "Invalid refresh token"})
+            return Response({"success": False, "error": "Invalid refresh token"})
         
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def logout(request):
     try:
         res = Response()
         res.delete_cookie('access_token', path='/', samesite='None')
         res.delete_cookie('refresh_token', path='/', samesite='None')
-        res.data = {'logged_out': True}
+        res.data = {'success': True}
         return res
     except:
-        return Response({'logged_out': False, 'error': 'Error during logout'})
+        return Response({'success': False, 'error': 'Error during logout'})
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def is_authenticated(request):
-    return Response({'is_authenticated': True})
+    return Response({'success': True})

@@ -7,5 +7,5 @@ router = DefaultRouter()
 router.register(r'ratings', RatingViewSet, basename='rating')
 
 urlpatterns = [
-    path('/', include(router.urls)),
+    path('', include(router.urls)),
 ]

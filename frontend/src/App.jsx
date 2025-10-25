@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { login as apilogin, logout as apilogout, getUser, isAuthenticated, refresh_token } from "./API/api";
 
 import Navigation from "./components/layout/Navigation";
 import Landing from "./pages/Landing/Landing";
@@ -13,21 +14,62 @@ import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import Analytics from "./pages/Analytics/Analytics";
 
 function App() {
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  const login = () => {
-    const userData = { id: 1, name: "Jhon", is_admin: false };
-    setUser(userData);
+  const handleLogin = async (email, password) => {
+    try {
+      const success = await apilogin(email, password);
+      if (success) {
+        const userData = await getUser(); // ← Añade await aquí
+        setUser(userData);
+      }
+      console.log("success:", success);
+      return success;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
+    }
   };
 
-  const logout = () => {
+  const handleLogOut = async () => {
+    const success = await apilogout()
+    if (!success) {
+      console.log("Logout failed");
+      return false;
+    }
+    console.log("Logout successful");
     setUser(null);
+    return success;
+
   };
+
+useEffect(() => {
+  const initializeAuth = async () => {
+    try {
+      if (!(await isAuthenticated())) {
+        console.log("User is not authenticated, trying refresh")
+        if (!(await refresh_token())) {
+          console.log("Couldn't refresh")
+          return;
+        }
+      }
+      console.log("Authenticated successfully, fetching user")
+      const userData = await getUser();  // Añade await
+      setUser(userData);
+    } catch (error) {
+      console.error("Error initializing auth:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  initializeAuth();
+}, []);
 
   return (
     <BrowserRouter>
       <Toaster position="top-center" reverseOrder={false} />
-      <Navigation user={user} logout={logout} login={login} />
+      <Navigation user={user} logout={handleLogOut} />
       <Routes>
         <Route
           path="/"
@@ -49,12 +91,12 @@ function App() {
           path="/login"
           element={
             <>
-              <Login />
+              <Login login={handleLogin} />
             </>
           }
         />
         //Aqui van las rutas que solo dependen del usuario
-        <Route element={<ProtectedRoute isAllowed={!!user} />}>
+        <Route element={<ProtectedRoute isAllowed={!!user} loading={loading} />}>
           <Route
             path="/dashboard"
             element={
@@ -75,7 +117,11 @@ function App() {
         <Route
           path={"/analytics"}
           element={
-            <ProtectedRoute isAllowed={user ? user.is_admin : false} redirectTo="/dashboard">
+            <ProtectedRoute
+              isAllowed={user ? user.is_admin : false}
+              loading={loading}
+              redirectTo="/dashboard"
+            >
               <Analytics />
             </ProtectedRoute>
           }

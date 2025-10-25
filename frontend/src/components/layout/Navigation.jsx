@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
 
-export default function Navigation({ user, logout, login }) {
+export default function Navigation({ user, logout}) {
   const [temaOscuro, setTemaOscuro] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -74,7 +74,7 @@ export default function Navigation({ user, logout, login }) {
   }
 
   function LoggedOutControls() {
-    return <button onClick={login}>Login</button>;
+    return <Link to="/login" className="NavBarLoginButton">Iniciar Sesión</Link>;
   }
 
   return (
