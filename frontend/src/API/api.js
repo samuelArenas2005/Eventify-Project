@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './axiosConfig';
 
 const BASE_URL = 'http://127.0.0.1:8000/api/'
 const LOGIN_URL = `${BASE_URL}token/`
@@ -22,20 +22,6 @@ export const refresh_token = async () => {
 	}
 }
 
-export const call_refresh = async (error, func) => {
-	if (error.response && error.response.status === 401) {
-		const refreshed = await refresh_token();
-		if (refreshed) {
-			const retryResponse = await func();
-			return retryResponse.data;
-		} else {
-			console.log("Couldn't refresh the token, loging")
-			await logout()
-		}
-	}
-	return false;
-}
-
 export const logout = async () => {
 	try {
 		const response = await axios.post(LOGOUT_URL, {}, {
@@ -50,8 +36,8 @@ export const logout = async () => {
 
 export const isAuthenticated = async () => {
 	try {
-		const response = await axios.post(AUTH_CHECK_URL, { withCredentials: true });
-		return response.success;
+		const response = await axios.post(AUTH_CHECK_URL, {}, { withCredentials: true });
+		return response.data.success;
 	}
 	catch (error) {
 		console.error("Error checking authentication:", error);
@@ -64,27 +50,22 @@ PETICIONES NO RELACIONADAS A LA AUTENTICACION
 */
 
 export const getUser = async () => {
-	try {
-		const response = await axios.get(USER_URL, { withCredentials: true });
-		return response.data;
-	}
-	catch (error) {
-		console.error("Error fetching user data:", error);
-		return null;
-	}
+	const response = await axios.get(USER_URL, { withCredentials: true });
+	return response.data;
 }
 
-export const getEventRegisteredUser = () => {
-	return axios.get('http://127.0.0.1:8000/api/event/user/2/confirmed') 
+export const getEventRegisteredUser = (userId) => {
+	return axios.get(`http://127.0.0.1:8000/api/event/user/${userId}/confirmed`, { withCredentials: true });
 }
 
-export const getEventPendingUser = () => {
-	return axios.get('http://127.0.0.1:8000/api/event/user/2/pending') 
+export const getEventPendingUser = (userId) => {
+	return axios.get(`http://127.0.0.1:8000/api/event/user/${userId}/pending`, { withCredentials: true });
 }
 
-export const getEventCreatedUser = () => {
-	return axios.get('http://127.0.0.1:8000/api/event/by-creator/2') 
+export const getEventCreatedUser = (userId) => {
+	return axios.get(`http://127.0.0.1:8000/api/event/by-creator/${userId}`, { withCredentials: true });
 }
 
-
-export const createEvent = (data) => axios.post('http://127.0.0.1:8000/api/event/events/',data) //mi url va aca
+export const createEvent = (data) => {
+	return axios.post('http://127.0.0.1:8000/api/event/events/', data, { withCredentials: true });
+}

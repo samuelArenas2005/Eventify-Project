@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { login as apilogin, logout as apilogout, getUser, isAuthenticated, refresh_token } from "./API/api";
+import {
+  login as apilogin,
+  logout as apilogout,
+  getUser
+} from "./API/api";
 
 import Navigation from "./components/layout/Navigation";
 import Landing from "./pages/Landing/Landing";
@@ -33,7 +37,7 @@ function App() {
   };
 
   const handleLogOut = async () => {
-    const success = await apilogout()
+    const success = await apilogout();
     if (!success) {
       console.log("Logout failed");
       return false;
@@ -41,30 +45,21 @@ function App() {
     console.log("Logout successful");
     setUser(null);
     return success;
-
   };
 
-useEffect(() => {
-  const initializeAuth = async () => {
-    try {
-      if (!(await isAuthenticated())) {
-        console.log("User is not authenticated, trying refresh")
-        if (!(await refresh_token())) {
-          console.log("Couldn't refresh")
-          return;
-        }
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const userData = await getUser();
+        setUser(userData);
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+      } finally {
+        setLoading(false);
       }
-      console.log("Authenticated successfully, fetching user")
-      const userData = await getUser();  // Añade await
-      setUser(userData);
-    } catch (error) {
-      console.error("Error initializing auth:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  initializeAuth();
-}, []);
+    };
+    initializeAuth();
+  }, []);
 
   return (
     <BrowserRouter>
@@ -96,7 +91,9 @@ useEffect(() => {
           }
         />
         //Aqui van las rutas que solo dependen del usuario
-        <Route element={<ProtectedRoute isAllowed={!!user} loading={loading} />}>
+        <Route
+          element={<ProtectedRoute isAllowed={!!user} loading={loading} />}
+        >
           <Route
             path="/dashboard"
             element={
