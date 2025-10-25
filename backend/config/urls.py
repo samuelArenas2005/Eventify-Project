@@ -25,4 +25,5 @@ urlpatterns = [
     path('api/rating', include('apps.rating.urls')),
     path('api/user', include('apps.user.urls')),
     path('api/notification', include('apps.notification.urls')),
+    path('api/token', include('apps.base.urls'))
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  
