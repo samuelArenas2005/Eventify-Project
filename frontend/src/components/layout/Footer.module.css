@@ -1,0 +1,41 @@
+/* src/components/Footer/Footer.module.css */
+
+.footer {
+  /* Fija el footer en la parte inferior si es necesario. 
+     Asegúrate de que el componente principal tenga un min-height: 100vh; si quieres que esté siempre abajo. */
+  /* position: fixed; 
+     bottom: 0; 
+     left: 0;
+     width: 100%; */
+     
+  /* Estilos de espaciado y fondo */
+  padding: 1.5rem 1rem; /* Padding superior/inferior generoso */
+  background-color: var(--color-white); /* Usa el color de fondo de columnas/tarjetas */
+  border-top: 1px solid var(--color-border); /* Borde superior sutil */
+  
+  /* Centrado del contenido */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Sombra sutil para destacarlo del fondo (opcional) */
+  box-shadow: 0 -2px 5px var(--color-shadow);
+}
+
+.copyright {
+  /* Tipografía y color */
+  font-family: var(--font-base);
+  font-size: 0.875rem; /* Tamaño de fuente pequeño (14px) */
+  color: var(--text-secundary); /* Usa el color de texto secundario (gris) */
+  text-align: center;
+  margin: 0; /* Asegura que no haya márgenes adicionales */
+}
+
+/* Estilo opcional para el modo oscuro, aunque las variables se mapean automáticamente
+  en los estilos globales, aquí podríamos hacer ajustes específicos si fueran necesarios.
+*/
+/*
+body.modo-oscuro .footer {
+  // Ajustes específicos para el modo oscuro, si los necesitas
+}
+*/

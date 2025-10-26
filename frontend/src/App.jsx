@@ -9,6 +9,7 @@ import {
 } from "./API/api";
 
 import Navigation from "./components/layout/Navigation";
+import Footer from "./components/layout/Footer";
 import Landing from "./pages/Landing/Landing";
 import Login from "./pages/login";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -126,6 +127,7 @@ function App() {
           }
         />
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }

@@ -1,0 +1,229 @@
+/*.discover{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, #E11D9E, #0B72B9);
+    width: 100%;
+    margin-top: 32px;
+    padding: 16px 16px 24px 16px;
+    color: white;
+}
+body{
+    padding: 0;
+    margin: 0;
+}
+.explore-button{
+    all: unset;
+    cursor: pointer;
+    background-color: #0B72B9;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) ;
+    border-color: var(--fondo-menu);
+    border-style: solid;
+    color: var(--fondo-menu);
+    margin-bottom: 16px;
+}
+.explore-button:hover{
+    box-shadow: 0 20px 10px rgba(0, 0, 0, 0.1) ;
+    transform: scale(1, 1);
+}
+.create-button{
+    all: unset;
+    cursor: pointer;
+    background-color: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) ;
+    border-color: var(--fondo-menu);
+    border-style: solid;
+    color: var(--fondo-menu);
+    margin-bottom: 16px;
+}
+.create-button:hover{
+    box-shadow: 0 20px 10px rgba(0, 0, 0, 0.1) ;
+    transform: scale(1, 1);
+}
+.estadisticas{
+    margin-top: 24px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.eventos-mes{
+    border-radius: 8px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    height: 150px;
+    padding: 10px;
+}
+.personas-total{
+    border-radius: 8px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    height: 150px;
+    padding: 10px;
+}
+.calificacion{
+    border-radius: 8px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    height: 150px;
+    padding: 10px;
+}*/
+
+
+/*
+ * HomePage.module.css
+ * Estilos para la sección Hero de la Home
+ */
+
+/*
+ * HomePage.module.css
+ * Estilos para la sección Hero de la Home
+ */
+
+.heroContainer {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-image: var(--hero-bg-image);
+  background-size: cover;
+  background-position: center;
+  color: var(--color-white);
+}
+
+/*
+ * --- ¡AQUÍ ESTÁ EL CAMBIO! ---
+ * Este es el degradado semitransparente.
+ * Se coloca sobre la imagen de fondo pero debajo del contenido.
+ */
+.heroContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  
+  /* 1. Aplicamos el degradado con tus colores */
+  background: linear-gradient(
+    135deg, /* Un ángulo diagonal se ve bien */
+    var(--color-primary) 0%, 
+    var(--color-secondary) 100%
+  );
+  
+  /* 2. Hacemos el degradado semitransparente */
+  /* Ajusta este valor (0.0 a 1.0) como prefieras */
+  opacity: 0.75; 
+  
+  z-index: 1;
+}
+
+/*
+ * Contenedor para el texto y los botones
+ * (Todo lo demás sigue igual)
+ */
+.heroContent {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 700px;
+}
+
+.logoText {
+  font-family: var(--font-title);
+  font-size: clamp(3.5rem, 12vw, 5.5rem);
+  font-weight: 800;
+  color: var(--color-white);
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.sloganText {
+  font-family: var(--font-base);
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-weight: 400;
+  color: var(--color-white);
+  opacity: 0.95;
+  margin-bottom: 2.5rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.9rem 2.2rem;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-title);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* El botón primario ahora contrasta mejor con el fondo */
+.buttonPrimary {
+  /* Lo cambiamos a blanco para que resalte sobre el degradado de color */
+  background-color: var(--color-white);
+  color: var(--color-primary); /* Texto en color primario */
+}
+
+.buttonPrimary:hover {
+  background-color: #f4f4f4;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* El botón secundario ahora necesita un borde para verse */
+.buttonSecondary {
+  background-color: transparent; /* Transparente */
+  color: var(--color-white); /* Texto blanco */
+  border: 2px solid var(--color-white);
+}
+
+.buttonSecondary:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Ligero fondo blanco */
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.heroContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  
+  /* 1. Aplicamos el degradado que va de TUS COLORES a transparente */
+  background: linear-gradient(
+    to top, /* Dirección: de abajo hacia arriba */
+    /* Empieza abajo con el color primario (100% opaco) */
+    var(--color-primary) 0%, 
+    /* El segundo color (secundario) con un poco de transparencia a media altura */
+    var(--color-secondary) 40%, 
+    /* Transparente al 100% en la parte superior */
+    transparent 100%
+  );
+  z-index: 1;
+}

@@ -1,12 +1,32 @@
 // src/pages/Landing.jsx
 import React from "react";
-import "./Landing.css";
+import styles from "./Landing.module.css";
+import { Link } from "react-router-dom";
+
+const HERO_IMAGE_URL = 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg';
 
 function Landing() {
   return (
-    <div>
-      hola
-    </div>
+    <section 
+      className={styles.heroContainer} 
+      style={{ '--hero-bg-image': `url(${HERO_IMAGE_URL})` }}
+    >
+      {/* El div de contenido se centra sobre el fondo y el degradado */}
+      <div className={styles.heroContent}>
+        <h1 className={styles.logoText}>Eventify</h1>
+        <p className={styles.sloganText}>
+          Tu plataforma definitiva para crear y descubrir eventos.
+        </p>
+        <div className={styles.buttonContainer}>
+          <Link to="/createEvent" className={`${styles.button} ${styles.buttonPrimary}`}>
+            Crear Eventos
+          </Link>
+          <Link to="/SearchEvent" className={`${styles.button} ${styles.buttonSecondary}`}>
+            Buscar Eventos
+          </Link>
+        </div>
+      </div>
+    </section>
     /*{ <section style={{ textAlign: "center", marginTop: "50px" }}>
       <div className="discover">
         <h1 className="discover-title">Descubre y Crea Eventos Increíbles</h1>
