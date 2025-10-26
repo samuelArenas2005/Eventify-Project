@@ -16,6 +16,7 @@ import RegisterUser from "./pages/RegisterUser";
 import CreateEventPage from "./pages/CreateEvent/CreateEventPage";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import Analytics from "./pages/Analytics/Analytics";
+import NotFoundPage from "./pages/NotFound/NotFoundPage";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -90,6 +91,7 @@ function App() {
             </>
           }
         />
+        <Route path="*" element={<NotFoundPage />} />
         //Aqui van las rutas que solo dependen del usuario
         <Route
           element={<ProtectedRoute isAllowed={!!user} loading={loading} />}

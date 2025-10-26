@@ -119,7 +119,7 @@ const navigate = useNavigate();
                 background: `url(${backgroundImage})`,
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
-                backgroundSize: 'cover'
+                backgroundSize: 'cover',
             }}
         >
             <Box
@@ -129,12 +129,14 @@ const navigate = useNavigate();
                     boxShadow: '0 5px 32px 5px rgba(11, 115, 185, 0.27), 0 1.5px 5px 0px rgba(194, 70, 180, 0.32)',
                     backdropFilter: 'blur(8px)',
                     p: 5,
-                    minWidth: 300,
-                    maxWidth: 450,
+                    minWidth: 450,
+                    maxWidth: 600,
                     width: '90%',
                     marginRight: '2rem',
                     marginY: 'auto',
                     alignSelf: 'center',
+                    marginTop: 5,
+                    marginBottom: 10,
                 }}
             >
                 <form onSubmit={handleSubmit(onSubmit)}>
