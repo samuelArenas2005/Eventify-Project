@@ -33,6 +33,7 @@ const EventCard = ({
   const categoryColors = {
     'Tecnología': 'rgba(61, 23, 80, 0.56)',
     'IA': 'rgba(23, 61, 80, 0.56)',
+    'DEPORTIVO': 'rgba(23, 80, 61, 0.56)',
   };
 
   const getCategoryStyle = (categoryName) => ({

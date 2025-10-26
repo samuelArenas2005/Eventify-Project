@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 
 class Category(models.Model):
+
     
     CATEGORY_CHOICES = [
         ('ACADEMICO', 'Academico'),
@@ -28,11 +29,16 @@ class Category(models.Model):
         return self.category
 
 class Event(models.Model):
+    ACTIVE = 'ACTIVE'
+    CANCELLED = 'CANCELLED'
+    FINISHED = 'FINISHED'
+    DRAFT = 'DRAFT'
+
     STATUS_CHOICES = [
-        ('ACTIVE', 'Active'),
-        ('CANCELLED', 'Cancelled'),
-        ('FINISHED', 'Finished'),
-        ('DRAFT', 'Draft')
+        (ACTIVE, 'Active'),
+        (CANCELLED, 'Cancelled'),
+        (FINISHED, 'Finished'),
+        (DRAFT, 'Draft')
     ]
 
     title = models.CharField(

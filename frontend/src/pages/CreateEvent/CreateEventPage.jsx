@@ -1,12 +1,11 @@
-import React from 'react';
-import styles from './CreateEventPage.module.css';
+import React from 'react'
+import EventDashboard from '../../components/UI/EventCreate/EventForm'
+
 
 const CreateEventPage = () => {
   return (
-    <div className={styles.contenedor}>
-      Hola crack
-    </div>
-  );
-};
+    <EventDashboard />
+  )
+}
 
 export default CreateEventPage;

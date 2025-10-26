@@ -21,4 +21,5 @@ urlpatterns = [
          PendingAttendeesByUserList.as_view(),
          name='pending-attendees-by-user'),
     path('/by-creator/<int:user_id>', EventsByCreatorList.as_view(), name='events-by-creator'),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

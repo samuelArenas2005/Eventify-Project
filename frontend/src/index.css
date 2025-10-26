@@ -1,44 +1,93 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700;800;900&display=swap');
 
 
-body {
-  font-family: 'Montserrat', Arial, sans-serif;
-  background: transparent;
-  margin: 0;
-  padding: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-smooth: always;
-
-}
-
-
-
+/* --- Light Mode Variables (Default) --- */
 :root {
   /* fuentes */
-  --font-title: 'Poppins';
-  --font-base: 'Montserrat';
+  --font-title: 'Poppins', sans-serif;
+  --font-base: 'Montserrat', sans-serif;
 
-  /* los colores de la paleta 3 que elegimos y los colores para las advertencias*/
+  /* Colores del Dashboard (Base) */
   --color-primary: #0B72B9;
   --color-secondary: #E11D9E;
+  --color-tertiary: #00C2B3;
   --color-success: #16A34A;
   --color-warning: #F59E0B;
   --color-danger: #DC2626;
   --color-info: #00C2B3;
 
-  --text-primary: #111827;
-  --text-secundary: #6B7280;
-
+  /* Colores de Fondo y Texto */
+  --text-primary: #111827; /* Negro/Gris Oscuro */
+  --text-secundary: #6B7280; /* Gris */
+  --color-white: #fff; /* Fondo de columnas */
+  --color-bg: #f5f8ff; /* Fondo de la página */
+  --color-border: #D1D5DB; /* Borde de inputs (Gris claro) */
+  --color-light-bg: #fafcff; /* Fondo de dropZone */
+  --color-shadow: rgba(0, 0, 0, 0.05); /* Sombra clara */
   
   --color-placeholder: #9CA3AF;
-  --color-bg: #f5f8ff;
-  --color-white: #fff;
   --color-black: #000;
 
-  
+  /* Dimensiones */
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
   --border-radius-lg: 16px;
   --input-height: 44px;
+}
+
+
+/* --- Dark Mode Variables (Mapeo) --- */
+body.modo-oscuro {
+  /* Colores de fondo y texto generales del tema oscuro */
+  --dark-bg-level-1: #0f172a; /* Fondo principal (Tu --fondo-nav) */
+  --dark-bg-level-2: #1e293b; /* Fondo de tarjetas/contenedores (Tu --fondo-menu) */
+  --dark-text-light: #f8fafc; /* Texto principal (Tu color body) */
+  --dark-text-secondary: #94a3b8; /* Texto secundario/Placeholder */
+  --dark-border: #334155; /* Borde y hover (Tu --hover-menu) */
+  
+  /* Mapeo de variables usadas en EventDashboard.module.css */
+  --color-bg: var(--dark-bg-level-1);
+  --color-white: var(--dark-bg-level-2);
+  --text-primary: var(--dark-text-light);
+  --text-secundary: var(--dark-text-secondary);
+  --color-placeholder: var(--dark-text-secondary);
+  --color-border: var(--dark-border);
+  --color-light-bg: var(--dark-border);
+  --color-shadow: rgba(0, 0, 0, 0.3); /* Sombra más oscura */
+}
+
+
+/* --- Reseteo Básico --- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-base);
+  background-color: var(--color-bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Asegura que html y body ocupen todo y 
+  NO tengan scroll propio.
+*/
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+/* ¡ESTA ES LA REGLA CLAVE! */
+body {
+  font-family: var(--font-base);
+  background-color: var(--color-bg);
+  color: var(--text-primary);
 }

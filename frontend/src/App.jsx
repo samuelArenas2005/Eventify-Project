@@ -54,8 +54,8 @@ function App() {
           path="/createEvent"
           element={
             <>
-               <Navigation />
-              <CreateEventPage />
+                <Navigation />
+                <CreateEventPage />
             </>
           }
         />

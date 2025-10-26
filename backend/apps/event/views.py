@@ -143,10 +143,13 @@ class ConfirmedAttendeesByUserList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user__id=user_id, status='CONFIRMED')
+            .filter(
+                user__id=user_id,
+                status='CONFIRMED',
+                event__status=Event.ACTIVE  # usa Event.ACTIVE o 'ACTIVE'
+            )
         )
-        
-        
+
 class PendingAttendeesByUserList(generics.ListAPIView):
     serializer_class = EventAttendeeSerializer
     permission_classes = [permissions.AllowAny]  # para pruebas
@@ -159,7 +162,11 @@ class PendingAttendeesByUserList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user__id=user_id, status='PENDING')
+            .filter(
+                user__id=user_id,
+                status='PENDING',
+                event__status=Event.ACTIVE  # usa Event.ACTIVE o 'ACTIVE'
+            )
         )
         
 class EventsByCreatorList(generics.ListAPIView):

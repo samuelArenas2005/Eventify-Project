@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
+import { Moon, Sun } from 'lucide-react';
 
 export default function Navigation() {
   const [temaOscuro, setTemaOscuro] = useState(false);
@@ -34,29 +35,17 @@ export default function Navigation() {
         {/* Modo claro/oscuro */}
         <div className="IconoTema" onClick={toggleTema}>
           {temaOscuro ? (
-            <i className="fa-regular fa-sun"></i>
+            <Moon className="icon"></Moon>
           ) : (
-            <i className="fa-regular fa-moon"></i>
+            <Sun className="icon"></Sun>
           )}
-        </div>
-
-        {/* Notificaciones */}
-        <div className="notificaciones">
-          <i className="fa-regular fa-bell"></i>
-          <span className="badge">3</span>
-        </div>
-
-        {/* Perfil */}
-        <div className="perfil">
-          <i className="fa-solid fa-circle-user"></i>
         </div>
 
         {/* Menú hamburguesa */}
         <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
           {!menuOpen ? (
             <div>
-            <i className="fa-solid fa-bars"></i>
-            
+              <i className="fa-solid fa-bars"></i>
             </div>
           ) : (
             <i className="fa-solid fa-square-xmark fa-spin"></i>
@@ -67,11 +56,33 @@ export default function Navigation() {
       {/* Menú desplegable */}
       {menuOpen && (
         <ul className="menuLinks">
-          <li>Inicio</li>
-          <li>Eventos</li>
-          <li>Calendario</li>
-          <li>Dashboard</li>
-          <li>Crear Evento</li>
+          <li>
+            <Link to="/">Inicio</Link>
+          </li>
+          <li>
+            <Link style={{
+              pointerEvents: "none",
+              color: "gray",
+              textDecoration: "none",
+              cursor: "not-allowed"
+            }}
+              to="/eventos">Eventos</Link>
+          </li>
+          <li>
+            <Link
+              style={{
+                pointerEvents: "none",
+                color: "gray",
+                textDecoration: "none",
+                cursor: "not-allowed"
+              }} to="/calendario">Calendario</Link>
+          </li>
+          <li>
+            <Link to="/dashboard">Dashboard</Link>
+          </li>
+          <li>
+            <Link to="/createEvent">Crear Evento</Link>
+          </li>
         </ul>
       )}
     </nav>

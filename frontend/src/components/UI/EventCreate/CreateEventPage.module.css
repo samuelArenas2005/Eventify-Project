@@ -1,0 +1,377 @@
+/* EventDashboard.module.css */
+
+/* Contenedor principal del Dashboard */
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-bg); /* Se adapta */
+  
+}
+
+
+/* Encabezado */
+.title { /* Cambié .title a .header para mantener la coherencia del código anterior */
+  padding: 1rem 0;
+  background-color: var(--color-white); /* Se adapta */
+  border-bottom: 1px solid var(--color-border); /* Usa borde mapeado */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  transition: background-color 0.3s, border-color 0.3s;
+  margin-bottom: 1rem;
+}
+
+/* Contenido principal con scroll */
+.mainContent {
+  flex-grow: 1;
+  padding: 2rem;
+  overflow:visible;
+  margin-bottom: 1rem;
+}
+
+/* Animación Soft */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.softAnimation {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Grid del formulario */
+.formGrid {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr;
+  gap: 2rem;
+}
+
+/* Columnas */
+.formColumn,
+.imageColumn {
+  background-color: var(--color-white); /* Se adapta */
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  box-shadow: 0 4px 12px var(--color-shadow); /* Se adapta */
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.columnTitle {
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary); /* Se adapta */
+}
+
+/* Grupo de formulario (label + input + error) */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary); /* Se adapta */
+}
+
+.label svg {
+  color: var(--color-primary);
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  height: var(--input-height);
+  padding: 0 0.75rem;
+  border: 1px solid var(--color-border); /* Usa borde mapeado */
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-base);
+  font-size: 0.95rem;
+  background-color: var(--color-white); /* Fondo del input (importante para modo oscuro) */
+  color: var(--text-primary); /* Color del texto dentro del input */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-placeholder); /* Se adapta */
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(11, 114, 185, 0.2);
+}
+
+.textarea {
+  height: auto;
+  min-height: 120px;
+  padding-top: 0.75rem;
+  resize: vertical;
+}
+
+/* Grid para campos dobles (fechas, capacidad/categoría) */
+.formGridGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Mensaje de error */
+.errorMessage {
+  color: var(--color-danger);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* --- Columna de Imágenes --- */
+
+/* Zona de carga */
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border: 2px dashed var(--color-primary);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-light-bg); /* Se adapta */
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dropZone:hover {
+  background-color: var(--color-border); /* Un tono ligeramente diferente al mapeado */
+}
+
+.dropZoneIcon {
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.dropZoneText {
+  font-size: 0.9rem;
+  color: var(--text-secundary); /* Se adapta */
+}
+
+.dropZoneText span {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.fileInput {
+  display: none;
+}
+
+/* Contenedor de previsualización */
+.imagePreviewContainer {
+  margin-top: 1.5rem;
+}
+
+.previewTitle {
+  font-family: var(--font-title);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-secundary); /* Se adapta */
+}
+
+/* Imagen principal */
+.mainImagePreview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-border); /* Color neutro para placeholder */
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--color-shadow); /* Se adapta */
+}
+
+.mainImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mainImagePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-placeholder); /* Se adapta */
+}
+
+.mainImageTag {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Grilla de thumbnails */
+.thumbnailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.75rem;
+}
+
+.thumbnail {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.thumbnail:hover {
+  transform: scale(1.05);
+}
+
+.thumbnail.active {
+  border-color: var(--color-primary);
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Botones sobre el thumbnail */
+.thumbnailActions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Usa un color sólido con opacidad para que se vea bien en ambos modos */
+  background-color: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.thumbnail:hover .thumbnailActions {
+  opacity: 1;
+}
+
+.actionButton {
+  /* Fondo blanco o muy claro en ambos modos */
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.actionButton:hover {
+  background: var(--color-white);
+  transform: scale(1.1);
+}
+
+.actionButton.delete {
+  color: var(--color-danger);
+}
+
+.actionButton.star {
+  color: var(--color-warning);
+}
+
+/* Botón de envío */
+.submitButton {
+  /* No necesita cambios, usa colores primarios y secundarios */
+  width: 100%;
+  height: var(--input-height);
+  padding: 0 1.5rem;
+  border: none;
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  color: var(--color-white);
+  font-family: var(--font-title);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 1rem;
+}
+
+.submitButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(11, 114, 185, 0.3);
+}
+
+.submitButton:disabled {
+  /* Usar un color neutro que se vea bien en oscuro también */
+  background: var(--color-border);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 1024px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .imageColumn {
+    grid-row: 1;
+  }
+
+  .formColumn {
+    grid-row: 2;
+  }
+
+  .mainContent {
+    padding: 1rem;
+    overflow: visible;  
+  }
+}
+
+
+

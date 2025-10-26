@@ -207,6 +207,7 @@ export const getPendingEvents = async () => {
   try {
     // Llamada al backend
     const events = await getEventPendingUser();
+    console.log(events)
 
     const formattedFromApi = events.data.map((events, index) => ({
       id: events.event.id || index,
