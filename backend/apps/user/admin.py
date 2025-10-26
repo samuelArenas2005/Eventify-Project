@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User
 
+
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     list_display = ('email', 'username', 'name', 'last_name', 'rol', 'is_active', 'is_staff','is_admin')
@@ -28,3 +29,4 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('email', 'username', 'name', 'last_name', 'rol', 'password1', 'password2', 'codigo', 'cedula', 'avatar'),
         }),
     )
+    

@@ -173,3 +173,4 @@ class EventsByCreatorList(generics.ListAPIView):
         user = self.request.user
         qs = Event.objects.filter(creator=user).order_by('-start_date')
         return qs
+

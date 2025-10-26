@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
-import { Moon, Sun, User, Bell  } from 'lucide-react';
+import { Moon, Sun, User, Bell } from 'lucide-react';
 
 export default function Navigation({ user, logout }) {
   const [temaOscuro, setTemaOscuro] = useState(false);
@@ -21,50 +21,41 @@ export default function Navigation({ user, logout }) {
     return (
       <>
         {/* Sección de íconos */}
-          {/* Menú hamburguesa */}
-          <Bell className="iconoNotificaciones" />
-          <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
-            {!menuOpen ? (
-              <div>
-                <i className="fa-solid fa-bars"></i>
-              </div>
-            ) : (
-              <i className="fa-solid fa-square-xmark fa-spin"></i>
-            )}
-          </div>
+        {/* Menú hamburguesa */}
+        <Bell className="iconoNotificaciones" />
+        <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
+          {!menuOpen ? (
+            <div>
+              <i className="fa-solid fa-bars"></i>
+            </div>
+          ) : (
+            <i className="fa-solid fa-square-xmark fa-spin"></i>
+          )}
+        </div>
 
         {/* Menú desplegable */}
         {menuOpen && (
           <ul className="menuLinks">
             <li>
-              <Link to="/">Inicio</Link>
+              <Link onClick={toggleMenuHamburguesa} to="/">Inicio</Link>
             </li>
             <li>
-              <Link style={{
-                pointerEvents: "none",
-                color: "gray",
-                textDecoration: "none",
-                cursor: "not-allowed"
-              }}
-                to="/eventos">Eventos</Link>
+              <Link onClick={toggleMenuHamburguesa} to="/eventos">Eventos</Link>
             </li>
             <li>
-              <Link
-                style={{
-                  pointerEvents: "none",
-                  color: "gray",
-                  textDecoration: "none",
-                  cursor: "not-allowed"
-                }} to="/calendario">Calendario</Link>
+              <Link onClick={toggleMenuHamburguesa} to="/calendario">Calendario</Link>
             </li>
             <li>
-              <Link to="/dashboard">Dashboard</Link>
+              <Link onClick={toggleMenuHamburguesa} to="/dashboard">Dashboard</Link>
             </li>
             <li>
-              <Link to="/createEvent">Crear Evento</Link>
+              <Link onClick={toggleMenuHamburguesa} to="/createEvent">Crear Evento</Link>
             </li>
             <li>
-              <Link onClick={logout}>Cerrar Sesión</Link>
+              <Link onClick={(e) => {
+                logout();
+                toggleMenuHamburguesa();
+              }}>Cerrar Sesión</Link>
             </li>
           </ul>
         )}
@@ -93,7 +84,7 @@ export default function Navigation({ user, logout }) {
         {user ? <LoggedInControls /> : <LoggedOutControls />}
       </div>
 
-      
+
     </nav>
   );
 
