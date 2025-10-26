@@ -173,3 +173,39 @@ class EventsByCreatorList(generics.ListAPIView):
         user = self.request.user
         qs = Event.objects.filter(creator=user).order_by('-start_date')
         return qs
+    
+
+class ActiveEventsList(generics.ListAPIView):
+    """
+    /api/event/active/ -> eventos con status ACTIVE, permisos AllowAny,
+    y si el usuario está autenticado excluye los eventos cuyo creador sea el mismo usuario.
+    """
+    serializer_class = EventListSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = (
+            Event.objects
+                 .filter(status=Event.ACTIVE)
+                 .select_related('creator')
+                 .prefetch_related(
+                     'categories',
+                     'images',
+                     Prefetch(
+                         'eventattendee_set',
+                         queryset=EventAttendee.objects.select_related('user')
+                     )
+                 )
+                 .annotate(attendees_count=Count('attendees'))
+                 .order_by('-start_date')
+        )
+
+        # Si el usuario está autenticado, excluimos los eventos que él creó
+        if user and user.is_authenticated:
+            qs = qs.exclude(creator=user)
+
+        return qs
+    
+
+
