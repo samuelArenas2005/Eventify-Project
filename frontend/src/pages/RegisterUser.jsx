@@ -11,6 +11,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import backgroundImage from '../assets/register_background.png'; // Add this import at the top
+import { useNavigate } from 'react-router-dom';
 import { 
     User2, 
     Phone, 
@@ -30,6 +31,7 @@ const roles = [
     { value: 'Externo', label: 'Externo' },
 ];
 const RegisterUser = () => {
+const navigate = useNavigate();
 
     const { register, handleSubmit, reset, setValue, control, watch, formState: { errors } } = useForm();
     const rol = watch('rol');
@@ -104,7 +106,7 @@ const RegisterUser = () => {
         // aqui imprimo todo en la consola, denle inspeccionar para ver el registro exitoso
         console.log('Datos recibidos:', data);
         toast.success('¡Registro exitoso!');
-        reset();
+        navigate('/login');
     };
 
     return (
@@ -206,7 +208,22 @@ const RegisterUser = () => {
                                 }}
                             />
                         </Stack>
-
+                                <TextField
+                                label="Nombre de usuario"
+                                fullWidth
+                                {...register('nombre de usuario', { required: true })}
+                                error={!!errors.apellido}
+                                helperText={errors.apellido ? 'Este campo no puede estar vacío' : ''}
+                                InputProps={{
+                                    startAdornment: <User2 size={20} style={{ marginRight: '8px', color: '#666' }} />,
+                                }}
+                                sx={{
+                                    '& .MuiInputBase-input::placeholder': {
+                                        color: 'var(--color-placeholder)',
+                                        opacity: 1,
+                                    }
+                                }}
+                            />
                         <Stack direction="row" spacing={2}>
                             <FormControl fullWidth error={!!errors.rol}>
                                 <InputLabel id="rol-label">Rol</InputLabel>

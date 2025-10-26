@@ -13,11 +13,11 @@ router.register(r'events', EventViewSet, basename='event')
 router.register(r'attendees', EventAttendeeViewSet, basename='eventattendee')
 
 urlpatterns = [
-    path('/', include(router.urls)),
-    path('/user/<int:user_id>/confirmed',
+    path('', include(router.urls)),
+    path('user/<int:user_id>/confirmed/',
          ConfirmedAttendeesByUserList.as_view(),
          name='confirmed-attendees-by-user'),
-    path('/user/<int:user_id>/pending',
+    path('user/<int:user_id>/pending/',
          PendingAttendeesByUserList.as_view(),
          name='pending-attendees-by-user'),
     path('/by-creator/<int:user_id>', EventsByCreatorList.as_view(), name='events-by-creator'),

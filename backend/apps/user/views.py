@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import User
@@ -16,8 +16,10 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         if self.action == 'create':
             permission_classes = [AllowAny]
+        elif self.action == 'me':
+            permission_classes = [IsAuthenticated]  # Solo autenticado para obtener su usuario
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsAuthenticated, IsAdminUser]  # Requiere auth + staff para otras (ej. list)
         return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
@@ -27,5 +29,13 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return UserRegistrationSerializer
         return UserSerializer
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        """
+        Devuelve el usuario autenticado actual.
+        """
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
 
 

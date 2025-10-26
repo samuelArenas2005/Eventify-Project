@@ -7,5 +7,5 @@ router.register(r'notifications', NotificationViewSet)
 router.register(r'user-notifications', UserNotificationViewSet, basename='user-notification')
 
 urlpatterns = [
-    path('/', include(router.urls)),
+    path('', include(router.urls)),
 ]

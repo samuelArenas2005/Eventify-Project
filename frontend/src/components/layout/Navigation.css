@@ -116,6 +116,24 @@ body.modo-oscuro {
   background-color: var(--hover-menu);
 }
 
+.NavBarLoginButton{
+  font-family: poppins, sans-serif;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  text-decoration: none;
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+
+.NavBarLoginButton:hover {
+  box-shadow: 0 4px 25px rgba(138, 99, 244, 0.3);
+  background: var(--color-primary);
+  transform: scale(1.05);
+}
+
 /* Animación de entrada */
 @keyframes slideDown {
   from {
