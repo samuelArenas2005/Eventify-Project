@@ -133,7 +133,7 @@ class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ConfirmedAttendeesByUserList(generics.ListAPIView):
     serializer_class = EventAttendeeSerializer
-    permission_classes = [permissions.AllowAny]  # para pruebas
+    permission_classes = [permissions.IsAuthenticated]  # para pruebas
 
     def get_queryset(self):
         user_id = self.kwargs.get('user_id')
@@ -152,7 +152,7 @@ class ConfirmedAttendeesByUserList(generics.ListAPIView):
 
 class PendingAttendeesByUserList(generics.ListAPIView):
     serializer_class = EventAttendeeSerializer
-    permission_classes = [permissions.AllowAny]  # para pruebas
+    permission_classes = [permissions.IsAuthenticated]  # para pruebas
 
     def get_queryset(self):
         user_id = self.kwargs.get('user_id')
@@ -175,7 +175,7 @@ class EventsByCreatorList(generics.ListAPIView):
     URL ejemplo: /api/events/by-creator/3/
     """
     serializer_class = EventListSerializer
-    permission_classes = [permissions.AllowAny]  # Cambia a IsAuthenticated si lo necesitas
+    permission_classes = [permissions.IsAuthenticated]  # Cambia a IsAuthenticated si lo necesitas
 
     def get_queryset(self):
         user_id = self.kwargs.get('user_id')

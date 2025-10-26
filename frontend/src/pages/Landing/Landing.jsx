@@ -4,7 +4,10 @@ import "./Landing.css";
 
 function Landing() {
   return (
-    <section style={{ textAlign: "center", marginTop: "50px" }}>
+    <div>
+      hola
+    </div>
+    /*{ <section style={{ textAlign: "center", marginTop: "50px" }}>
       <div className="discover">
         <h1 className="discover-title">Descubre y Crea Eventos Increíbles</h1>
         <p>
@@ -37,7 +40,7 @@ function Landing() {
 
       <h1>Hello world</h1>
       <p>Bienvenido a Eventify 🎉</p>
-    </section>
+    </section> }*/
   );
 }
 

@@ -18,64 +18,56 @@ export default function Navigation({ user, logout }) {
   function LoggedInControls() {
     return (
       <>
-          {/* Sección de íconos */}
-          <div className="NavIcons">
-            {/* Modo claro/oscuro */}
-            <div className="IconoTema" onClick={toggleTema}>
-              {temaOscuro ? (
-                <Moon className="icon"></Moon>
-              ) : (
-                <Sun className="icon"></Sun>
-              )}
-            </div>
+        {/* Sección de íconos */}
+        <div className="NavIcons">
 
-            {/* Menú hamburguesa */}
-            <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
-              {!menuOpen ? (
-                <div>
-                  <i className="fa-solid fa-bars"></i>
-                </div>
-              ) : (
-                <i className="fa-solid fa-square-xmark fa-spin"></i>
-              )}
-            </div>
+          {/* Menú hamburguesa */}
+          <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
+            {!menuOpen ? (
+              <div>
+                <i className="fa-solid fa-bars"></i>
+              </div>
+            ) : (
+              <i className="fa-solid fa-square-xmark fa-spin"></i>
+            )}
           </div>
+        </div>
 
-          {/* Menú desplegable */}
-          {menuOpen && (
-            <ul className="menuLinks">
-              <li>
-                <Link to="/">Inicio</Link>
-              </li>
-              <li>
-                <Link style={{
+        {/* Menú desplegable */}
+        {menuOpen && (
+          <ul className="menuLinks">
+            <li>
+              <Link to="/">Inicio</Link>
+            </li>
+            <li>
+              <Link style={{
+                pointerEvents: "none",
+                color: "gray",
+                textDecoration: "none",
+                cursor: "not-allowed"
+              }}
+                to="/eventos">Eventos</Link>
+            </li>
+            <li>
+              <Link
+                style={{
                   pointerEvents: "none",
                   color: "gray",
                   textDecoration: "none",
                   cursor: "not-allowed"
-                }}
-                  to="/eventos">Eventos</Link>
-              </li>
-              <li>
-                <Link
-                  style={{
-                    pointerEvents: "none",
-                    color: "gray",
-                    textDecoration: "none",
-                    cursor: "not-allowed"
-                  }} to="/calendario">Calendario</Link>
-              </li>
-              <li>
-                <Link to="/dashboard">Dashboard</Link>
-              </li>
-              <li>
-                <Link to="/createEvent">Crear Evento</Link>
-              </li>
-              <li>
-                <Link onClick={logout}>Cerrar Sesión</Link>
-              </li>
-            </ul>
-          )}
+                }} to="/calendario">Calendario</Link>
+            </li>
+            <li>
+              <Link to="/dashboard">Dashboard</Link>
+            </li>
+            <li>
+              <Link to="/createEvent">Crear Evento</Link>
+            </li>
+            <li>
+              <Link onClick={logout}>Cerrar Sesión</Link>
+            </li>
+          </ul>
+        )}
       </>
     );
   }
@@ -90,8 +82,20 @@ export default function Navigation({ user, logout }) {
         <div className="NavBarLogo">Eventify</div>
       </Link>
 
+      <div className="NavIcons">
+        <div className="IconoTema" onClick={toggleTema}>
+          {temaOscuro ? (
+            <Moon className="icon"></Moon>
+          ) : (
+            <Sun className="icon"></Sun>
+          )}
+        </div>
+      </div>
+      {/* Modo claro/oscuro */}
+
+
       {user ? <LoggedInControls /> : <LoggedOutControls />}
     </nav>
   );
-   
+
 }
