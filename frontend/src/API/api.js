@@ -54,16 +54,16 @@ export const getUser = async () => {
 	return response.data;
 }
 
-export const getEventRegisteredUser = (userId) => {
-	return axios.get(`http://127.0.0.1:8000/api/event/user/${userId}/confirmed`, { withCredentials: true });
+export const getEventRegisteredUser = () => {
+  return axios.get(`${BASE_URL}event/confirmed/`, { withCredentials: true });
 }
 
-export const getEventPendingUser = (userId) => {
-	return axios.get(`http://127.0.0.1:8000/api/event/user/${userId}/pending`, { withCredentials: true });
+export const getEventPendingUser = () => {
+  return axios.get(`${BASE_URL}event/pending/`, { withCredentials: true });
 }
 
-export const getEventCreatedUser = (userId) => {
-	return axios.get(`http://127.0.0.1:8000/api/event/by-creator/${userId}`, { withCredentials: true });
+export const getEventCreatedUser = () => {
+  return axios.get(`${BASE_URL}event/created/`, { withCredentials: true });
 }
 
 export const createEvent = (data) => {

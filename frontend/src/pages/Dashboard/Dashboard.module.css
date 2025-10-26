@@ -62,6 +62,31 @@
   gap: 1rem;
   flex-shrink: 0;
 }
+
+.profileAvatar {
+  width: 72px; /* Aumenta el tamaño del avatar */
+  height: 72px; /* Debe coincidir con el ancho */
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  
+  /* Borde más sutil, enfocado en el brillo o el destaque */
+  border: 3px solid #f0f0f0; /* Borde más grueso y claro */
+  
+  /* Sombra del avatar más pronunciada y centrada en el elemento */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  
+  /* Transición más suave y con efecto de elevación */
+  transition: transform .2s ease-out, box-shadow .2s ease-out;
+  cursor: pointer;
+}
+
+/* Efecto hover: lo hacemos "flotar" y aumentamos la sombra */
+.profileAvatar:hover {
+  transform: translateY(-2px) scale(1.04); /* Subir un poco y escalar ligeramente */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Sombra más fuerte para la elevación */
+}
+
 .actionButton {
   display: flex;
   align-items: center;
@@ -257,3 +282,4 @@
   gap: 2rem; /* Espacio entre tarjetas, horizontal y vertical */
   /* ¡Ya no hay 'justify-content' que las estire! */
 }
+

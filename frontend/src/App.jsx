@@ -101,7 +101,7 @@ function App() {
             path="/dashboard"
             element={
               <>
-                <Dashboard />
+                <Dashboard user = {user}/>
               </>
             }
           />
@@ -127,7 +127,6 @@ function App() {
           }
         />
       </Routes>
-      <Footer />
     </BrowserRouter>
   );
 }

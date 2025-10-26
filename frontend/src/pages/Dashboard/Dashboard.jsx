@@ -8,17 +8,21 @@ import { getRegisteredEvents,getPendingEvents,getCreatedEvent } from './GetEvent
 const historyData = [];
 
 // --- Componente Principal ---
-const UserProfileDashboard = () => {
+const UserProfileDashboard = ({user}) => {
   const [activeTab, setActiveTab] = useState('registrados');
   const [loading, setLoading] = useState(true);
   const [registeredEventsData, setregisteredEventsData] = useState([])
   const [pendingEventData, setpendingEventData] = useState([])
   const [myEventsData, setMyEventsData] = useState([])
 
+  const FullName = user ? `${user.name} ${user.last_name}` : 'Usuario';
+  const initials = user ? `${user.name.charAt(0)}${user.last_name.charAt(0)}` : 'UU';
+
   const handleFilterClick = () => {
     alert('Abrir modal de filtros');
   };
 
+  console.log(user);
   
 
   useEffect(() => {
@@ -107,13 +111,15 @@ const UserProfileDashboard = () => {
     <div className={styles.dashboardContainer}>
       {/* --- Sección de Perfil (Sin cambios) --- */}
       <header className={styles.profileHeader}>
-        <div className={styles.profileInitials}>JP</div>
+        {(user.avatar ? 
+        <img src={user.avatar} alt="Avatar" className={styles.profileAvatar} /> :
+        <div className={styles.profileInitials}>{initials}</div>)}
         <div className={styles.profileInfo}>
-          <h1>Juan Pérez</h1>
-          <p>juan.perez@universidad.edu.co</p>
+          <h1>{FullName}</h1>
+          <p>{user.email}</p>
           <div className={styles.profileTags}>
-            <span>Ingeniería de Sistemas</span>
-            <span>8vo Semestre</span>
+            <span>{user.rol}</span>
+            <span>{user.codigo}</span>
           </div>
         </div>
         <div className={styles.profileActions}>

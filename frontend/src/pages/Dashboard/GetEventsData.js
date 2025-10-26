@@ -272,6 +272,8 @@ export const getCreatedEvent = async () => {
 };
 
 
+
+
 /*  const map = new Map();
     registeredEventsDataObjet.forEach((e) => map.set(e.id, e));
     formattedFromApi.forEach((e) => map.set(e.id, e));

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, User, Bell  } from 'lucide-react';
 
 export default function Navigation({ user, logout }) {
   const [temaOscuro, setTemaOscuro] = useState(false);
@@ -15,13 +15,14 @@ export default function Navigation({ user, logout }) {
     else document.body.classList.remove("modo-oscuro");
   }, [temaOscuro]);
 
+  console.log(user)
+
   function LoggedInControls() {
     return (
       <>
         {/* Sección de íconos */}
-        <div className="NavIcons">
-
           {/* Menú hamburguesa */}
+          <Bell className="iconoNotificaciones" />
           <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
             {!menuOpen ? (
               <div>
@@ -31,7 +32,6 @@ export default function Navigation({ user, logout }) {
               <i className="fa-solid fa-square-xmark fa-spin"></i>
             )}
           </div>
-        </div>
 
         {/* Menú desplegable */}
         {menuOpen && (
@@ -90,11 +90,10 @@ export default function Navigation({ user, logout }) {
             <Sun className="icon"></Sun>
           )}
         </div>
+        {user ? <LoggedInControls /> : <LoggedOutControls />}
       </div>
-      {/* Modo claro/oscuro */}
 
-
-      {user ? <LoggedInControls /> : <LoggedOutControls />}
+      
     </nav>
   );
 

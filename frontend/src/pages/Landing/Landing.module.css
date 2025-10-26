@@ -1,4 +1,4 @@
-/*.discover{
+.discover{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -13,7 +13,7 @@ body{
     padding: 0;
     margin: 0;
 }
-.explore-button{
+.exploreButton{
     all: unset;
     cursor: pointer;
     background-color: #0B72B9;
@@ -25,11 +25,11 @@ body{
     color: var(--fondo-menu);
     margin-bottom: 16px;
 }
-.explore-button:hover{
+.exploreButton:hover{
     box-shadow: 0 20px 10px rgba(0, 0, 0, 0.1) ;
     transform: scale(1, 1);
 }
-.create-button{
+.createButton{
     all: unset;
     cursor: pointer;
     background-color: none;
@@ -41,7 +41,7 @@ body{
     color: var(--fondo-menu);
     margin-bottom: 16px;
 }
-.create-button:hover{
+.createButton:hover{
     box-shadow: 0 20px 10px rgba(0, 0, 0, 0.1) ;
     transform: scale(1, 1);
 }
@@ -52,14 +52,14 @@ body{
     align-items: center;
     justify-content: space-evenly;
 }
-.eventos-mes{
+.eventosMes{
     border-radius: 8px;
     box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
     width: 300px;
     height: 150px;
     padding: 10px;
 }
-.personas-total{
+.personasTotal{
     border-radius: 8px;
     box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
     width: 300px;
@@ -72,7 +72,7 @@ body{
     width: 300px;
     height: 150px;
     padding: 10px;
-}*/
+}
 
 
 /*
@@ -80,10 +80,6 @@ body{
  * Estilos para la sección Hero de la Home
  */
 
-/*
- * HomePage.module.css
- * Estilos para la sección Hero de la Home
- */
 
 .heroContainer {
   height: 100vh;

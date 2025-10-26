@@ -131,57 +131,45 @@ class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EventAttendeeSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-class ConfirmedAttendeesByUserList(generics.ListAPIView):
+class ConfirmedAttendeesList(generics.ListAPIView):
+    """
+    /api/event/confirmed/  -> devuelve solo los EventAttendee confirmados del usuario autenticado
+    """
     serializer_class = EventAttendeeSerializer
-    permission_classes = [permissions.IsAuthenticated]  # para pruebas
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user_id = self.kwargs.get('user_id')
-        if not user_id:
-            return EventAttendee.objects.none()
-
+        user = self.request.user
+        # Ajusta el valor 'CONFIRMED' si en tu modelo usas constantes (e.g. EventAttendee.Status.CONFIRMED)
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(
-                user__id=user_id,
-                status='CONFIRMED',
-                event__status=Event.ACTIVE  # usa Event.ACTIVE o 'ACTIVE'
-            )
+            .filter(user=user, status='CONFIRMED', event__status=Event.ACTIVE)
         )
 
-class PendingAttendeesByUserList(generics.ListAPIView):
+class PendingAttendeesList(generics.ListAPIView):
+    """
+    /api/event/pending/  -> devuelve EventAttendee pendientes del usuario autenticado
+    """
     serializer_class = EventAttendeeSerializer
-    permission_classes = [permissions.IsAuthenticated]  # para pruebas
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user_id = self.kwargs.get('user_id')
-        if not user_id:
-            return EventAttendee.objects.none()
-
+        user = self.request.user
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(
-                user__id=user_id,
-                status='PENDING',
-                event__status=Event.ACTIVE  # usa Event.ACTIVE o 'ACTIVE'
-            )
+            .filter(user=user, status='PENDING', event__status=Event.ACTIVE)
         )
-        
+
 class EventsByCreatorList(generics.ListAPIView):
     """
-    Lista eventos creados por un usuario dado (creator = user).
-    URL ejemplo: /api/events/by-creator/3/
+    /api/event/created/ -> eventos creados por el usuario autenticado
     """
     serializer_class = EventListSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Cambia a IsAuthenticated si lo necesitas
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user_id = self.kwargs.get('user_id')
-        if not user_id:
-            return Event.objects.none()
-
-        qs = Event.objects.filter(creator__id=user_id).order_by('-start_date')
-        #qs = qs.select_related('creator').prefetch_related('categories', 'images')
+        user = self.request.user
+        qs = Event.objects.filter(creator=user).order_by('-start_date')
         return qs

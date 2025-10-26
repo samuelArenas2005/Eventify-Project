@@ -1,4 +1,4 @@
-.loading-container {
+.loadingContainer {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -25,7 +25,7 @@
       margin-bottom: 1.5rem;
     }
 
-    .loading-text {
+    .loadingText {
       font-family: var(--font-title); /* Fuente Poppins */
       font-size: 1.1rem;
       font-weight: 500;
