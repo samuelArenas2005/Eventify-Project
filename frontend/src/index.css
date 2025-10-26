@@ -54,6 +54,14 @@ body.modo-oscuro {
   --color-border: var(--dark-border);
   --color-light-bg: var(--dark-border);
   --color-shadow: rgba(0, 0, 0, 0.3); /* Sombra más oscura */
+  
+  /* Variables adicionales para Dashboard */
+  --dark-card-bg: #1e293b; /* Fondo de tarjetas */
+  --dark-card-border: #334155; /* Borde de tarjetas */
+  --dark-hover-bg: #334155; /* Fondo hover */
+  --dark-shadow: rgba(0, 0, 0, 0.4); /* Sombra más intensa */
+  --dark-gradient-start: #1e293b; /* Inicio de gradientes */
+  --dark-gradient-end: #0f172a; /* Fin de gradientes */
 }
 
 

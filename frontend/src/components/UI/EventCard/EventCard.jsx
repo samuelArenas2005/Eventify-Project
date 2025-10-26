@@ -55,31 +55,31 @@ const EventCard = ({
             className={`${styles.heartIcon}`}
             onClick={handleHeartClick}
           >
-            {/* Ajustado el tamaño del icono */}
-            <Heart size={24} className={`${isHeartActive ? styles.heartActive : ''}`}/> 
+            {/* Icono de corazón más grande */}
+            <Heart size={28} className={`${isHeartActive ? styles.heartActive : ''}`}/> 
           </div> 
           :null }
         </div>
         <p className={styles.eventDescription}>{description}</p>
 
         <div className={styles.detailItem}>
-           {/* Ajustado el tamaño del icono */}
-          <Calendar size={17} className={styles.detailIcon} />
+           {/* Iconos más grandes */}
+          <Calendar size={20} className={styles.detailIcon} />
           <span className={styles.detailText}>{date}</span>
         </div>
         <div className={styles.detailItem}>
-           {/* Ajustado el tamaño del icono */}
-          <Clock size={17} className={styles.detailIcon} />
+           {/* Iconos más grandes */}
+          <Clock size={20} className={styles.detailIcon} />
           <span className={styles.detailText}>{time}</span>
         </div>
         <div className={styles.detailItem}>
-           {/* Ajustado el tamaño del icono */}
-          <MapPin size={17} className={styles.detailIcon} />
+           {/* Iconos más grandes */}
+          <MapPin size={20} className={styles.detailIcon} />
           <span className={styles.detailText}>{location}</span>
         </div>
         <div className={styles.detailItem}>
-           {/* Ajustado el tamaño del icono */}
-          <Users size={17} className={styles.detailIcon} />
+           {/* Iconos más grandes */}
+          <Users size={20} className={styles.detailIcon} />
           <span className={styles.detailText}>{currentParticipants}/{totalParticipants} Participantes</span>
         </div>
 

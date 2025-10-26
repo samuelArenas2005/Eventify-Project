@@ -10,12 +10,14 @@ import { Mail, Lock } from "lucide-react";
 import { Link as RouterLink } from "react-router-dom";
 import Link from "@mui/material/Link";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 // Asegúrate de que la ruta a la imagen de fondo sea correcta
 import backgroundImage from "../assets/register_background.png";
 
 const Login = ({ login }) => {
   const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(false);
 
   // Para el login, solo necesitamos register, handleSubmit, reset y errors
   const {
@@ -24,6 +26,14 @@ const Login = ({ login }) => {
     reset,
     formState: { errors },
   } = useForm();
+
+  // Trigger animation on component mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const onSubmit = async (data) => {
     const success = await login(data.email, data.password)
@@ -63,6 +73,13 @@ const Login = ({ login }) => {
           marginRight: "2rem",
           marginY: "auto",
           alignSelf: "center",
+          // Animation styles
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible 
+            ? "translateY(0) scale(1)" 
+            : "translateY(30px) scale(0.95)",
+          transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+          transitionDelay: "0.1s",
         }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>

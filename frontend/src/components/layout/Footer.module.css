@@ -1,41 +1,270 @@
 /* src/components/Footer/Footer.module.css */
 
 .footer {
-  /* Fija el footer en la parte inferior si es necesario. 
-     Asegúrate de que el componente principal tenga un min-height: 100vh; si quieres que esté siempre abajo. */
-  /* position: fixed; 
-     bottom: 0; 
-     left: 0;
-     width: 100%; */
-     
-  /* Estilos de espaciado y fondo */
-  padding: 1.5rem 1rem; /* Padding superior/inferior generoso */
-  background-color: var(--color-white); /* Usa el color de fondo de columnas/tarjetas */
-  border-top: 1px solid var(--color-border); /* Borde superior sutil */
-  
-  /* Centrado del contenido */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8fafc 100%);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  margin-top: auto;
+}
 
-  /* Sombra sutil para destacarlo del fondo (opcional) */
-  box-shadow: 0 -2px 5px var(--color-shadow);
+.footerContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem 1.5rem;
+}
+
+/* Sección Principal */
+.mainSection {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 2rem;
+}
+
+/* Sección de Marca */
+.brandSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.logo svg {
+  color: var(--color-secondary);
+}
+
+.description {
+  font-size: 0.95rem;
+  color: var(--text-secundary);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 300px;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--text-secundary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.socialLink:hover {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(11, 114, 185, 0.3);
+  border-color: var(--color-primary);
+}
+
+/* Secciones de Enlaces */
+.linksSection,
+.contactSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  font-family: var(--font-title);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.linksList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.link {
+  color: var(--text-secundary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.link:hover {
+  color: var(--color-primary);
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-primary);
+  transition: width 0.3s ease;
+}
+
+.link:hover::after {
+  width: 100%;
+}
+
+/* Información de Contacto */
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secundary);
+}
+
+.contactItem svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* Divisor */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+  margin: 1.5rem 0;
+}
+
+/* Sección Inferior */
+.bottomSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
 }
 
 .copyright {
-  /* Tipografía y color */
-  font-family: var(--font-base);
-  font-size: 0.875rem; /* Tamaño de fuente pequeño (14px) */
-  color: var(--text-secundary); /* Usa el color de texto secundario (gris) */
-  text-align: center;
-  margin: 0; /* Asegura que no haya márgenes adicionales */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secundary);
+  margin: 0;
 }
 
-/* Estilo opcional para el modo oscuro, aunque las variables se mapean automáticamente
-  en los estilos globales, aquí podríamos hacer ajustes específicos si fueran necesarios.
-*/
-/*
-body.modo-oscuro .footer {
-  // Ajustes específicos para el modo oscuro, si los necesitas
+.heart {
+  color: var(--color-danger);
+  animation: heartbeat 2s ease-in-out infinite;
 }
-*/
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Botón Volver Arriba */
+.scrollToTop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(11, 114, 185, 0.3);
+}
+
+.scrollToTop:hover {
+  background-color: var(--color-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(11, 114, 185, 0.4);
+}
+
+.scrollToTop:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .footerContainer {
+    padding: 2rem 1rem 1rem;
+  }
+  
+  .mainSection {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .brandSection {
+    text-align: center;
+  }
+  
+  .description {
+    max-width: none;
+  }
+  
+  .socialLinks {
+    justify-content: center;
+  }
+  
+  .bottomSection {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .scrollToTop {
+    align-self: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footerContainer {
+    padding: 1.5rem 1rem 1rem;
+  }
+  
+  .mainSection {
+    gap: 1.5rem;
+  }
+  
+  .socialLinks {
+    gap: 0.75rem;
+  }
+  
+  .socialLink {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .scrollToTop {
+    width: 40px;
+    height: 40px;
+  }
+}

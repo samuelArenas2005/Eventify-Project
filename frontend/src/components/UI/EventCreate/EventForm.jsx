@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Toaster, toast } from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import {
   LayoutDashboard,
   FileText,
@@ -14,7 +15,8 @@ import {
   Star,
   X,
   Send,
-  Loader2
+  Loader2,
+  ArrowLeft
 } from 'lucide-react';
 import styles from './CreateEventPage.module.css';
 
@@ -162,6 +164,14 @@ const EventDashboard = () => {
 
         {/* Contenido Principal */}
         <main className={styles.mainContent}>
+          {/* Botón Volver al Dashboard */}
+          <div className={styles.backButtonContainer}>
+            <Link to="/dashboard" className={styles.backButton}>
+              <ArrowLeft size={16} />
+              Volver al Dashboard
+            </Link>
+          </div>
+          
           <form onSubmit={handleSubmit(onSubmit, onError)} className={styles.formGrid}>
             
             {/* Columna Izquierda: Detalles del Evento */}

@@ -12,6 +12,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import backgroundImage from '../assets/register_background.png'; // Add this import at the top
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { 
     User2, 
     Phone, 
@@ -32,9 +33,18 @@ const roles = [
 ];
 const RegisterUser = () => {
 const navigate = useNavigate();
+const [isVisible, setIsVisible] = useState(false);
 
     const { register, handleSubmit, reset, setValue, control, watch, formState: { errors } } = useForm();
     const rol = watch('rol');
+
+    // Trigger animation on component mount
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsVisible(true);
+        }, 100);
+        return () => clearTimeout(timer);
+    }, []);
 
     // Restringe el input de teléfono para que no podamos escribir numeros
     const handleTelefonoChange = (e) => {
@@ -137,6 +147,13 @@ const navigate = useNavigate();
                     alignSelf: 'center',
                     marginTop: 5,
                     marginBottom: 10,
+                    // Animation styles
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible 
+                        ? "translateY(0) scale(1)" 
+                        : "translateY(30px) scale(0.95)",
+                    transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                    transitionDelay: "0.1s",
                 }}
             >
                 <form onSubmit={handleSubmit(onSubmit)}>
