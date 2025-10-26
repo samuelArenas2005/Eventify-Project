@@ -40,13 +40,8 @@ export default function Navigation({ user, logout }) {
               <Link to="/">Inicio</Link>
             </li>
             <li>
-              <Link style={{
-                pointerEvents: "none",
-                color: "gray",
-                textDecoration: "none",
-                cursor: "not-allowed"
-              }}
-                to="/eventos">Eventos</Link>
+              <Link 
+                to="/SearchPage">Eventos</Link>
             </li>
             <li>
               <Link

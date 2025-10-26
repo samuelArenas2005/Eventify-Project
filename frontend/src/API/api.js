@@ -69,3 +69,12 @@ export const getEventCreatedUser = () => {
 export const createEvent = (data) => {
 	return axios.post('http://127.0.0.1:8000/api/event/events/', data, { withCredentials: true });
 }
+export const getAllEvents = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}event/active/`, { withCredentials: true });
+    return response.data;  // Axios envuelve la respuesta en .data
+  } catch (error) {
+    console.error("Error en getAllEvents:", error);
+    return [];  // Retornamos array vacío en caso de error
+  }
+}
