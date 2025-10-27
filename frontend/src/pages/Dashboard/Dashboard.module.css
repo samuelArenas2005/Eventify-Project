@@ -395,15 +395,17 @@
 
 .eventList {
   display: flex;
-  justify-content:center;
+  justify-content: center;
 }
 
 /* Modificador para vista Grid */
 .eventList.grid {
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 2rem; /* Espacio entre tarjetas, horizontal y vertical */
-  /* ¡Ya no hay 'justify-content' que las estire! */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  justify-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* --- Responsive Design --- */
@@ -418,6 +420,11 @@
   
   .profileMain {
     gap: 1.5rem;
+  }
+  
+  .eventList.grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
   }
 }
 
@@ -477,6 +484,11 @@
   
   .viewOptions {
     justify-content: center;
+  }
+  
+  .eventList.grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 

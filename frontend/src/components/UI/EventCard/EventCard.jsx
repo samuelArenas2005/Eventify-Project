@@ -17,7 +17,7 @@ const EventCard = ({
   onHeartClick,
   showHeartButton,
   showRegisterButton,
-  activeHeart,
+  activeHeart = true, 
 }) => {
   const [isHeartActive, setIsHeartActive] = useState(activeHeart);
 

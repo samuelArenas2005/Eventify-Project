@@ -1,6 +1,6 @@
 import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '../../API/api'
  
-/* export const registeredEventsDataObjet = [
+ export const registeredEventsDataObjet = [
 
 
   {
@@ -153,7 +153,7 @@ import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '..
     onRegisterClick: () => alert('Ver detalle de registro 10'),
     onHeartClick: () => console.log('Heart 10'),
   }
-]; */
+]; 
 
 function diaMes(iso) {
   const d = new Date(iso);
@@ -194,7 +194,10 @@ export const getRegisteredEvents = async () => {
     }));
 
 
-    return formattedFromApi
+    const map = new Map();
+    registeredEventsDataObjet.forEach((e) => map.set(e.id, e));
+    formattedFromApi.forEach((e) => map.set(e.id, e));
+    return Array.from(map.values()); 
 
 
   } catch (error) {
@@ -272,9 +275,3 @@ export const getCreatedEvent = async () => {
 };
 
 
-
-
-/*  const map = new Map();
-    registeredEventsDataObjet.forEach((e) => map.set(e.id, e));
-    formattedFromApi.forEach((e) => map.set(e.id, e));
-    return Array.from(map.values()); */

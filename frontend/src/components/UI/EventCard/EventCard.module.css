@@ -1,10 +1,10 @@
 
 
 .cardContainer {
-  /* Tamaño escalado (antes 300px) */
-  width: 360px; 
-  /* Radio escalado (antes 26px) */
-  border-radius: 31px; 
+  /* Tarjeta más ancha y cuadrada */
+  width: 375px; 
+  /* Radio más pequeño para aspecto más cuadrado */
+  border-radius: 20px; 
   background-color: #fff;
   /* Sombra escalada (antes 6px 12px) */
   box-shadow: 0px 7px 14px rgba(0, 0, 0, 0.1); 
@@ -33,17 +33,17 @@
   margin-bottom: 18px; 
   /* Añadido para contener el zoom de la imagen */
   overflow: hidden; 
-  /* Radio escalado para que coincida con la imagen */
-  border-radius: 14px; 
+  /* Radio más pequeño para aspecto más cuadrado */
+  border-radius: 12px; 
 }
 
 .eventImage {
   width: 100%;
-  /* Altura escalada (antes 128px) */
-  height: 154px; 
+  /* Altura aumentada para aspecto más cuadrado */
+  height: 200px; 
   object-fit: cover;
-  /* Radio escalado (antes 12px) */
-  border-radius: 14px; 
+  /* Radio más pequeño para aspecto más cuadrado */
+  border-radius: 12px; 
   /* Sombra escalada (antes 2px 4px 4px) */
   box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.1); 
   /* Transición añadida para el zoom en hover */
@@ -259,12 +259,12 @@
 @media (max-width: 768px) {
   .cardContainer {
     width: 100%;
-    max-width: 380px;
+    max-width: 420px;
     margin: 0 auto;
   }
   
   .eventImage {
-    height: 180px;
+    height: 200px;
   }
   
   .eventTitle {
@@ -288,12 +288,12 @@
 @media (max-width: 480px) {
   .cardContainer {
     width: 100%;
-    max-width: 340px;
+    max-width: 380px;
     padding: 20px;
   }
   
   .eventImage {
-    height: 160px;
+    height: 180px;
   }
   
   .eventTitle {
