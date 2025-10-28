@@ -8,6 +8,8 @@
   --texto-menu: #333;
   --hover-menu: #f0f0f0;
   --fuente-base: 'Poppins', sans-serif;
+  --color-primary: #8a63f4; /* Añadí esta variable para consistencia */
+  --border-radius-md: 8px; /* Añadí esta variable para consistencia */
   font-family: var(--fuente-base);
 }
 
@@ -26,13 +28,13 @@ body.modo-oscuro {
 /* 🧭 Barra de navegación principal */
 .NavBar {
   width: 100%;
-  padding: 1rem 1rem;
+  padding: 1rem 2rem; /* Aumenté un poco el padding horizontal */
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
   top: 0;
-  background-color: var(--fondo-nav, #ffffff);
+  background-color: var(--fondo-nav);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   z-index: 100;
 }
@@ -44,51 +46,119 @@ body.modo-oscuro {
   background: linear-gradient(90deg, #ff6ad5, #8a63f4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  cursor: pointer;
 }
 
-/* Sección derecha */
-.NavIcons {
+/* --- NUEVA ESTRUCTURA DERECHA (LA CLAVE) --- */
+
+/* Contenedor para TODOS los elementos de la derecha */
+.nav-derecha {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem; /* Espacio entre el ícono de tema y el grupo de usuario */
 }
 
-/* Íconos generales */
-.NavIcons .icon{
+/* Contenedor específico para los controles del usuario (notificaciones, menú, avatar) */
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem; /* Espacio entre los íconos del usuario */
+}
+
+/* --- FIN DE LA NUEVA ESTRUCTURA --- */
+
+/* Íconos generales (Sol, Luna, Campana) */
+.icon {
   font-size: 1.2rem;
   cursor: pointer;
-  color: var(--icon-color, #222);
+  color: var(--icon-color);
   transition: transform 0.2s, color 0.3s;
+  display: flex; /* Asegura buena alineación */
+  align-items: center;
 }
 
-.NavIcons .icon:hover {
+.icon:hover {
   transform: scale(1.1);
-  color: #8a63f4;
+  color: var(--color-primary);
 }
 
-/* Menú hamburguesa: visible SIEMPRE */
+/* Menú hamburguesa */
 .menuHamburguesa {
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 1.4rem;
-  color: var(--icon-color, #222);
+  color: var(--icon-color);
   transition: transform 0.2s, color 0.3s;
   z-index: 200;
-  margin-right: 3rem;
+  /* El margin-right FUE ELIMINADO */
 }
 
 .menuHamburguesa:hover {
   transform: scale(1.1);
-  color: #8a63f4;
+  color: var(--color-primary);
 }
+
+
+.profileAvatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 4px solid #ffffff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.profileAvatar:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+.statusIndicator {
+  position: absolute;
+  bottom: 8px;
+  right: 30px;
+  width: 20px;
+  height: 20px;
+  background-color: #10B981;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  animation: pulse 2s infinite;
+}
+.profileInitials {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #E11D9E, #9333EA);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  box-shadow: 0 8px 25px rgba(225, 29, 158, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profileInitials:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(225, 29, 158, 0.4);
+}
+
+
+
+
 
 /* Menú desplegable */
 .menuLinks {
   position: absolute;
-  top: 60px;
-  right: 15px;
+  top: 70px; /* Ajustado para que no esté tan pegado */
+  right: 2rem; /* Alineado con el padding de la NavBar */
   background: var(--fondo-menu);
   border-radius: 10px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
@@ -96,12 +166,12 @@ body.modo-oscuro {
   padding: 0.5rem 0;
   width: 180px;
   animation: slideDown 0.3s ease forwards;
-  z-index: 999; /* que esté encima */
+  z-index: 999;
 }
 
 /* Items del menú */
 .menuLinks li {
-  padding: 0.7rem 1rem;
+  padding: 0; /* Quitamos padding aquí para ponerlo en el 'a' */
 }
 
 .menuLinks li a {
@@ -110,27 +180,30 @@ body.modo-oscuro {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 0.7rem 1.2rem; /* Padding dentro del link para un área de click más grande */
+  transition: background-color 0.2s;
 }
 
 .menuLinks li:hover {
   background-color: var(--hover-menu);
 }
 
-.NavBarLoginButton{
-  font-family: poppins, sans-serif;
+/* Botón de Iniciar Sesión */
+.NavBarLoginButton {
+  font-family: 'Poppins', sans-serif;
   padding: 0.5rem 1rem;
   background: var(--color-primary);
   color: white;
   border: none;
   border-radius: var(--border-radius-md);
   text-decoration: none;
-  transition: transform 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .NavBarLoginButton:hover {
   box-shadow: 0 4px 25px rgba(138, 99, 244, 0.3);
-  background: var(--color-primary);
   transform: scale(1.05);
 }
 

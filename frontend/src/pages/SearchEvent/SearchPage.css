@@ -1,0 +1,154 @@
+.titulo {
+    font-family: 'Poppins', sans-serif; /* Usa la fuente principal de tu proyecto */
+    font-size: 2.5rem;  /* Tamaño grande e impactante */
+    font-weight: 700;   /* Grosor en negrita (bold) */
+    color: var(--texto-menu); /* Color azul oscuro (casi negro) */
+    margin: 0;          /* Elimina márgenes por defecto */
+    margin-left: 30px;
+  }
+  
+  /* Estilo para el subtítulo "Descubre eventos..." */
+  .subtitulo {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;   /* Tamaño más pequeño y legible */
+    font-weight: 400;    /* Grosor normal */
+    color: var(--texto-menu); /* Color gris sutil */
+    margin-top: 0.25rem; /* Pequeño espacio debajo del título principal */
+    margin-bottom: 0;
+    margin-left: 30px;
+  }
+.eventCards{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    margin: 50px;
+    gap: 20px;
+    padding: 0, 70px;
+}
+.search{
+    margin-top: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+/* Añade esta nueva regla en tu CSS */
+.search-form {
+    width: 60%;
+  }
+/* Contenedor principal para posicionar el ícono */
+.search-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  /* Estilos del campo de texto */
+  .search-input {
+    width: 100%; /* Ocupa todo el espacio del contenedor */
+    padding: 12px 40px 12px 15px; /* Espacio para el texto y para el ícono */
+    border-radius: 50px; /* Bordes redondeados */
+    border: 1px solid #ccc;
+    font-size: 16px;
+    outline: none; /* Quita el borde azul al hacer clic */
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: var(--fondo-menu);
+  }
+  
+  /* Efecto al hacer clic en el input */
+  .search-input:focus {
+    border-color: #8a63f4; /* Un color de acento */
+    box-shadow: 0 0 8px rgba(138, 99, 244, 0.3);
+  }
+  
+  /* Estilos del botón/ícono de búsqueda */
+  .search-button {
+    position: absolute; /* ¡La clave para ponerlo sobre el input! */
+    right: 10px; /* Lo posicionamos a la derecha */
+    top: 50%;
+    transform: translateY(-50%); /* Centrado vertical perfecto */
+    
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-size: 18px;
+    color: #888;
+    transition: color 0.3s;
+  }
+  
+  .search-button:hover {
+    color: #8a63f4; /* Color de acento al pasar el mouse */
+  }
+  
+  /* (Opcional) Estilo del texto del placeholder */
+  .search-input::placeholder {
+    color: var(--texto-menu);
+    font-style: italic;
+  }
+/* Contenedor principal para posicionar el menú desplegable */
+.filter-container {
+    position: relative; /* ¡Muy importante! El menú se posicionará respecto a este div */
+    display: inline-block; /* Ocupa solo el espacio necesario */
+  }
+  
+  /* Estilo del botón de filtros */
+  .filter {
+    background-color: var(--fondo-menu);
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espacio entre el texto "Filtros" y la flecha */
+    transition: background-color 0.3s;
+    color: var(--texto-menu);
+  }
+  
+  .filter:hover {
+    background-color: var(--hover-menu);
+  }
+  
+  /* Estilo del menú desplegable */
+  .filter-dropdown {
+    position: absolute; /* Se posiciona sobre el resto del contenido */
+    top: 110%; /* Justo debajo del botón, con un pequeño espacio */
+    left: 0;
+    background-color: var(--fondo-menu);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 0.5rem 0;
+    margin: 0;
+    width: 200px; /* Ancho del menú */
+    z-index: 10; /* Asegura que esté por encima de otros elementos */
+    animation: fadeIn 0.2s ease-out; /* Animación sutil */
+  }
+  
+  .filter-dropdown li a {
+    display: block;
+    padding: 0.75rem 1.2rem;
+    text-decoration: none;
+    color: var(--texto-menu); /* ¡También corregí esta línea! */
+    transition: background-color 0.2s;
+  }
+  
+  .filter-dropdown li a:hover {
+    background-color: var(--hover-menu); /* ¡Y esta! */
+  }
+  
+  /* Animación de entrada */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

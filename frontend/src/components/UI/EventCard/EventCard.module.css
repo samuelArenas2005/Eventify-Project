@@ -1,13 +1,15 @@
-
+body{
+  background-color: --hover-menu;
+}
 
 .cardContainer {
   /* Tamaño escalado (antes 300px) */
   width: 360px; 
   /* Radio escalado (antes 26px) */
   border-radius: 31px; 
-  background-color: #fff;
+  background-color: --fondo-nav;
   /* Sombra escalada (antes 6px 12px) */
-  box-shadow: 0px 7px 14px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0px 7px 14px rgba(0, 0, 0, 0.5);
   /* Padding escalado (antes 15px) */
   padding: 18px; 
   display: flex;
@@ -16,7 +18,7 @@
   position: relative;
   /* Transición añadida para el hover */
   transition: translate 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
-  
+  color: --texto-menu;
 }
 
 /* --- NUEVO EFECTO HOVER --- */
@@ -95,7 +97,7 @@
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
   font-size: 19px;
-  color: #111827;
+  color: --texto-menu;
   margin: 0;
   cursor: pointer;
   transition: color 1s ease;
