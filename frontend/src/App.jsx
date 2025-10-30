@@ -18,6 +18,7 @@ import CreateEventPage from "./pages/CreateEvent/CreateEventPage";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import Analytics from "./pages/Analytics/Analytics";
 import NotFoundPage from "./pages/NotFound/NotFoundPage";
+import SearchPage from "./pages/SearchEvent/SearchPage.jsx";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -89,6 +90,14 @@ function App() {
           element={
             <>
               <Login login={handleLogin} />
+            </>
+          }
+        />
+        <Route
+          path="/searchPage"
+          element={
+            <>
+              <SearchPage />
             </>
           }
         />
