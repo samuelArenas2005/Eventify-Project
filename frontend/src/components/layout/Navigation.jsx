@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
-<<<<<<< HEAD
-import { Moon, Sun, User, Bell } from 'lucide-react';
-=======
-import { Moon, Sun, Bell } from 'lucide-react'; // Quité 'User' que no se usaba
->>>>>>> 19d01910a103ad39ce0ea2302eb3488b9cdfe59e
+import { Moon, Sun, Bell, Home } from 'lucide-react'; // Quité 'User' que no se usaba
 
 export default function Navigation({ user, logout }) {
   const [temaOscuro, setTemaOscuro] = useState(false);
@@ -27,20 +23,6 @@ export default function Navigation({ user, logout }) {
   function LoggedInControls() {
     return (
       <>
-<<<<<<< HEAD
-        {/* Sección de íconos */}
-        {/* Menú hamburguesa */}
-        <Bell className="iconoNotificaciones" />
-        <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
-          {!menuOpen ? (
-            <div>
-              <i className="fa-solid fa-bars"></i>
-            </div>
-          ) : (
-            <i className="fa-solid fa-square-xmark fa-spin"></i>
-          )}
-        </div>
-=======
         {/* Este es el contenedor que agrupa los controles del usuario */}
         <div className="user-controls">
           <Bell className="icon" />
@@ -52,7 +34,6 @@ export default function Navigation({ user, logout }) {
               <i className="fa-solid fa-bars"></i>
             )}
           </div>
->>>>>>> 19d01910a103ad39ce0ea2302eb3488b9cdfe59e
 
           <div className={"profileImageContainer"}>
             {(user.avatar ? 
@@ -65,12 +46,11 @@ export default function Navigation({ user, logout }) {
         {/* El menú desplegable se posiciona de forma absoluta, por eso está fuera del div */}
         {menuOpen && (
           <ul className="menuLinks">
-<<<<<<< HEAD
             <li>
               <Link onClick={toggleMenuHamburguesa} to="/">Inicio</Link>
             </li>
             <li>
-              <Link onClick={toggleMenuHamburguesa} to="/eventos">Eventos</Link>
+              <Link onClick={toggleMenuHamburguesa} to="/searchPage">Eventos</Link>
             </li>
             <li>
               <Link onClick={toggleMenuHamburguesa} to="/calendario">Calendario</Link>
@@ -86,26 +66,7 @@ export default function Navigation({ user, logout }) {
                 logout();
                 toggleMenuHamburguesa();
               }}>Cerrar Sesión</Link>
-=======
-            <li><Link to="/">Inicio</Link></li>
-            <li><Link to="/SearchPage">Eventos</Link></li>
-            <li>
-              <Link
-                style={{
-                  pointerEvents: "none",
-                  color: "gray",
-                  textDecoration: "none",
-                  cursor: "not-allowed"
-                }}
-                to="/calendario"
-              >
-                Calendario
-              </Link>
->>>>>>> 19d01910a103ad39ce0ea2302eb3488b9cdfe59e
             </li>
-            <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/createEvent">Crear Evento</Link></li>
-            <li><Link to="/" onClick={logout}>Cerrar Sesión</Link></li>
           </ul>
         )}
       </>
@@ -125,20 +86,16 @@ export default function Navigation({ user, logout }) {
 
       {/* Contenedor principal de todos los elementos de la derecha */}
       <div className="nav-derecha">
-        <div className="IconoTema" onClick={toggleTema}>
+        <div className="IconoTema" >
           {temaOscuro ? (
-            <Moon className="icon" />
+            <Moon className="iconDesactive" />
           ) : (
-            <Sun className="icon" />
+            <Sun className="iconDesactive" />
           )}
         </div>
         {user ? <LoggedInControls /> : <LoggedOutControls />}
       </div>
-<<<<<<< HEAD
 
-
-=======
->>>>>>> 19d01910a103ad39ce0ea2302eb3488b9cdfe59e
     </nav>
   );
 }

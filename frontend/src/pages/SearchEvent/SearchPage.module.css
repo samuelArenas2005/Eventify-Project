@@ -2,9 +2,10 @@
     font-family: 'Poppins', sans-serif; /* Usa la fuente principal de tu proyecto */
     font-size: 2.5rem;  /* Tamaño grande e impactante */
     font-weight: 700;   /* Grosor en negrita (bold) */
-    color: var(--texto-menu); /* Color azul oscuro (casi negro) */
+    color: var(--text-primary); /* Color azul oscuro (casi negro) */
     margin: 0;          /* Elimina márgenes por defecto */
     margin-left: 30px;
+    margin-top: 1rem;
   }
   
   /* Estilo para el subtítulo "Descubre eventos..." */
@@ -12,7 +13,7 @@
     font-family: 'Poppins', sans-serif;
     font-size: 1.1rem;   /* Tamaño más pequeño y legible */
     font-weight: 400;    /* Grosor normal */
-    color: var(--texto-menu); /* Color gris sutil */
+    color: var(--text-secundary); /* Color gris sutil */
     margin-top: 0.25rem; /* Pequeño espacio debajo del título principal */
     margin-bottom: 0;
     margin-left: 30px;
@@ -35,17 +36,18 @@
     width: 100%;
 }
 /* Añade esta nueva regla en tu CSS */
-.search-form {
+.searchForm {
     width: 60%;
   }
 /* Contenedor principal para posicionar el ícono */
-.search-container {
+.searchContainer {
     position: relative;
     width: 100%;
   }
   
   /* Estilos del campo de texto */
-  .search-input {
+  .searchInput {
+    font-family: 'Poppins', sans-serif; /* Usa la fuente principal de tu proyecto */
     width: 100%; /* Ocupa todo el espacio del contenedor */
     padding: 12px 40px 12px 15px; /* Espacio para el texto y para el ícono */
     border-radius: 50px; /* Bordes redondeados */
@@ -54,16 +56,17 @@
     outline: none; /* Quita el borde azul al hacer clic */
     transition: border-color 0.3s, box-shadow 0.3s;
     background-color: var(--fondo-menu);
+    color: var(--text-secundary)
   }
   
   /* Efecto al hacer clic en el input */
-  .search-input:focus {
+  .searchInput:focus {
     border-color: #8a63f4; /* Un color de acento */
     box-shadow: 0 0 8px rgba(138, 99, 244, 0.3);
   }
   
   /* Estilos del botón/ícono de búsqueda */
-  .search-button {
+  .searchButton {
     position: absolute; /* ¡La clave para ponerlo sobre el input! */
     right: 10px; /* Lo posicionamos a la derecha */
     top: 50%;
@@ -78,17 +81,13 @@
     transition: color 0.3s;
   }
   
-  .search-button:hover {
+  .searchButton:hover {
     color: #8a63f4; /* Color de acento al pasar el mouse */
   }
-  
-  /* (Opcional) Estilo del texto del placeholder */
-  .search-input::placeholder {
-    color: var(--texto-menu);
-    font-style: italic;
-  }
+
+
 /* Contenedor principal para posicionar el menú desplegable */
-.filter-container {
+.filterContainer {
     position: relative; /* ¡Muy importante! El menú se posicionará respecto a este div */
     display: inline-block; /* Ocupa solo el espacio necesario */
   }
@@ -113,7 +112,7 @@
   }
   
   /* Estilo del menú desplegable */
-  .filter-dropdown {
+  .filterDropdown {
     position: absolute; /* Se posiciona sobre el resto del contenido */
     top: 110%; /* Justo debajo del botón, con un pequeño espacio */
     left: 0;
@@ -129,7 +128,7 @@
     animation: fadeIn 0.2s ease-out; /* Animación sutil */
   }
   
-  .filter-dropdown li a {
+  .filterDropdown li a {
     display: block;
     padding: 0.75rem 1.2rem;
     text-decoration: none;
@@ -137,7 +136,7 @@
     transition: background-color 0.2s;
   }
   
-  .filter-dropdown li a:hover {
+  .filterDropdown li a:hover {
     background-color: var(--hover-menu); /* ¡Y esta! */
   }
   

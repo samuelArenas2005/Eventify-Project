@@ -4,12 +4,12 @@ body{
 
 .cardContainer {
   /* Tarjeta más ancha y cuadrada */
-  width: 375px; 
+  width: 410px; 
   /* Radio más pequeño para aspecto más cuadrado */
   border-radius: 20px; 
   background-color: #fff;
   /* Sombra escalada (antes 6px 12px) */
-  box-shadow: 0px 7px 14px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
   /* Padding escalado (antes 15px) */
   padding: 18px; 
   display: flex;
@@ -42,7 +42,7 @@ body{
 .eventImage {
   width: 100%;
   /* Altura aumentada para aspecto más cuadrado */
-  height: 200px; 
+  height: 180px; 
   object-fit: cover;
   /* Radio más pequeño para aspecto más cuadrado */
   border-radius: 12px; 
