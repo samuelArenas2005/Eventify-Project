@@ -127,7 +127,7 @@ class User(AbstractUser):
 
     # Configuración de campos
     USERNAME_FIELD = 'email'
-    # Añadimos 'cedula' a REQUIRED_FIELDS para que `createsuperuser` la solicite al crear usuarios
+    # Añadimos 'cedula' a `createsuperuser` la solicite al crear usuarios
     REQUIRED_FIELDS = ['name', 'last_name', 'username', 'rol', 'cedula']
     
     def save(self, *args, **kwargs):

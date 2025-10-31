@@ -11,6 +11,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import backgroundImage from '../assets/register_background.png'; // Add this import at the top
+import { useState, useEffect } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 import { 
     User2, 
@@ -23,23 +24,27 @@ import {
 } from 'lucide-react';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@mui/material/Link';
+import axios from '../API/axiosConfig'; // añadido
 
 const roles = [
-    { value: 'Estudiante', label: 'Estudiante' },
-    { value: 'Profesor', label: 'Profesor' },
-    { value: 'Funcionario', label: 'Funcionario' },
-    { value: 'Externo', label: 'Externo' },
+    { value: 'ESTUDIANTE', label: 'Estudiante' },
+    { value: 'PROFESOR', label: 'Profesor' },
+    { value: 'FUNCIONARIO', label: 'Funcionario' },
+    { value: 'EXTERNO', label: 'Externo' },
 ];
 const RegisterUser = () => {
 const navigate = useNavigate();
-
+const [isVisible, setIsVisible] = useState(false);
+useEffect(() => {
+        setIsVisible(true);
+    }, []);
     const { register, handleSubmit, reset, setValue, control, watch, formState: { errors } } = useForm();
     const rol = watch('rol');
 
     // Restringe el input de teléfono para que no podamos escribir numeros
     const handleTelefonoChange = (e) => {
         const value = e.target.value.replace(/\D/g, '');
-        setValue('telefono', value);
+        setValue('phone', value);
     };
     // lo mismo de arriba pero para codigo
     const handleCodigoChange = (e) => {
@@ -50,20 +55,20 @@ const navigate = useNavigate();
     // para cedula
     const handleIdentificacionChange = (e) => {
         const value = e.target.value.replace(/\D/g, '');
-        setValue('identificacion', value);
+        setValue('cedula', value);
     };
 
-    const onSubmit = (data) => {
-        // Validaciones para cada campo
-        if (!data.nombre || !data.apellido || !data.email || !data.telefono || !data.password || !data.rol || !data.identificacion) {
+    const onSubmit = async (data) => {
+        // Validaciones para cada campo (ajustadas a los nombres reales)
+        if (!data.name || !data.last_name || !data.email || !data.phone || !data.password || !data.rol || !data.cedula || !data.username) {
             toast.error('Todos los campos son obligatorios');
             return;
         }
-        if (!/^\d+$/.test(data.telefono)) {
+        if (!/^\d+$/.test(data.phone)) {
             toast.error('El teléfono solo debe contener números');
             return;
         }
-        if (data.telefono.length < 6) {
+        if (data.phone.length < 6) {
             toast.error('El teléfono debe tener al menos 6 dígitos');
             return;
         }
@@ -71,16 +76,16 @@ const navigate = useNavigate();
             toast.error('La contraseña debe tener al menos 6 caracteres');
             return;
         }
-        if (!/^\d+$/.test(data.identificacion)) {
+        if (!/^\d+$/.test(data.cedula)) {
             toast.error('El N° de identificación solo debe contener números');
             return;
         }
-        if (!data.identificacion) {
+        if (!data.cedula) {
             toast.error('El N° de identificación no puede estar vacío');
             return;
         }
         //ifs para exigir codigo institucional a profesores y estudiantes
-        if (rol === 'Estudiante' || rol === 'Profesor') {
+        if (data.rol === 'ESTUDIANTE' || data.rol === 'PROFESOR') {
             if (!data.codigo) {
                 toast.error('Debes proporcionar un código institucional');
                 return;
@@ -98,15 +103,35 @@ const navigate = useNavigate();
                 toast.error('El código institucional debe comenzar con un año entre 2000 y 2025');
                 return;
             }
-        } else if ((rol === 'Funcionario' || rol === 'Externo') && data.codigo) {
+        } else if ((data.rol === 'FUNCIONARIO' || data.rol === 'EXTERNO') && data.codigo) {
             // funcionarios y externos no ingresaran codigo
             toast.error('Los roles Funcionario y Externo no deben ingresar código institucional');
             return;
         }
-        // aqui imprimo todo en la consola, denle inspeccionar para ver el registro exitoso
-        console.log('Datos recibidos:', data);
-        toast.success('¡Registro exitoso!');
-        navigate('/login');
+
+        // Preparar payload para backend (incluye password2)
+        const payload = {
+            username: data.username,
+            email: data.email,
+            password: data.password,
+            password2: data.password,
+            name: data.name,
+            last_name: data.last_name,
+            phone: data.phone,
+            rol: data.rol,
+            codigo: data.codigo || '',
+            cedula: data.cedula,
+        };
+
+        try {
+            await axios.post('http://127.0.0.1:8000/api/user/users/', payload);
+            toast.success('¡Registro exitoso!');
+            navigate('/login');
+        } catch (err) {
+            console.error('Registro error:', err);
+            const message = err.response?.data || err.message || 'Error en registro';
+            toast.error(JSON.stringify(message));
+        }
     };
 
     return (
@@ -119,7 +144,7 @@ const navigate = useNavigate();
                 background: `url(${backgroundImage})`,
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
-                backgroundSize: 'cover',
+                backgroundSize: 'cover'
             }}
         >
             <Box
@@ -137,8 +162,16 @@ const navigate = useNavigate();
                     alignSelf: 'center',
                     marginTop: 5,
                     marginBottom: 10,
+                    // Animation styles
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible 
+                        ? "translateY(0) scale(1)" 
+                        : "translateY(30px) scale(0.95)",
+                    transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                    transitionDelay: "0.1s",
                 }}
             >
+                
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Stack spacing={3}>
                         <>
@@ -180,9 +213,9 @@ const navigate = useNavigate();
                             <TextField
                                 label="Nombre"
                                 fullWidth
-                                {...register('nombre', { required: true })}
-                                error={!!errors.nombre}
-                                helperText={errors.nombre ? 'Este campo no puede estar vacío' : ''}
+                                {...register('name', { required: true })}
+                                error={!!errors.name}
+                                helperText={errors.name ? 'Este campo no puede estar vacío' : ''}
                                 InputProps={{
                                     startAdornment: <User2 size={20} style={{ marginRight: '8px', color: '#666' }} />,
                                 }}
@@ -196,9 +229,9 @@ const navigate = useNavigate();
                             <TextField
                                 label="Apellido"
                                 fullWidth
-                                {...register('apellido', { required: true })}
-                                error={!!errors.apellido}
-                                helperText={errors.apellido ? 'Este campo no puede estar vacío' : ''}
+                                {...register('last_name', { required: true })}
+                                error={!!errors.last_name}
+                                helperText={errors.last_name ? 'Este campo no puede estar vacío' : ''}
                                 InputProps={{
                                     startAdornment: <User2 size={20} style={{ marginRight: '8px', color: '#666' }} />,
                                 }}
@@ -213,9 +246,9 @@ const navigate = useNavigate();
                                 <TextField
                                 label="Nombre de usuario"
                                 fullWidth
-                                {...register('nombre de usuario', { required: true })}
-                                error={!!errors.apellido}
-                                helperText={errors.apellido ? 'Este campo no puede estar vacío' : ''}
+                                {...register('username', { required: true })}
+                                error={!!errors.username}
+                                helperText={errors.username ? 'Este campo no puede estar vacío' : ''}
                                 InputProps={{
                                     startAdornment: <User2 size={20} style={{ marginRight: '8px', color: '#666' }} />,
                                 }}
@@ -271,9 +304,9 @@ const navigate = useNavigate();
                         <TextField
                             label="N° de identificación"
                             fullWidth
-                            {...register('identificacion', { required: true })}
-                            error={!!errors.identificacion}
-                            helperText={errors.identificacion ? 'Este campo no puede estar vacío' : ''}
+                            {...register('cedula', { required: true })}
+                            error={!!errors.cedula}
+                            helperText={errors.cedula ? 'Este campo no puede estar vacío' : ''}
                             onChange={handleIdentificacionChange}
                             InputProps={{
                                 startAdornment: <IdCard size={20} style={{ marginRight: '8px', color: '#666' }} />,
@@ -290,9 +323,9 @@ const navigate = useNavigate();
                             label="Teléfono"
                             type="tel"
                             fullWidth
-                            {...register('telefono', { required: true })}
-                            error={!!errors.telefono}
-                            helperText={errors.telefono ? 'Este campo no puede estar vacío' : ''}
+                            {...register('phone', { required: true })}
+                            error={!!errors.phone}
+                            helperText={errors.phone ? 'Este campo no puede estar vacío' : ''}
                             onChange={handleTelefonoChange}
                             InputProps={{
                                 startAdornment: <Phone size={20} style={{ marginRight: '8px', color: '#666' }} />,

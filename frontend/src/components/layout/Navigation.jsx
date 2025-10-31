@@ -72,7 +72,12 @@ export default function Navigation({ user, logout }) {
 
   // Componente para cuando el usuario NO está logueado
   function LoggedOutControls() {
-    return <Link to="/login" className="NavBarLoginButton">Iniciar Sesión</Link>;
+    return (
+      <>
+        <Link to="/login" className="NavBarLoginButton">Iniciar Sesión</Link>
+        <Link to="/register" className="NavBarRegisterButton">Regístrate</Link>
+      </>
+    );
   }
 
   return (

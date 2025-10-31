@@ -65,22 +65,30 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # Remover password2 del diccionario
-        validated_data.pop('password2')
+        validated_data.pop('password2', None)
         
-        # Crear el User
+        # campos que faltaban para create user 
+        phone = validated_data.pop('phone', '') or ''
+        codigo = validated_data.pop('codigo', None)
+        cedula = validated_data.pop('cedula', None)
+
+        # Crear el User (asegura que se pasan los campos requeridos)
         user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password'],
-            name=validated_data['name'],
-            last_name=validated_data['last_name'],
-            phone=validated_data.get('phone', ''),
-            rol=validated_data['rol']
+            username=validated_data.get('username'),
+            email=validated_data.get('email'),
+            password=validated_data.get('password'),
+            name=validated_data.get('name'),
+            last_name=validated_data.get('last_name'),
+            phone=phone,
+            rol=validated_data.get('rol'),
+            cedula=cedula,
+            codigo=codigo
         )
 
         # Manejar el avatar si está presente
-        if 'avatar' in validated_data:
-            user.avatar = validated_data['avatar']
+        avatar = validated_data.get('avatar')
+        if avatar:
+            user.avatar = avatar
             user.save()
 
         return user

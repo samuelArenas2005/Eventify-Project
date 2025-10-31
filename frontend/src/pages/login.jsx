@@ -138,7 +138,7 @@ const Login = ({ login }) => {
               {...register("password", {
                 required: "Este campo no puede estar vacío",
                 minLength: {
-                  value: 6,
+                  value: 0,
                   message: "La contraseña debe tener al menos 6 caracteres",
                 },
               })}
