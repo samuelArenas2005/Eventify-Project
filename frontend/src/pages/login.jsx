@@ -16,6 +16,7 @@ import backgroundImage from "../assets/register_background.png";
 
 const Login = ({ login }) => {
   const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(false);
 
   // Para el login, solo necesitamos register, handleSubmit, reset y errors
   const {
@@ -137,17 +138,9 @@ const Login = ({ login }) => {
               fullWidth
               {...register("password", {
                 required: "Este campo no puede estar vacío",
-                minLength: {
-                  value: 0,
-                  message: "La contraseña debe tener al menos 6 caracteres",
-                },
+                
               })}
               error={!!errors.password}
-              helperText={
-                errors.password
-                  ? errors.password.message
-                  : "Mínimo 6 caracteres"
-              }
               InputProps={{
                 startAdornment: (
                   <Lock

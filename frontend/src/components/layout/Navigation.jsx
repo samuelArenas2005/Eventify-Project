@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Navigation.css";
 import { Link } from "react-router-dom";
-import { Moon, Sun, Bell } from 'lucide-react'; // Quité 'User' que no se usaba
+import { Moon, Sun, Bell, Home } from 'lucide-react'; // Quité 'User' que no se usaba
 
 export default function Navigation({ user, logout }) {
   const [temaOscuro, setTemaOscuro] = useState(false);
@@ -46,24 +46,27 @@ export default function Navigation({ user, logout }) {
         {/* El menú desplegable se posiciona de forma absoluta, por eso está fuera del div */}
         {menuOpen && (
           <ul className="menuLinks">
-            <li><Link to="/">Inicio</Link></li>
-            <li><Link to="/SearchPage">Eventos</Link></li>
             <li>
-              <Link
-                style={{
-                  pointerEvents: "none",
-                  color: "gray",
-                  textDecoration: "none",
-                  cursor: "not-allowed"
-                }}
-                to="/calendario"
-              >
-                Calendario
-              </Link>
+              <Link onClick={toggleMenuHamburguesa} to="/">Inicio</Link>
             </li>
-            <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/createEvent">Crear Evento</Link></li>
-            <li><Link to="/" onClick={logout}>Cerrar Sesión</Link></li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/searchPage">Eventos</Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/calendario">Calendario</Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/dashboard">Dashboard</Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/createEvent">Crear Evento</Link>
+            </li>
+            <li>
+              <Link onClick={(e) => {
+                logout();
+                toggleMenuHamburguesa();
+              }}>Cerrar Sesión</Link>
+            </li>
           </ul>
         )}
       </>
@@ -88,15 +91,16 @@ export default function Navigation({ user, logout }) {
 
       {/* Contenedor principal de todos los elementos de la derecha */}
       <div className="nav-derecha">
-        <div className="IconoTema" onClick={toggleTema}>
+        <div className="IconoTema" >
           {temaOscuro ? (
-            <Moon className="icon" />
+            <Moon className="iconDesactive" />
           ) : (
-            <Sun className="icon" />
+            <Sun className="iconDesactive" />
           )}
         </div>
         {user ? <LoggedInControls /> : <LoggedOutControls />}
       </div>
+
     </nav>
   );
 }

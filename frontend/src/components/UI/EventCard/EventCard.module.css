@@ -3,13 +3,13 @@ body{
 }
 
 .cardContainer {
-  /* Tamaño escalado (antes 300px) */
-  width: 360px; 
-  /* Radio escalado (antes 26px) */
-  border-radius: 31px; 
-  background-color: --fondo-nav;
+  /* Tarjeta más ancha y cuadrada */
+  width: 410px; 
+  /* Radio más pequeño para aspecto más cuadrado */
+  border-radius: 20px; 
+  background-color: #fff;
   /* Sombra escalada (antes 6px 12px) */
-  box-shadow: 0px 7px 14px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
   /* Padding escalado (antes 15px) */
   padding: 18px; 
   display: flex;
@@ -35,17 +35,17 @@ body{
   margin-bottom: 18px; 
   /* Añadido para contener el zoom de la imagen */
   overflow: hidden; 
-  /* Radio escalado para que coincida con la imagen */
-  border-radius: 14px; 
+  /* Radio más pequeño para aspecto más cuadrado */
+  border-radius: 12px; 
 }
 
 .eventImage {
   width: 100%;
-  /* Altura escalada (antes 128px) */
-  height: 154px; 
+  /* Altura aumentada para aspecto más cuadrado */
+  height: 180px; 
   object-fit: cover;
-  /* Radio escalado (antes 12px) */
-  border-radius: 14px; 
+  /* Radio más pequeño para aspecto más cuadrado */
+  border-radius: 12px; 
   /* Sombra escalada (antes 2px 4px 4px) */
   box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.1); 
   /* Transición añadida para el zoom en hover */
@@ -218,27 +218,110 @@ body{
 }
 
 .registerButton {
-  width: 271px; 
-  height: 43px; 
-  border-radius: 19px; 
-  background-color: #0B72B9;
+  width: 100%; 
+  height: 40px; 
+  border-radius: 20px; 
+  background: linear-gradient(135deg, #0B72B9, #00C2B3);
   color: white;
   font-family: 'Poppins', sans-serif;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px; 
   border: none;
   cursor: pointer;
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15); 
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  box-shadow: 0px 3px 12px rgba(11, 114, 185, 0.3); 
+  transition: all 0.3s ease-in-out;
   display: block;
   margin: 0 auto;
   margin-top: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.registerButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.registerButton:hover::before {
+  left: 100%;
 }
 
 .registerButton:hover {
-  transform: scale(1.03);
-  /* Sombra escalada (antes 4px 12px) */
-  box-shadow: 0px 0px 8px #00C2B3; 
+  transform: translateY(-2px);
+  box-shadow: 0px 8px 24px rgba(11, 114, 185, 0.4); 
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cardContainer {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  
+  .eventImage {
+    height: 200px;
+  }
+  
+  .eventTitle {
+    font-size: 20px;
+  }
+  
+  .eventDescription {
+    font-size: 13px;
+  }
+  
+  .detailText {
+    font-size: 13px;
+  }
+  
+  .registerButton {
+    height: 38px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardContainer {
+    width: 100%;
+    max-width: 380px;
+    padding: 20px;
+  }
+  
+  .eventImage {
+    height: 180px;
+  }
+  
+  .eventTitle {
+    font-size: 18px;
+  }
+  
+  .eventDescription {
+    font-size: 12px;
+  }
+  
+  .detailText {
+    font-size: 12px;
+  }
+  
+  .detailIcon {
+    min-width: 18px;
+  }
+  
+  .registerButton {
+    height: 36px;
+    font-size: 12px;
+  }
+  
+  .organizerSection {
+    font-size: 13px;
+  }
 }
 
 

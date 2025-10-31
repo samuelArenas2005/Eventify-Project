@@ -7,23 +7,8 @@
   --fondo-menu: #ffffff;
   --texto-menu: #333;
   --hover-menu: #f0f0f0;
-  --fuente-base: 'Poppins', sans-serif;
-  --color-primary: #8a63f4; /* Añadí esta variable para consistencia */
-  --border-radius-md: 8px; /* Añadí esta variable para consistencia */
-  font-family: var(--fuente-base);
 }
 
-/* 🌙 Modo oscuro */
-body.modo-oscuro {
-  --fondo-nav: #0f172a;
-  --icon-color: #e2e8f0;
-  --fondo-menu: #1e293b;
-  --texto-menu: #e2e8f0;
-  --hover-menu: #334155;
-  background-color: #0f172a;
-  color: #f8fafc;
-  font-family: var(--fuente-base);
-}
 
 /* 🧭 Barra de navegación principal */
 .NavBar {
@@ -80,6 +65,16 @@ body.modo-oscuro {
 .icon:hover {
   transform: scale(1.1);
   color: var(--color-primary);
+}
+
+.iconDesactive {
+  font-size: 1.2rem;
+  color: gray;
+  opacity: 20;
+  transition: transform 0.2s, color 0.3s, opacity 0.3s;
+  display: flex; /* Asegura buena alineación */
+  align-items: center;
+
 }
 
 /* Menú hamburguesa */
@@ -187,6 +182,7 @@ body.modo-oscuro {
 .menuLinks li:hover {
   background-color: var(--hover-menu);
 }
+
 
 /* Botón de Iniciar Sesión */
 .NavBarLoginButton {

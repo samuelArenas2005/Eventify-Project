@@ -109,30 +109,50 @@ const UserProfileDashboard = ({user}) => {
 
   return (
     <div className={styles.dashboardContainer}>
-      {/* --- Sección de Perfil (Sin cambios) --- */}
+      {/* --- Sección de Perfil Mejorada --- */}
       <header className={styles.profileHeader}>
-        {(user.avatar ? 
-        <img src={user.avatar} alt="Avatar" className={styles.profileAvatar} /> :
-        <div className={styles.profileInitials}>{initials}</div>)}
-        <div className={styles.profileInfo}>
-          <h1>{FullName}</h1>
-          <p>{user.email}</p>
-          <div className={styles.profileTags}>
-            <span>{user.rol}</span>
-            <span>{user.codigo}</span>
+        <div className={styles.profileMain}>
+          <div className={styles.profileImageContainer}>
+            {(user.avatar ? 
+            <img src={user.avatar} alt="Avatar" className={styles.profileAvatar} /> :
+            <div className={styles.profileInitials}>{initials}</div>)}
+            <div className={styles.statusIndicator}></div>
+          </div>
+          <div className={styles.profileInfo}>
+            <div className={styles.profileTitle}>
+              <h1>{FullName}</h1>
+              <div className={styles.profileTags}>
+                <span className={styles.roleTag}>{user.rol}</span>
+                <span className={styles.codeTag}>{user.codigo}</span>
+              </div>
+            </div>
+            <div className={styles.profileDetails}>
+              <p className={styles.emailText}>{user.email}</p>
+              <div className={styles.profileStats}>
+                <span className={styles.statItem}>
+                  <Calendar size={14} />
+                  <span>Miembro desde 2024</span>
+                </span>
+                <span className={styles.statItem}>
+                  <Star size={14} />
+                  <span>
+                    {(user.is_active) ? 'Activo' : 'Inactivo'}
+                  </span>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
         <div className={styles.profileActions}>
           <Link to="/createEvent" className={`${styles.actionButton} ${styles.createButton}`}>
-            <CirclePlus size={16} /> Crear Evento
+            <CirclePlus size={18} /> Crear Evento
           </Link>
           <button className={styles.actionButton}>
-            <Edit size={16} /> Editar Perfil
+            <Edit size={18} /> Editar Perfil
           </button>
           <button className={styles.actionButton}>
-            <Settings size={16} /> Configuración
+            <Settings size={18} /> Configuración
           </button>
-          
         </div>
       </header>
 
