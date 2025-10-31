@@ -1,0 +1,134 @@
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  /* Fondo oscuro para que el degradado resalte (opcional) */
+  background-color: transparent;
+}
+
+.textWrapper {
+  /* Posición relativa para anclar los SVGs */
+  position: relative;
+  text-align: center;
+  /* Damos espacio arriba para que los SVGs tengan dónde aparecer */
+  padding-top: 20px;
+  transition: padding-top 0.4s ease;
+  cursor: pointer;
+}
+
+
+/* --- Título con Rotterin y Degradado ---
+*/
+.title {
+  font-family: 'Poppins', sans-serif; /* Fallback por si Rotterin falla */
+  font-size: 3.2rem; /* Ajusta el tamaño según necesites */
+  margin: 0;
+  margin-bottom: 10px;
+  letter-spacing: 5px;
+  padding-top: 10px;
+  
+  /* 1. El Degradado: de derecha (#0b72b9) a izquierda (#e11d9e) */
+  background: linear-gradient(to left, #0b72b9, #e11d9e);
+  
+  /* 2. El truco para aplicar el degradado al texto */
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  
+  /* Evita que el usuario seleccione el texto (mejora la sensación del hover) */
+  user-select: none;
+}
+
+/* --- Subtítulo con Chewy ---
+*/
+.subtitle {
+  font-family: 'Poppins', cursive; /* Fallback */
+  font-size: 0.9rem; /* Tamaño menor que el título */
+  color: #6b7280;
+  margin: -10px 0 0 0; /* Ajuste fino de posición */
+  user-select: none;
+  font-weight: normal;
+  font-style: bold;
+}
+
+/* =======================================
+ ANIMACIÓN DE SVGs
+ =======================================
+*/
+
+.svgContainer {
+  /* Este contenedor es solo un holder, 
+     los SVGs se posicionarán respecto al .textWrapper */
+}
+
+.svgIcon {
+  position: absolute;
+  width: 150px; /* Tamaño de los iconos */
+  height: 150px;
+  
+  /* 1. ESTADO INICIAL (Ocultos y "abajo") */
+  opacity: 0;
+  z-index: -1; /* Detrás del texto */
+  
+  /* Anclados arriba y centrados horizontalmente en el .textWrapper */
+  left: 50%;
+  top: 0; /* Aparecerán "desde el título" (en la zona del padding-top) */
+  
+  /* Empezamos escalados (scale(0.5)) y movidos hacia abajo (translateY(30px)) */
+  transform-origin: center bottom;
+  
+  /* La transición: 'all' para animar opacity y transform.
+    La función cubic-bezier() crea el efecto "pop" (se pasa un poco y rebota).
+  */
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+/* Posiciones iniciales específicas (separadas) */
+.svg1 {
+  /* translateX(-120%) = 120% a la izquierda de su posición (left: 50%) */
+  transform: translate(-120%, 30px) scale(0.5); 
+}
+.svg2 {
+  /* translateX(-50%) = centrado exacto */
+  transform: translate(-50%, 30px) scale(0.5);
+}
+.svg3 {
+  /* translateX(20%) = 20% a la derecha de su posición (left: 50%) */
+  transform: translate(20%, 30px) scale(0.5);
+}
+
+
+/* 2. ESTADO HOVER (Visibles y en posición final) 
+  Cuando hacemos hover en .textWrapper...
+*/
+.textWrapper:hover .svgIcon {
+  opacity: 1;
+  
+  /* Posición final: 
+    Se mueven hacia arriba (translateY(0)) y escalan a tamaño completo (scale(1))
+  */
+}
+
+.textWrapper:hover{
+  /* Todos los SVGs comparten la transición de opacidad y transform */
+  padding-top: 130px;
+}
+
+.textWrapper:hover .svg1 {
+
+  transform: translate(-120%, 0) scale(1);
+  /* Sin delay, aparece primero */
+}
+
+.textWrapper:hover .svg2 {
+  /* El del medio sube un poco más para variar */
+  transform: translate(-50%, -15px) scale(1);
+  transition-delay: 0.1s; /* Delay secuencial */
+}
+
+.textWrapper:hover .svg3 {
+  transform: translate(30%, 0) scale(1);
+  transition-delay: 0.2s; /* Delay secuencial */
+}

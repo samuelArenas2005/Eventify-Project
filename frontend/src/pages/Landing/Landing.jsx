@@ -23,7 +23,7 @@ function Landing() {
             <Link to="/createEvent" className={`${style.button} ${style.buttonPrimary}`}>
               Crea Eventos
             </Link>
-            <Link to="/SearchEvent" className={`${style.button} ${style.buttonSecondary}`}>
+            <Link to="/searchPage" className={`${style.button} ${style.buttonSecondary}`}>
               Explora eventos{" "}
               <ArrowRight size={16} />
             </Link>

@@ -2,6 +2,7 @@ import { use, useEffect, useState } from 'react'
 import React from 'react'
 import { getEvents } from './searchPage'
 import EventCard from '../../components/UI/EventCard/EventCard.jsx';
+import TextPop from '../../components/UI/TextPop/TextPop.jsx';
 import { set } from 'react-hook-form';
 import style from "./SearchPage.module.css"
 import { Search, Filter } from 'lucide-react';
@@ -27,8 +28,7 @@ export default function SearchPage() {
     return (
 
         <div>
-            <h1 className={style.titulo}>Explorar eventos</h1>
-            <h2 className={style.subtitulo}>Descubre eventos increíbles de tu universidad</h2>
+            <TextPop></TextPop>
             <div className={style.search}>
                 <form action="buscar" class={style.searchForm}>
                     <div class={style.searchContainer}>
@@ -39,7 +39,7 @@ export default function SearchPage() {
                             placeholder="Buscar un evento..."
                         />
                         <button type="submit" class={style.searchButton}>
-                            <Search></Search>
+                            <Search style={{margin: '10px'}}></Search>
                         </button>
                     </div>
                 </form>
