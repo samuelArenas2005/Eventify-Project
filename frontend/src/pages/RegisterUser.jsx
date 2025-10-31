@@ -13,7 +13,6 @@ import MenuItem from '@mui/material/MenuItem';
 import backgroundImage from '../assets/register_background.png'; // Add this import at the top
 import { useState, useEffect } from 'react'; 
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import { 
     User2, 
     Phone, 
