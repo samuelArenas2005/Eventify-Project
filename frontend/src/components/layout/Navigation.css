@@ -138,6 +138,7 @@
   font-weight: 700;
   box-shadow: 0 8px 25px rgba(225, 29, 158, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .profileInitials:hover {

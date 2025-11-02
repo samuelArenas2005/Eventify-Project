@@ -11,6 +11,8 @@ from .views import (
     PendingAttendeesList,
     EventsByCreatorList,
     ActiveEventsList,
+    AllRegisteredEventsList,
+    AllCreatedEventsList,
 )
 
 
@@ -25,4 +27,6 @@ urlpatterns = [
     path('pending/', PendingAttendeesList.as_view(), name='pending-attendees'),
     path('created/', EventsByCreatorList.as_view(), name='events-by-creator'),   
     path('active/', ActiveEventsList.as_view(), name='active-events'),
+    path('registered/all/', AllRegisteredEventsList.as_view(), name='all-registered-events'),
+    path('created/all/', AllCreatedEventsList.as_view(), name='all-created-events'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

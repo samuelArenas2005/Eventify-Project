@@ -78,3 +78,13 @@ export const getAllEvents = async () => {
     return [];  // Retornamos array vacío en caso de error
   }
 }
+
+export const getAllRegisteredEventsCount = () => {
+  // Suponiendo que tienes un endpoint que trae TODOS los eventos registrados (activos y finalizados)
+  return axios.get(`${BASE_URL}event/registered/all/`, { withCredentials: true });
+}
+
+export const getAllCreatedEventsCount = () => {
+  // Suponiendo que tienes un endpoint que trae TODOS los eventos creados (activos y finalizados)
+  return axios.get(`${BASE_URL}event/created/all/`, { withCredentials: true });
+}

@@ -20,13 +20,14 @@ import {
 } from 'lucide-react';
 import styles from './CreateEventPage.module.css';
 
-const EventDashboard = () => {
+const EventDashboard = ({onClose=null}) => {
   // --- Estados ---
   const [images, setImages] = useState([]); // Almacena { url: '...', file: File }
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
 
+  console.log("hola soy onClose", onClose);
   // --- React Hook Form ---
   const {
     register,
@@ -133,7 +134,7 @@ const EventDashboard = () => {
     // fetch('/api/events', { method: 'POST', body: formData })
     //   .then(res => res.json())
     //   .then(result => { ... })
-    
+
     console.log('--- Datos del Evento Enviados ---');
     console.log('Datos del formulario:', data);
     console.log('Total de imágenes:', images.length);
@@ -166,17 +167,24 @@ const EventDashboard = () => {
         <main className={styles.mainContent}>
           {/* Botón Volver al Dashboard */}
           <div className={styles.backButtonContainer}>
-            <Link to="/dashboard" className={styles.backButton}>
-              <ArrowLeft size={16} />
-              Volver al Dashboard
-            </Link>
+            {typeof onClose === "function" ? (
+              <button className={styles.closeButton} onClick={onClose}>
+                <ArrowLeft size={16} />
+                Cerrar
+              </button>
+            ) : (
+              <Link to="/dashboard" className={styles.backButton}>
+                <ArrowLeft size={16} />
+                Volver al Dashboard
+              </Link>
+            )}
           </div>
-          
+
           <form onSubmit={handleSubmit(onSubmit, onError)} className={styles.formGrid}>
-            
+
             {/* Columna Izquierda: Detalles del Evento */}
             <section className={`${styles.formColumn} ${styles.softAnimation}`}>
-              <h1  className={styles.title} > <LayoutDashboard size={28} /> Crear Nuevo Evento</h1>
+              <h1 className={styles.title} > <LayoutDashboard size={28} /> Crear Nuevo Evento</h1>
               <h2 className={styles.columnTitle}>Detalles del Evento</h2>
 
               {/* Título */}
@@ -225,7 +233,7 @@ const EventDashboard = () => {
                     className={styles.input}
                     {...register('startDate', {
                       required: 'La fecha de inicio es obligatoria',
-                      validate: val => new Date(val) >= new Date().setHours(0,0,0,0) || "La fecha no puede ser en el pasado"
+                      validate: val => new Date(val) >= new Date().setHours(0, 0, 0, 0) || "La fecha no puede ser en el pasado"
                     })}
                   />
                   {errors.startDate && <span className={styles.errorMessage}>{errors.startDate.message}</span>}
@@ -335,7 +343,7 @@ const EventDashboard = () => {
                 </div>
               </div>
 
-               {/* Botón de Envío */}
+              {/* Botón de Envío */}
               <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
@@ -426,7 +434,7 @@ const EventDashboard = () => {
                             }}
                             title="Marcar como principal"
                           >
-                            <Star size={14} fill={mainImageIndex === index ? 'currentColor' : 'none'}/>
+                            <Star size={14} fill={mainImageIndex === index ? 'currentColor' : 'none'} />
                           </button>
                           <button
                             type="button"

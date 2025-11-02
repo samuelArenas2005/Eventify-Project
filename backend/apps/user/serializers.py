@@ -21,7 +21,8 @@ class UserSerializer(serializers.ModelSerializer):
             'codigo',
             'cedula',
             'is_active',
-            'is_admin'
+            'is_admin',
+            'date_joined'
         )
         read_only_fields = ('id', 'is_active','is_admin')
 

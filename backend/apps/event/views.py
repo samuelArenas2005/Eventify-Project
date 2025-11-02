@@ -206,6 +206,32 @@ class ActiveEventsList(generics.ListAPIView):
             qs = qs.exclude(creator=user)
 
         return qs
-    
+
+class AllRegisteredEventsList(generics.ListAPIView):
+    """
+    /api/event/registered/all/ -> devuelve todos los EventAttendee del usuario (activos y finalizados)
+    """
+    serializer_class = EventAttendeeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return (
+            EventAttendee.objects
+            .select_related('user', 'event')
+            .filter(user=user)
+        )
+
+class AllCreatedEventsList(generics.ListAPIView):
+    """
+    /api/event/created/all/ -> devuelve todos los eventos creados por el usuario (activos y finalizados)
+    """
+    serializer_class = EventListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Event.objects.filter(creator=user)
+
 
 

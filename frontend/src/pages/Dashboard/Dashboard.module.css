@@ -42,6 +42,16 @@
   }
 }
 
+
+.quickCreatePanel{
+  z-index: 100;
+  position: relative;
+  top: auto;
+  right: auto;
+  margin-bottom: 2rem;
+  border-radius: 20px;
+}
+
 /* --- Perfil Mejorado --- */
 .profileHeader {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -57,6 +67,8 @@
   overflow: hidden;
   animation: slideInUp 0.8s ease-out;
 }
+
+
 
 .profileHeader::before {
   content: '';
@@ -258,17 +270,28 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   border: 1px solid #E5E7EB;
 }
+.statInfo {
+  display: flex;
+  flex-direction: column;
+}
+
 .statInfo span {
   font-size: 0.95rem;
   color: #6B7280;
   display: block;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
 }
-.statInfo strong {
-  font-size: 2.25rem;
-  font-weight: 600;
+
+.statInfo b {
+  font-size: 2.5rem;
+  font-weight: 700;
   color: #111827;
   line-height: 1;
+  background: linear-gradient(135deg, #E11D9E, #9333EA);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fadeIn 0.6s ease-out;
 }
 .statIcon {
   padding: 0.9rem;
@@ -278,16 +301,13 @@
   justify-content: center;
 }
 .iconEvents {
-  background-color: #F3E8FF;
-  color: #9333EA;
+  color: var(--color-primary);
 }
 .iconCreated {
-  background-color: #EDE9FE;
-  color: #7C3AED;
+  color: var(--color-secondary);
 }
 .iconRating {
-  background-color: #F5D0FE;
-  color: #C026D3;
+  color: var(--color-tertiary);
 }
 
 /* --- Tabs (Sin cambios) --- */
@@ -517,5 +537,70 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+}
+
+/* --- Modal overlay y panel movidos desde inline styles --- */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.55);
+  z-index: 9999;
+  padding: 20px; /* espacio para que el modal no toque los bordes */
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes popOut {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0; }
+}
+
+.modalPanel {
+  animation: popOut 0.3s forwards;
+}
+
+.show .modalPanel {
+  animation: popIn 0.3s forwards;
+}
+
+.modalPanel {
+  background: #fff;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 900px;
+  max-height: calc(100vh - 80px);
+  box-sizing: border-box;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalContent {
+  padding: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
 }
 

@@ -1,29 +1,35 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 import EventCard from '../../components/UI/EventCard/EventCard';
-import { Edit, Settings, Calendar, User, Star, Filter,CirclePlus,Plus} from 'lucide-react';
-import { getRegisteredEvents,getPendingEvents,getCreatedEvent } from './GetEventsData';
+import { Edit, Settings, Calendar, User, Star, Filter, CirclePlus, Plus, CalendarCheck2 } from 'lucide-react';
+import { getRegisteredEvents, getPendingEvents, getCreatedEvent } from './GetEventsData';
+import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../API/api';
+import EventDashboard from '../../components/UI/EventCreate/EventForm'
 
 const historyData = [];
 
 // --- Componente Principal ---
-const UserProfileDashboard = ({user}) => {
+const UserProfileDashboard = ({ user }) => {
   const [activeTab, setActiveTab] = useState('registrados');
   const [loading, setLoading] = useState(true);
   const [registeredEventsData, setregisteredEventsData] = useState([])
   const [pendingEventData, setpendingEventData] = useState([])
   const [myEventsData, setMyEventsData] = useState([])
+  const [totalRegisteredCount, setTotalRegisteredCount] = useState(0);
+  const [totalCreatedCount, setTotalCreatedCount] = useState(0);
+  const [toggleCreatePanel, setToggleCreatePanel] = useState(false);
 
   const FullName = user ? `${user.name} ${user.last_name}` : 'Usuario';
   const initials = user ? `${user.name.charAt(0)}${user.last_name.charAt(0)}` : 'UU';
+  const dateRegister = user ? `${user.date_joined.substring(0, 4)}` : 'fecha no disponible';
 
   const handleFilterClick = () => {
     alert('Abrir modal de filtros');
   };
 
   console.log(user);
-  
+
 
   useEffect(() => {
     async function loadEvents() {
@@ -31,13 +37,18 @@ const UserProfileDashboard = ({user}) => {
       const Registerdata = await getRegisteredEvents();
       const PendingData = await getPendingEvents();
       const CreatedData = await getCreatedEvent();
+
+      // Nuevas llamadas para contar todos los eventos (activos + finalizados)
+      const allRegistered = await getAllRegisteredEventsCount();
+      const allCreated = await getAllCreatedEventsCount();
+
       setLoading(false);
       setregisteredEventsData(Registerdata)
       setpendingEventData(PendingData)
       setMyEventsData(CreatedData)
-      console.log(Registerdata)
-      console.log(PendingData)
-      console.log(CreatedData)
+      setTotalRegisteredCount(allRegistered.data.length);
+      setTotalCreatedCount(allCreated.data.length);
+      console.log(user)
     }
 
     loadEvents();
@@ -82,11 +93,11 @@ const UserProfileDashboard = ({user}) => {
         <div className={styles.contentHeader}>
           <h2 className={styles.contentTitle}>{title}</h2>
           <div className={styles.viewOptions}>
-            {type == 'myevent' ? 
-            <Link to="/createEvent" className={`${styles.actionButton} ${styles.createButton}`}>
-              <Plus size={16} /> 
-            </Link>
-            :null}
+            {type == 'myevent' ?
+              <button onClick={() => setToggleCreatePanel(true)}className={`${styles.actionButton} ${styles.createButton}`}>
+                <Plus size={16} />
+              </button>
+              : null}
             <button className={styles.filterButton} onClick={handleFilterClick}>
               <Filter size={16} />
               Filtrar
@@ -113,9 +124,9 @@ const UserProfileDashboard = ({user}) => {
       <header className={styles.profileHeader}>
         <div className={styles.profileMain}>
           <div className={styles.profileImageContainer}>
-            {(user.avatar ? 
-            <img src={user.avatar} alt="Avatar" className={styles.profileAvatar} /> :
-            <div className={styles.profileInitials}>{initials}</div>)}
+            {(user.avatar ?
+              <img src={user.avatar} alt="Avatar" className={styles.profileAvatar} /> :
+              <div className={styles.profileInitials}>{initials}</div>)}
             <div className={styles.statusIndicator}></div>
           </div>
           <div className={styles.profileInfo}>
@@ -131,7 +142,7 @@ const UserProfileDashboard = ({user}) => {
               <div className={styles.profileStats}>
                 <span className={styles.statItem}>
                   <Calendar size={14} />
-                  <span>Miembro desde 2024</span>
+                  <span>Miembro desde {dateRegister}</span>
                 </span>
                 <span className={styles.statItem}>
                   <Star size={14} />
@@ -161,28 +172,28 @@ const UserProfileDashboard = ({user}) => {
         <div className={styles.statCard}>
           <div className={styles.statInfo}>
             <span>Eventos Asistidos</span>
-            <strong>.</strong>
+            <b>{totalRegisteredCount || '0'}</b>
           </div>
           <div className={`${styles.statIcon} ${styles.iconEvents}`}>
-            <Calendar size={24} />
+            <CalendarCheck2 size={25} />
           </div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statInfo}>
             <span>Eventos Creados</span>
-            <strong>.</strong>
+            <b>{totalCreatedCount || '0'}</b>
           </div>
           <div className={`${styles.statIcon} ${styles.iconCreated}`}>
-            <User size={24} />
+            <User size={25} />
           </div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statInfo}>
             <span>Calificación Promedio</span>
-            <strong>.</strong>
+            <b>0</b>
           </div>
           <div className={`${styles.statIcon} ${styles.iconRating}`}>
-            <Star size={24} />
+            <Star size={25} />
           </div>
         </div>
       </section>
@@ -194,7 +205,7 @@ const UserProfileDashboard = ({user}) => {
         >
           Eventos Registrados
         </button>
-         <button
+        <button
           className={`${styles.tabButton} ${activeTab === 'megustas' ? styles.active : ''}`}
           onClick={() => setActiveTab('megustas')}
         >
@@ -218,6 +229,16 @@ const UserProfileDashboard = ({user}) => {
       <main className={styles.contentSection}>
         {renderContent()}
       </main>
+      {(toggleCreatePanel ? 
+      <div className={`${styles.modalOverlay} ${toggleCreatePanel ? styles.show : ""}`}>
+        <div className={`${styles.quickCreatePanel} ${styles.modalPanel}`}>
+          <div className={styles.modalContent}>
+            <EventDashboard onClose={() => setToggleCreatePanel(false)} />
+          </div>
+        </div>
+      </div> : null)}
+
+
     </div>
   );
 };

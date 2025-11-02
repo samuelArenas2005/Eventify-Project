@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./Navigation.css";
-import { Link } from "react-router-dom";
-import { Moon, Sun, Bell, Home } from 'lucide-react'; // Quité 'User' que no se usaba
+import { Link, useNavigate } from "react-router-dom";
+import { Moon, Sun, Bell } from 'lucide-react';
 
 export default function Navigation({ user, logout }) {
   const [temaOscuro, setTemaOscuro] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const initials = user ? `${user.name.charAt(0)}${user.last_name.charAt(0)}` : 'UU';
   
+  const navigate = useNavigate();
+
   const toggleTema = () => setTemaOscuro((v) => !v);
   const toggleMenuHamburguesa = () => setMenuOpen((v) => !v);
 
@@ -35,7 +37,7 @@ export default function Navigation({ user, logout }) {
             )}
           </div>
 
-          <div className={"profileImageContainer"}>
+          <div className={"profileImageContainer"} onClick={() => navigate('/dashboard')}>
             {(user.avatar ? 
             <img src={user.avatar} alt="Avatar" className={"profileAvatar"} /> :
             <div className={"profileInitials"}>{initials}</div>)}
