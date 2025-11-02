@@ -1,0 +1,272 @@
+/* --- Overlay y Contenedor Principal --- */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65); /* Fondo oscuro semitransparente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Z-index alto como solicitaste */
+  padding: 1rem;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 900px; /* Ancho máximo del modal */
+  max-height: 90vh; /* Altura máxima, deja márgenes */
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 10px 30px var(--color-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Controla el desbordamiento */
+  position: relative; /* Para el botón de cerrar */
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--text-secundary);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  z-index: 10;
+}
+.closeButton:hover {
+  color: var(--text-primary);
+}
+
+/* --- Cuerpo del Modal (Galería + Detalles) --- */
+.modalBody {
+  display: flex;
+  padding: 2rem 2.5rem;
+  gap: 2rem;
+  overflow-y: auto; /* Scroll solo si el contenido es muy largo */
+}
+
+/* --- Columna de Galería --- */
+.gallery {
+  flex: 1;
+  min-width: 300px;
+}
+.mainImageContainer {
+  width: 100%;
+  padding-top: 66.66%; /* Aspect ratio 3:2 */
+  position: relative;
+  background-color: var(--color-light-bg);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+.mainImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.noImagePlaceholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secundary);
+  font-family: var(--font-title);
+}
+.thumbnailContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.thumbnail {
+  width: 70px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  opacity: 0.6;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+.thumbnail:hover {
+  opacity: 1;
+}
+.thumbnail.active {
+  opacity: 1;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 5px var(--color-primary);
+}
+
+/* --- Columna de Detalles --- */
+.details {
+  flex: 1.2; /* Un poco más de espacio para el texto */
+  display: flex;
+  flex-direction: column;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.title {
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+.tags {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+.tag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 100px; /* pill shape */
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-white);
+  text-transform: uppercase;
+}
+.tagCategory {
+  background-color: var(--color-secondary);
+}
+.tagStatus {
+  background-color: var(--color-info);
+}
+
+.description {
+  font-size: 0.95rem;
+  color: var(--text-secundary);
+  line-height: 1.6;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* --- Grid de Información --- */
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.infoIcon {
+  font-size: 1.2rem;
+  margin-top: 2px;
+  color: var(--color-primary);
+}
+.infoItem > div {
+  display: flex;
+  flex-direction: column;
+}
+.infoLabel {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.infoValue {
+  font-size: 0.9rem;
+  color: var(--text-secundary);
+}
+
+/* --- Footer de Acciones --- */
+.footerActions {
+  padding: 1rem 2.5rem;
+  background-color: var(--color-light-bg);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: auto; /* Empuja el footer hacia abajo */
+}
+
+.button {
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--color-white);
+}
+.button:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.registerButton {
+  background-color: var(--color-success);
+}
+.editButton {
+  background-color: var(--color-warning);
+}
+.deleteButton {
+  background-color: var(--color-danger);
+}
+
+/* --- Responsividad --- */
+@media (max-width: 768px) {
+  .modalContent {
+    max-height: 95vh;
+  }
+  .modalBody {
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+  .gallery {
+    min-width: auto;
+  }
+  .title {
+    font-size: 1.5rem;
+  }
+  .infoGrid {
+    grid-template-columns: 1fr; /* Una columna en móviles */
+    gap: 1rem;
+  }
+  .footerActions {
+    padding: 1rem 1.5rem;
+    flex-direction: column; /* Botones apilados */
+  }
+  .button {
+    width: 100%;
+  }
+}
