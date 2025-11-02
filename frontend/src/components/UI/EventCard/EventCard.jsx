@@ -17,17 +17,14 @@ const EventCard = ({
   onHeartClick,
   showHeartButton,
   showRegisterButton,
-  activeHeart = true, 
-}) => {
+  activeHeart = true,
+  handleImageTitleClick,
+  }) => {
   const [isHeartActive, setIsHeartActive] = useState(activeHeart);
 
   const handleHeartClick = () => {
     setIsHeartActive(!isHeartActive);
     onHeartClick && onHeartClick();
-  };
-
-  const handleImageTitleClick = () => {
-    console.log('Abrir detalle del evento (componente futuro)');
   };
 
   const categoryColors = {
