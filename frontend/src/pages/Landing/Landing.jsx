@@ -1,8 +1,9 @@
 // src/pages/Landing.jsx
-import React from "react";
+import React, { useState } from "react";
 import style from "./Landing.module.css";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Users, Calendar, Star, Mail, MapPin, Phone } from "lucide-react";
+import toast from "react-hot-toast";
 
 const HERO_IMAGE_URL = 'https://images.pexels.com/photos/8197544/pexels-photo-8197544.jpeg';
 

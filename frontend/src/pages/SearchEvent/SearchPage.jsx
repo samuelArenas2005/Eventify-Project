@@ -61,8 +61,10 @@ export default function SearchPage() {
                 </div>
             </div>
             <div className={style.eventCards}>
-                {eventsData.map((event) => (
-                    <EventCard key={event.id} {...event} />
+                {eventsData.map((event, index) => (
+                    <div key={event.id} style={{"--card-index": index}}>
+                        <EventCard {...event} />
+                    </div>
                 ))}
             </div>
         </div>

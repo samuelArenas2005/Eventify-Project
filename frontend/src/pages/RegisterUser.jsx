@@ -167,16 +167,17 @@ const RegisterUser = () => {
   };
 
   return (
-    <Box
+      <Box
       sx={{
         minHeight: "100vh",
         display: "flex",
-        justifyContent: "flex-end",
+        justifyContent: { xs: "center", sm: "flex-end" },
         alignItems: "center",
         background: `url(${backgroundImage})`,
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
+        padding: { xs: '16px', sm: 0 },
       }}
     >
       <Box
@@ -187,15 +188,16 @@ const RegisterUser = () => {
           boxShadow:
             "0 5px 32px 5px rgba(11, 115, 185, 0.27), 0 1.5px 5px 0px rgba(194, 70, 180, 0.32)",
           backdropFilter: "blur(8px)",
-          p: 5,
-          minWidth: 450,
+          p: { xs: 2, sm: 3, md: 5 },
+          minWidth: { xs: '100%', sm: 450 },
           maxWidth: 600,
-          width: "90%",
-          marginRight: "2rem",
+          width: { xs: '95%', sm: '90%' },
+          marginRight: { xs: 'auto', sm: '2rem' },
+          marginLeft: { xs: 'auto', sm: 0 },
           marginY: "auto",
           alignSelf: "center",
-          marginTop: 5,
-          marginBottom: 10,
+          marginTop: { xs: 2, sm: 5 },
+          marginBottom: { xs: 4, sm: 10 },
           // Animation styles
           opacity: isVisible ? 1 : 0,
           transform: isVisible
@@ -238,7 +240,7 @@ const RegisterUser = () => {
                 </Link>
               </Typography>
             </>
-            <Stack direction="row" spacing={2}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
                 label="Nombre"
                 fullWidth
@@ -309,7 +311,7 @@ const RegisterUser = () => {
                 },
               }}
             />
-            <Stack direction="row" spacing={2}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <FormControl fullWidth error={!!errors.rol}>
                 <InputLabel id="rol-label">Rol</InputLabel>
                 <Controller
