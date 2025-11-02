@@ -134,7 +134,7 @@ const UserProfileDashboard = ({ user }) => {
               <h1>{FullName}</h1>
               <div className={styles.profileTags}>
                 <span className={styles.roleTag}>{user.rol}</span>
-                <span className={styles.codeTag}>{user.codigo}</span>
+                <span className={styles.codeTag}>{user.codigo || user.cedula}</span>
               </div>
             </div>
             <div className={styles.profileDetails}>

@@ -82,11 +82,11 @@ const Footer = () => {
               </div>
               <div className={styles.contactItem}>
                 <Phone size={16} />
-                <span>+1 (555) 123-4567</span>
+                <span>+57 317 2715674</span>
               </div>
               <div className={styles.contactItem}>
                 <MapPin size={16} />
-                <span>San Francisco, CA</span>
+                <span>Cali, Valle del Cauca</span>
               </div>
             </div>
           </div>
