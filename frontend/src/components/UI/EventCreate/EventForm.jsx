@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Toaster, toast } from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { createEvent, getAllEvents,getEventCreatedUser } from '../../../API/api';
 import {
   LayoutDashboard,
   FileText,
@@ -26,6 +27,7 @@ const EventDashboard = () => {
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   // --- React Hook Form ---
   const {
@@ -48,6 +50,16 @@ const EventDashboard = () => {
       category: '',
     },
   });
+  // 👇💡 Aquí agregas el useEffect
+  const formValues = watch();
+
+  useEffect(() => {
+    console.log("🧩 Datos actuales del formulario:", {
+      ...formValues,
+      images: images.map((img) => img.file.name),
+      mainImage: images[mainImageIndex]?.file?.name || null,
+    });
+  }, [formValues, images, mainImageIndex]);
 
   // Observar la fecha de inicio para validación
   const startDate = watch('startDate');
@@ -97,66 +109,84 @@ const EventDashboard = () => {
 
   // --- Manejador de Envío ---
 
-  const onSubmit = async (data) => {
-    setIsSubmitting(true);
-    const loadingToast = toast.loading('Registrando tu evento...');
+const onSubmit = async (data) => {
+  setIsSubmitting(true);
+  const loadingToast = toast.loading("Registrando tu evento...");
 
-    // 1. Validación de imágenes
-    if (images.length === 0) {
-      toast.error('Debes subir al menos una imagen.');
-      setIsSubmitting(false);
-      toast.dismiss(loadingToast);
-      return;
-    }
+  if (images.length === 0) {
+    toast.error("Debes subir al menos una imagen.");
+    setIsSubmitting(false);
+    toast.dismiss(loadingToast);
+    return;
+  }
 
-    // Simulación de subida
-    await new Promise((resolve) => setTimeout(resolve, 2500));
-
-    // 2. Crear FormData para enviar
+  try {
+    const startDateTime = `${data.startDate}T${data.startTime}:00`;
+    const endDateTime = `${data.endDate}T${data.endTime}:00`;
     const formData = new FormData();
 
-    // Añadir datos del formulario (data)
-    for (const key in data) {
-      formData.append(key, data[key]);
+    formData.append("title", data.title);
+    formData.append("description", data.description);
+    formData.append("start_date", startDateTime);
+    formData.append("end_date", endDateTime);
+    formData.append("address", data.address);
+    formData.append("location_info", data.venueInfo || "");
+    formData.append("capacity", String(data.capacity));
+    formData.append("status", "ACTIVE");
+
+    // categorías (IDs)
+    if (Array.isArray(data.categories)) {
+      data.categories.forEach((id) => formData.append("categories", id));
+    } else {
+      formData.append("categories", data.categoryId || 1);
     }
 
-    // Añadir imágenes
     images.forEach((image, index) => {
-      formData.append('images', image.file);
-      // Marcar la imagen principal
+      formData.append("images", image.file);
       if (index === mainImageIndex) {
-        formData.append('mainImageName', image.file.name);
+        formData.append("main_image", image.file);
       }
     });
-
-    // --- Aquí harías tu llamada fetch/axios ---
-    // fetch('/api/events', { method: 'POST', body: formData })
-    //   .then(res => res.json())
-    //   .then(result => { ... })
+    // Enviar el formData usando axios a través de la función createEvent
+    const response = await createEvent(formData);
+    console.log("✅ Evento registradoaaaa:", response);
+    console.log("✅ Evento registrado:", response.data);
     
-    console.log('--- Datos del Evento Enviados ---');
-    console.log('Datos del formulario:', data);
-    console.log('Total de imágenes:', images.length);
-    console.log('Imagen principal:', images[mainImageIndex]?.file.name);
-    // console.log('FormData (para inspección):', ...formData.entries());
-
-    // 3. Respuesta
-    toast.dismiss(loadingToast);
-    toast.success('¡Evento creado exitosamente!');
-    setIsSubmitting(false);
-
-    // 4. Resetear formulario
+    // Verificar que el evento se creó correctamente
+    const allEventsResponse = await getEventCreatedUser();
+    const allEvents = allEventsResponse.data;
+    const eventCreated = allEvents.find(event => event.id === response.data.id);
+    console.log("mi event id es: ", response.data.id);
+    console.log("all events:", allEvents);
+    if (eventCreated) {
+      toast.success("¡Evento verificado en la base de datos!");
+      // Redirigir al usuario al evento creado después de 2 segundos
+      setTimeout(() => {
+        navigate(`/dashboard`);
+      }, 2000);
+    } else {
+      console.log("⚠️ Evento no encontrado tras creación:");
+      toast.warning("El evento se creó pero no se pudo verificar. Por favor, revisa el dashboard.");
+    }
+    toast.success("¡Evento creado exitosamente!");
     reset();
-    images.forEach((image) => URL.revokeObjectURL(image.url)); // Limpiar memoria
+    images.forEach((image) => URL.revokeObjectURL(image.url));
     setImages([]);
     setMainImageIndex(0);
-  };
+  } catch (error) {
+    console.error("❌ Error al enviar evento:", error);
+    toast.error("Hubo un error al registrar tu evento.");
+  } finally {
+    toast.dismiss(loadingToast);
+    setIsSubmitting(false);
+  }
+};
 
   const onError = (formErrors) => {
     console.log("Errores de validación:", formErrors);
     toast.error('Por favor, revisa los campos marcados en rojo.');
   };
-
+   const hoy = new Date().toISOString().split("T")[0];
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
@@ -186,13 +216,16 @@ const EventDashboard = () => {
                 </label>
                 <input
                   id="title"
+                  maxLength={50}
                   className={styles.input}
                   placeholder="Ej: Concierto de Rock Sinfónico"
                   {...register('title', {
                     required: 'El título es obligatorio',
                     minLength: { value: 5, message: 'Mínimo 5 caracteres' }
                   })}
-                />
+                  />
+                  <span className={styles.errorMessage}>{errors.title?.message}</span>
+                  <span className={styles.errorMessage}>{errors.title?.type === 'maxLength' && 'Máximo 50 caracteres'}</span>
                 {errors.title && <span className={styles.errorMessage}>{errors.title.message}</span>}
               </div>
 
@@ -222,10 +255,15 @@ const EventDashboard = () => {
                   <input
                     id="startDate"
                     type="date"
+                    min={hoy}
                     className={styles.input}
                     {...register('startDate', {
                       required: 'La fecha de inicio es obligatoria',
-                      validate: val => new Date(val) >= new Date().setHours(0,0,0,0) || "La fecha no puede ser en el pasado"
+                      validate: val => {
+                        const colombiaDate = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Bogota"}));
+                        colombiaDate.setHours(0,0,0,0);
+                        return new Date(val) >= colombiaDate || "La fecha no puede ser en el pasado"
+                      }
                     })}
                   />
                   {errors.startDate && <span className={styles.errorMessage}>{errors.startDate.message}</span>}
@@ -250,10 +288,15 @@ const EventDashboard = () => {
                   <input
                     id="endDate"
                     type="date"
+                    min={hoy}
                     className={styles.input}
                     {...register('endDate', {
                       required: 'La fecha de fin es obligatoria',
-                      validate: val => new Date(val) >= new Date(startDate) || "Debe ser igual o posterior a la fecha de inicio"
+                      validate: val => {
+                        const colombiaDate = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Bogota"}));
+                        colombiaDate.setHours(0,0,0,0);
+                        return new Date(val) >= colombiaDate || "La fecha no puede ser en el pasado"
+                      }
                     })}
                   />
                   {errors.endDate && <span className={styles.errorMessage}>{errors.endDate.message}</span>}
@@ -277,9 +320,13 @@ const EventDashboard = () => {
                 </label>
                 <input
                   id="address"
+                  maxLength={55}
                   className={styles.input}
                   placeholder="Ej: Av. Siempre Viva 123"
-                  {...register('address', { required: 'La dirección es obligatoria' })}
+                  {...register('address', { 
+                    required: 'La dirección es obligatoria',
+                    maxLength: { value: 50, message: 'Máximo 50 caracteres' }
+                  })}
                 />
                 {errors.address && <span className={styles.errorMessage}>{errors.address.message}</span>}
               </div>

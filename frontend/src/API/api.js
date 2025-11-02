@@ -67,7 +67,7 @@ export const getEventCreatedUser = () => {
 }
 
 export const createEvent = (data) => {
-	return axios.post('http://127.0.0.1:8000/api/event/events/', data, { withCredentials: true });
+	return axios.post(`${BASE_URL}event/events/`, data, { withCredentials: true });
 }
 export const getAllEvents = async () => {
   try {
