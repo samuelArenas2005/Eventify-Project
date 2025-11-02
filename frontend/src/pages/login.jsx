@@ -36,10 +36,28 @@ const Login = ({ login }) => {
   }, []);
 
   const onSubmit = async (data) => {
-    const success = await login(data.email, data.password)
+    const success = await login(data.email, data.password);
     console.log("Login successful:", success);
     if (success) {
+      toast.success("¡Bienvenido!", {
+        duration: 3000,
+        style: {
+          background: "var(--color-primary)",
+          color: "var(--color-white)",
+        },
+      });
       navigate("/dashboard"); // ← Redirige aquí
+    } else {
+      toast.error(
+        "Credenciales inválidas. Por favor, verifica tu correo y contraseña.",
+        {
+          duration: 4000,
+          style: {
+            background: "#ef4444",
+            color: "white",
+          },
+        }
+      );
     }
   };
 
@@ -75,8 +93,8 @@ const Login = ({ login }) => {
           alignSelf: "center",
           // Animation styles
           opacity: isVisible ? 1 : 0,
-          transform: isVisible 
-            ? "translateY(0) scale(1)" 
+          transform: isVisible
+            ? "translateY(0) scale(1)"
             : "translateY(30px) scale(0.95)",
           transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
           transitionDelay: "0.1s",

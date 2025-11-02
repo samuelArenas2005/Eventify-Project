@@ -6,6 +6,7 @@ import { Edit, Settings, Calendar, User, Star, Filter, CirclePlus, Plus, Calenda
 import { getRegisteredEvents, getPendingEvents, getCreatedEvent } from './GetEventsData';
 import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../API/api';
 import EventDashboard from '../../components/UI/EventCreate/EventForm'
+import Loanding from '../../components/UI/Loanding/Loanding';
 
 const historyData = [];
 
@@ -54,7 +55,7 @@ const UserProfileDashboard = ({ user }) => {
     loadEvents();
   }, []);
 
-  if (loading) return <div>Cargando eventos...</div>;
+  if (loading) return <Loanding />;
 
   const renderContent = () => {
     let title = '';
