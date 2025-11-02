@@ -18,7 +18,7 @@ class EventAttendeeInline(admin.TabularInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('title', 'start_date', 'end_date', 'status', 'creator', 'capacity')
+    list_display = ('id','title', 'start_date', 'end_date', 'status', 'creator', 'capacity')
     list_filter = ('status', 'categories', 'start_date', 'created_at')
     search_fields = ('title', 'description', 'address', 'creator__email')
     raw_id_fields = ('creator',)

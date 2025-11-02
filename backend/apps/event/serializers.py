@@ -22,6 +22,7 @@ class EventImageSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at']
 
 class EventListSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
     creator = UserBasicSerializer(read_only=True)
     categories = CategorySerializer(many=True, read_only=True)
     attendees_count = serializers.SerializerMethodField()
@@ -79,7 +80,7 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = [
-            'title', 'description', 'main_image',
+            'id','title', 'description', 'main_image',
             'start_date', 'end_date', 'address',
             'location_info', 'capacity', 'status', 
             'categories', 'images' 
