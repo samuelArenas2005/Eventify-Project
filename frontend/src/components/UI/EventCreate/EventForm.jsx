@@ -150,8 +150,6 @@ const onSubmit = async (data) => {
     });
     // Enviar el formData usando axios a través de la función createEvent
     const response = await createEvent(formData);
-    console.log("✅ Evento registradoaaaa:", response);
-    console.log("✅ Evento registrado:", response.data);
     
     // Verificar que el evento se creó correctamente
     const allEventsResponse = await getEventCreatedUser();
@@ -162,9 +160,12 @@ const onSubmit = async (data) => {
     if (eventCreated) {
       toast.success("¡Evento verificado en la base de datos!");
       // Redirigir al usuario al evento creado después de 2 segundos
+      typeof onClose === "function" ? setTimeout(() => {
+        onClose();
+      }, 1000) :
       setTimeout(() => {
         navigate(`/dashboard`);
-      }, 2000);
+      }, 1000);
     } else {
       console.log("⚠️ Evento no encontrado tras creación:");
       toast.warning("El evento se creó pero no se pudo verificar. Por favor, revisa el dashboard.");

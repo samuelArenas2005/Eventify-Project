@@ -1,6 +1,6 @@
 import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '../../API/api'
  
- export const registeredEventsDataObjet = [
+ /* export const registeredEventsDataObjet = [
 
 
   {
@@ -153,7 +153,7 @@ import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '..
     onRegisterClick: () => alert('Ver detalle de registro 10'),
     onHeartClick: () => console.log('Heart 10'),
   }
-]; 
+];  */
 
 function diaMes(iso) {
   const d = new Date(iso);
@@ -183,7 +183,7 @@ export const getRegisteredEvents = async () => {
       description: events.event.description,
       date: diaMes(events.event.start_date) || "Por definir",
       time: hora12Colombia(events.event.start_date)  || "Por definir",
-      location: events.event.location_info || "Por definir",
+      location: events.event.address || "Por definir",
       currentParticipants: events.event.attendees_count || 0,
       totalParticipants: events.event.capacity || 100,
       organizer: events.event.creator.username || "Desconocido",
@@ -194,10 +194,11 @@ export const getRegisteredEvents = async () => {
     }));
 
 
-    const map = new Map();
+    /* const map = new Map();
     registeredEventsDataObjet.forEach((e) => map.set(e.id, e));
     formattedFromApi.forEach((e) => map.set(e.id, e));
-    return Array.from(map.values()); 
+    return Array.from(map.values());  */
+    return formattedFromApi
 
 
   } catch (error) {
@@ -220,7 +221,7 @@ export const getPendingEvents = async () => {
       description: events.event.description,
       date: diaMes(events.event.start_date) || "Por definir",
       time: hora12Colombia(events.event.start_date)  || "Por definir",
-      location: events.event.location_info || "Por definir",
+      location: events.event.address || "Por definir",
       currentParticipants: events.event.attendees_count || 0,
       totalParticipants: events.event.capacity || 100,
       organizer: events.event.creator.username || "Desconocido",
@@ -254,7 +255,7 @@ export const getCreatedEvent = async () => {
       description: event.description,
       date: diaMes(event.start_date) || "Por definir",
       time: hora12Colombia(event.start_date)  || "Por definir",
-      location: event.location_info || "Por definir",
+      location: event.address || "Por definir",
       currentParticipants: event.attendees_count || 0,
       totalParticipants: event.capacity || 100,
       organizer: event.creator.username || "Desconocido",
