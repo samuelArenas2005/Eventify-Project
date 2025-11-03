@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styles from './EventCard.module.css';
-import { Calendar, Clock, MapPin, Users, Heart } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, Heart, UserPlus } from 'lucide-react';
 
 const EventCard = ({
   imageUrl,
@@ -85,11 +85,16 @@ const EventCard = ({
           <span className={styles.organizerName}>{organizer}</span>
         </div>
 
-        {showRegisterButton ? 
-        <button className={styles.registerButton} onClick={onRegisterClick}>
-          Registrarse
-        </button> 
-        : null}
+        <div className={styles.actions}>
+          {showRegisterButton && (
+            <button 
+              className={styles.registerButton} 
+              onClick={onRegisterClick}
+            >
+              Registrarme
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
-import {getAllEvents} from '../../API/api'
-
+import { getAllEvents } from '../../API/api'
 
 
 function diaMes(iso) {
@@ -17,15 +16,45 @@ function hora12Colombia(iso) {
   }).toLowerCase();
 }
 
-export const getEvents = async () => {
+const formattedDetailEvent = (event, onCloseHandler) => {
+  return {
+
+    titulo: event.title || "Sin título",
+    descripcion: event.description || "Sin descripción",
+    imag: event.images || [event.main_image || "https://via.placeholder.com/300x200"],
+    fechaInicio: event.start_date || null,
+    fechaFin: event.end_date || null,
+    direccion: event.location_info || "Por definir",
+    capacidad: event.capacity || 100,
+    asistentes: event.attendees_count || 0,
+    organizador: event.creator?.username || "Desconocido",
+    categoria: event.categories?.[0]?.category || "Sin categoría",
+    estado: event.status || "Activo",
+    local_info: event.location_info || "Por definir",   // detalle del local
+    fechaCreacion:event.created_at || null,     // string ISO o similar
+
+    onClose: onCloseHandler,
+    showEditar: true,
+    onEditar: () => console.log(`Editar evento ${event.id}`),
+    showBorrar: true,
+    onBorrar: () => console.log(`Borrar evento ${event.id}`),
+    showRegistrar: false,
+    onRegistrar: () => console.log(`Registrar en evento ${event.id}`)
+  };
+};
+
+const showDetailedEvent = (event) => {
+
+
+}
+
+export const getEvents = async (closeModalHandler) => {
   try {
-    // Llamada al backend
     const response = await getAllEvents();
     console.log("Respuesta cruda del backend:", response);
-    
-    // Asegurarnos de que tenemos un array para mapear
+
     const events = Array.isArray(response) ? response : [];
-    
+
     const formattedFromApi = events.map(event => ({
       id: event.id || 0,
       imageUrl: event.main_image || "https://via.placeholder.com/300x200",
@@ -43,14 +72,13 @@ export const getEvents = async () => {
       showRegisterButton: true,
       showHeartButton: true,
       activeHeart: false,
+      formattedDetailEvent: formattedDetailEvent(event, closeModalHandler) // Pass the close handler
     }));
 
     console.log("Eventos formateados:", formattedFromApi);
-    return formattedFromApi
-
-    console.log("Eventos crudos del backend:", events.data);
+    return formattedFromApi;
   } catch (error) {
     console.error("Error al obtener eventos:", error);
-    return []; // retornar array vacío en caso de error
+    return [];
   }
 };

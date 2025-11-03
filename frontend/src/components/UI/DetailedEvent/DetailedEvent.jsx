@@ -1,193 +1,205 @@
 import React, { useState } from 'react';
 import styles from './DetailedEvent.module.css';
+import {
+  X,
+  MapPin,
+  Calendar,
+  Users,
+  User,
+  Tag,
+  ClipboardList,
+  ChevronLeft,
+  ChevronRight,
+  Trash2,
+  Edit,
+  CheckSquare,
+  Info
+} from 'lucide-react';
 
-/**
- * Un componente de ventana flotante (modal) para mostrar los detalles de un evento.
- *
- * @param {object} props
- * @param {object} props.event - El objeto que contiene toda la información del evento.
- * @param {string} props.event.titulo
- * @param {string} props.event.descripcion
- * @param {string[]} props.event.imagenes - Array de URLs de imágenes.
- * @param {string|Date} props.event.fechaInicio
- * @param {string|Date} props.event.fechaFin
- * @param {string} props.event.direccion
- * @param {number} props.event.capacidad
- * @param {number} props.event.asistentes
- * @param {string} props.event.organizador
- * @param {string} props.event.categoria
- * @param {string} props.event.estado
- * @param {function} props.onClose - Función para cerrar el modal.
- * @param {boolean} [props.showEditar=false] - Mostrar el botón de editar.
- * @param {function} [props.onEditar] - Callback para el botón de editar.
- * @param {boolean} [props.showBorrar=false] - Mostrar el botón de borrar.
- * @param {function} [props.onBorrar] - Callback para el botón de borrar.
- * @param {boolean} [props.showRegistrar=false] - Mostrar el botón de registrar.
- * @param {function} [props.onRegistrar] - Callback para el botón de registrar.
- */
-const EventModal = ({
-  event,
+// Objeto para mapear el estado a un color (usando tus variables CSS)
+const estadoColors = {
+  'Próximo': 'var(--color-info)',
+  'En Curso': 'var(--color-success)',
+  'Finalizado': 'var(--color-warning)',
+  'Cancelado': 'var(--color-danger)',
+};
+
+const EventDetailModal = ({
+  // Datos del evento
+  titulo,
+  descripcion,
+  imag = [], // Array de URLs
+  fechaInicio,
+  fechaFin,
+  direccion,
+  capacidad,
+  asistentes,
+  organizador,
+  categoria,
+  estado,
+  mainImage,
+
+  // Nueva información opcional
+  local_info,        // detalle del local
+  fechaCreacion,     // string ISO o similar
+
+  // Control del modal
   onClose,
-  showEditar = false,
-  onEditar,
+
+  // Visibilidad de botones
   showBorrar = false,
-  onBorrar,
+  showEditar = false,
   showRegistrar = false,
+
+  // Funciones de botones
+  onBorrar,
+  onEditar,
   onRegistrar,
 }) => {
-  const {
-    titulo,
-    descripcion,
-    imagenes,
-    fechaInicio,
-    fechaFin,
-    direccion,
-    capacidad,
-    asistentes,
-    organizador,
-    categoria,
-    estado,
-  } = event;
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-
-  // Formateador simple de fechas (puedes reemplazarlo por date-fns o moment)
-  const formatDate = (dateString) => {
-    if (!dateString) return 'No definida';
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-    return new Date(dateString).toLocaleDateString('es-ES', options);
+  const imagenes = imag.map(img => img.image); 
+  // --- Lógica de la Galería ---
+  const handlePrevImage = () => {
+    setActiveIndex((prev) => (prev === 0 ? imagenes.length - 1 : prev - 1));
   };
 
-  // Prevenir que el clic en el contenido cierre el modal
-  const handleContentClick = (e) => e.stopPropagation();
+  const handleNextImage = () => {
+    setActiveIndex((prev) => (prev === imagenes.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleThumbnailClick = (index) => {
+    setActiveIndex(index);
+  };
+
+  // --- Lógica de Fechas ---
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No especificada';
+    return new Date(dateString).toLocaleString('es-ES', {
+      dateStyle: 'long',
+      timeStyle: 'short',
+    });
+  };
+
+  // Formatea la fecha de creación mostrando solo YYYY-MM-DD (primeros caracteres)
+  const formatCreationDate = (isoString) => {
+    if (!isoString) return 'No especificada';
+    // Si viene en formato ISO, tomamos los primeros 10 caracteres: YYYY-MM-DD
+    return typeof isoString === 'string' ? isoString.slice(0, 10) : String(isoString);
+  };
+
+  // --- Lógica del Overlay ---
+  const handleOverlayClick = (e) => {
+    // Cierra solo si se hace clic en el fondo (overlay)
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const estadoColor = estadoColors[estado] || 'var(--text-secundary)';
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modalContent} onClick={handleContentClick}>
-        <button className={styles.closeButton} onClick={onClose}>
-          &times;
+    <div className={styles.modalOverlay} onClick={handleOverlayClick}>
+      <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+        
+        {/* Botón de Cerrar */}
+        <button className={styles.closeButton} onClick={onClose} title="Cerrar">
+          <X size={24} />
         </button>
 
+        {/* --- Cuerpo del Modal (con scroll) --- */}
         <div className={styles.modalBody}>
-          {/* Columna de Galería */}
-          <div className={styles.gallery}>
-            <div className={styles.mainImageContainer}>
-              {imagenes && imagenes.length > 0 ? (
+          
+          {/* --- Galería de Imágenes --- */}
+          {imagenes.length > 0 && (
+            <div className={styles.gallery}>
+              <div className={styles.mainImageContainer}>
                 <img
-                  src={imagenes[activeImageIndex]}
-                  alt={`${titulo} - imagen principal`}
+                  src={imagenes[activeIndex]}
+                  alt={`Imagen ${activeIndex + 1} de ${titulo}`}
                   className={styles.mainImage}
                 />
-              ) : (
-                <div className={styles.noImagePlaceholder}>Sin Imagen</div>
+                {imagenes.length > 1 && (
+                  <>
+                    <button className={`${styles.galleryNav} ${styles.prev}`} onClick={handlePrevImage}>
+                      <ChevronLeft size={28} />
+                    </button>
+                    <button className={`${styles.galleryNav} ${styles.next}`} onClick={handleNextImage}>
+                      <ChevronRight size={28} />
+                    </button>
+                  </>
+                )}
+              </div>
+              {imagenes.length > 1 && (
+                <div className={styles.thumbnailList}>
+                  {imagenes.map((imgUrl, index) => (
+                    <img
+                      key={index}
+                      src={imgUrl}
+                      alt={`Miniatura ${index + 1}`}
+                      className={`${styles.thumbnail} ${index === activeIndex ? styles.activeThumbnail : ''}`}
+                      onClick={() => handleThumbnailClick(index)}
+                    />
+                  ))}
+                </div>
               )}
             </div>
-            {imagenes && imagenes.length > 1 && (
-              <div className={styles.thumbnailContainer}>
-                {imagenes.map((imgUrl, index) => (
-                  <img
-                    key={index}
-                    src={imgUrl}
-                    alt={`Thumbnail ${index + 1}`}
-                    className={`${styles.thumbnail} ${
-                      index === activeImageIndex ? styles.active : ''
-                    }`}
-                    onClick={() => setActiveImageIndex(index)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          )}
 
-          {/* Columna de Detalles */}
-          <div className={styles.details}>
-            <div className={styles.header}>
-              <h2 className={styles.title}>{titulo}</h2>
-              <div className={styles.tags}>
-                <span className={`${styles.tag} ${styles.tagCategory}`}>
-                  {categoria}
-                </span>
-                <span className={`${styles.tag} ${styles.tagStatus}`}>
-                  {estado}
-                </span>
-              </div>
-            </div>
-
-            <p className={styles.description}>{descripcion}</p>
-
-            <div className={styles.infoGrid}>
-              <div className={styles.infoItem}>
-                <span className={styles.infoIcon}>📅</span>
-                <div>
-                  <span className={styles.infoLabel}>Inicio:</span>
-                  <span className={styles.infoValue}>{formatDate(fechaInicio)}</span>
-                </div>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoIcon}>🏁</span>
-                <div>
-                  <span className={styles.infoLabel}>Fin:</span>
-                  <span className={styles.infoValue}>{formatDate(fechaFin)}</span>
-                </div>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoIcon}>📍</span>
-                <div>
-                  <span className={styles.infoLabel}>Ubicación:</span>
-                  <span className={styles.infoValue}>{direccion}</span>
-                </div>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoIcon}>👤</span>
-                <div>
-                  <span className={styles.infoLabel}>Organizador:</span>
-                  <span className={styles.infoValue}>{organizador}</span>
-                </div>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoIcon}>👥</span>
-                <div>
-                  <span className={styles.infoLabel}>Asistencia:</span>
-                  <span className={styles.infoValue}>
-                    {asistentes} / {capacidad}
-                  </span>
-                </div>
-              </div>
+          {/* --- Encabezado: Título y Tags --- */}
+          <div className={styles.eventHeader}>
+            <h2 className={styles.title}>{titulo}</h2>
+            <div className={styles.tags}>
+              <span className={styles.tag} style={{ backgroundColor: estadoColor, color: 'white' }}>
+                <ClipboardList size={14} /> {estado}
+              </span>
+              <span className={styles.tag} style={{ backgroundColor: 'var(--color-secondary)', color: 'white' }}>
+                <Tag size={14} /> {categoria}
+              </span>
             </div>
           </div>
+
+          {/* --- Grid de Información Principal --- */}
+          <div className={styles.infoGrid}>
+            <InfoItem icon={<Calendar size={20} />} label="Inicia" value={formatDate(fechaInicio)} />
+            <InfoItem icon={<Calendar size={20} />} label="Finaliza" value={formatDate(fechaFin)} />
+            <InfoItem icon={<MapPin size={20} />} label="Ubicación" value={direccion} />
+            {/* Nuevo: muestra local_info si existe */}
+            {local_info && <InfoItem icon={<Info size={20} />} label="Información del Lugar" value={local_info} />}
+            <InfoItem icon={<User size={20} />} label="Organizador" value={organizador} />
+            <InfoItem 
+              icon={<Users size={20} />} 
+              label="Participantes" 
+              value={`${asistentes} / ${capacidad}`} 
+            />
+            {/* Nuevo: fecha de creación del evento (YYYY-MM-DD) */}
+            <InfoItem icon={<Calendar size={20} />} label="Creado" value={formatCreationDate(fechaCreacion)} />
+          </div>
+
+          {/* --- Descripción --- */}
+          <div className={styles.descriptionSection}>
+            <h3 className={styles.sectionTitle}>Acerca del Evento</h3>
+            <p className={styles.descriptionText}>{descripcion}</p>
+          </div>
+
         </div>
 
-        {/* Footer con Acciones */}
+        {/* --- Pie de Página (Acciones) --- */}
         {(showBorrar || showEditar || showRegistrar) && (
-          <div className={styles.footerActions}>
+          <div className={styles.modalFooter}>
             {showRegistrar && (
-              <button
-                className={`${styles.button} ${styles.registerButton}`}
-                onClick={onRegistrar}
-              >
-                Registrarse
+              <button className={`${styles.button} ${styles.registerButton}`} onClick={onRegistrar}>
+                <CheckSquare size={18} /> Registrarse
               </button>
             )}
             {showEditar && (
-              <button
-                className={`${styles.button} ${styles.editButton}`}
-                onClick={onEditar}
-              >
-                Editar
+              <button className={`${styles.button} ${styles.editButton}`} onClick={onEditar}>
+                <Edit size={18} /> Editar
               </button>
             )}
             {showBorrar && (
-              <button
-                className={`${styles.button} ${styles.deleteButton}`}
-                onClick={onBorrar}
-              >
-                Borrar
+              <button className={`${styles.button} ${styles.deleteButton}`} onClick={onBorrar}>
+                <Trash2 size={18} /> Borrar
               </button>
             )}
           </div>
@@ -197,4 +209,15 @@ const EventModal = ({
   );
 };
 
-export default EventModal;
+// Pequeño componente auxiliar para los items de información
+const InfoItem = ({ icon, label, value }) => (
+  <div className={styles.infoItem}>
+    <span className={styles.infoIcon}>{icon}</span>
+    <div className={styles.infoContent}>
+      <span className={styles.infoLabel}>{label}</span>
+      <span className={styles.infoValue}>{value}</span>
+    </div>
+  </div>
+);
+
+export default EventDetailModal;
