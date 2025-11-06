@@ -4,29 +4,30 @@ from django.conf import settings
 from django.utils import timezone
 
 class Category(models.Model):
-
-    
-    CATEGORY_CHOICES = [
-        ('ACADEMICO', 'Academico'),
-        ('DEPORTIVO', 'Deportivo'),
-        ('SOCIAL', 'Social'),
-        ('CULTURAL', 'Cultural'),
-        ('TECNOLOGIA', 'Tecnologia')
-    ]
-    
-    category = models.CharField(
+    name = models.CharField(
         max_length=60,
-        choices=CATEGORY_CHOICES,
         unique=True,
         blank=False,
         null=False
+    )
+    color = models.CharField(
+        max_length=7,  # Para formato hexadecimal #RRGGBB
+        default='#000000',
+        blank=False,
+        null=False,
+        help_text='Color en formato hexadecimal (ej: #FF5733)'
     )
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+        ordering = ['name']
+
     def __str__(self):
-        return self.category
+        return self.name
 
 class Event(models.Model):
     ACTIVE = 'ACTIVE'
@@ -101,10 +102,12 @@ class Event(models.Model):
         related_name='attending_events'
     )
     
-    categories = models.ManyToManyField(
+    category = models.ForeignKey(
         Category,
+        on_delete=models.SET_NULL,
         related_name='events',
-        blank=False  
+        null=True,
+        blank=False
     )
     
     created_at = models.DateTimeField(auto_now_add=True)

@@ -3,9 +3,10 @@ from .models import Category, Event, EventAttendee, EventImage
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('category', 'created_at', 'updated_at')
-    search_fields = ('category',)
+    list_display = ('name', 'color', 'created_at', 'updated_at')
+    search_fields = ('name',)
     readonly_fields = ('created_at', 'updated_at')
+    list_editable = ('color',)
 
 class EventImageInline(admin.TabularInline):
     model = EventImage
@@ -18,12 +19,11 @@ class EventAttendeeInline(admin.TabularInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('id','title', 'start_date', 'end_date', 'status', 'creator', 'capacity')
-    list_filter = ('status', 'categories', 'start_date', 'created_at')
+    list_display = ('id','title', 'start_date', 'end_date', 'status', 'creator', 'capacity', 'category')
+    list_filter = ('status', 'category', 'start_date', 'created_at')
     search_fields = ('title', 'description', 'address', 'creator__email')
     raw_id_fields = ('creator',)
     readonly_fields = ('created_at', 'updated_at')
-    filter_horizontal = ('categories',)
     
     inlines = [EventImageInline, EventAttendeeInline]
     

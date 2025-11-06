@@ -1,4 +1,4 @@
-import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '../../API/api'
+import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '../../api/api'
  
  /* export const registeredEventsDataObjet = [
 
@@ -178,7 +178,7 @@ export const getRegisteredEvents = async () => {
     const formattedFromApi = events.data.map((events, index) => ({
       id: events.event.id || index,
       imageUrl: events.event.main_image || "https://via.placeholder.com/300x200",
-      category: events.event.categories[0].category || "Sin categoría",
+      category: events.event.category?.name || "Sin categoría",
       title: events.event.title,
       description: events.event.description,
       date: diaMes(events.event.start_date) || "Por definir",
@@ -216,7 +216,7 @@ export const getPendingEvents = async () => {
     const formattedFromApi = events.data.map((events, index) => ({
       id: events.event.id || index,
       imageUrl: events.event.main_image || "https://via.placeholder.com/300x200",
-      category: events.event.categories[0].category || "Sin categoría",
+      category: events.event.category?.name || "Sin categoría",
       title: events.event.title,
       description: events.event.description,
       date: diaMes(events.event.start_date) || "Por definir",
@@ -250,7 +250,7 @@ export const getCreatedEvent = async () => {
     const formattedFromApi = events.data.map((event, index) => ({
       id: event.id || index,
       imageUrl: event.main_image || "https://via.placeholder.com/300x200",
-      category: event.categories[0].category || "Sin categoría",
+      category: event.category?.name || "Sin categoría",
       title: event.title,
       description: event.description,
       date: diaMes(event.start_date) || "Por definir",

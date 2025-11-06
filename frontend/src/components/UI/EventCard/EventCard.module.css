@@ -14,7 +14,8 @@
   position: relative;
   /* Transición añadida para el hover */
   transition: translate 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
-  min-height: 550px;
+  min-height: 250px;
+  max-width: 550px;
 }
 
 /* --- NUEVO EFECTO HOVER --- */
@@ -78,11 +79,6 @@
 
 .contentWrapper {
   padding: 0 6px; 
-
-  /* --- AÑADE ESTAS 3 LÍNEAS --- */
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1; 
 }
 
 .titleHeartContainer {

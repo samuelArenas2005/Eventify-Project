@@ -24,9 +24,9 @@ class EventImageSerializer(serializers.ModelSerializer):
 class EventListSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
     creator = UserBasicSerializer(read_only=True)
-    categories = CategorySerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
     attendees_count = serializers.SerializerMethodField()
-    images = EventImageSerializer(many=True, read_only=True)  # Add this line
+    images = EventImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Event
@@ -34,7 +34,7 @@ class EventListSerializer(serializers.ModelSerializer):
             'id', 'title', 'description', 'main_image', 
             'start_date', 'end_date', 'address', 
             'location_info', 'capacity', 'status', 
-            'creator', 'categories', 'attendees_count',
+            'creator', 'category', 'attendees_count',
             'images', 
             'created_at', 'updated_at'
         ]
@@ -70,11 +70,9 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
-    categories = serializers.PrimaryKeyRelatedField(
+    category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),
-        many=True,
-        required=True, 
-        write_only=False
+        required=True
     )
 
     class Meta:
@@ -83,7 +81,7 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
             'id','title', 'description', 'main_image',
             'start_date', 'end_date', 'address',
             'location_info', 'capacity', 'status', 
-            'categories', 'images' 
+            'category', 'images' 
         ]
 
     def validate(self, data):
@@ -93,9 +91,9 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "end_date": "End date must be after start date"
                 })
-        if not data.get('categories', []):
+        if not data.get('category'):
             raise serializers.ValidationError({
-                "categories": "At least one category must be specified"
+                "category": "A category must be specified"
             })
         return data
 

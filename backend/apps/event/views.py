@@ -46,9 +46,8 @@ class EventViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return (
             Event.objects
-                 .select_related('creator')
+                 .select_related('creator', 'category')
                  .prefetch_related(
-                     'categories',
                      'images',  # Add prefetch for images
                      Prefetch(
                          'eventattendee_set',
@@ -183,7 +182,7 @@ class EventsByCreatorList(generics.ListAPIView):
         return qs
     
 
-class ActiveEventsList(generics.ListAPIView):
+class  ActiveEventsList(generics.ListAPIView):
     """
     /api/event/active/ -> eventos con status ACTIVE, permisos AllowAny,
     y si el usuario está autenticado excluye los eventos cuyo creador sea el mismo usuario.
@@ -196,9 +195,8 @@ class ActiveEventsList(generics.ListAPIView):
         qs = (
             Event.objects
                  .filter(status=Event.ACTIVE)
-                 .select_related('creator')
+                 .select_related('creator', 'category')
                  .prefetch_related(
-                     'categories',
                      'images',
                      Prefetch(
                          'eventattendee_set',

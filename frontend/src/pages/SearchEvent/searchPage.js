@@ -28,7 +28,7 @@ const formattedDetailEvent = (event, onCloseHandler) => {
     capacidad: event.capacity || 100,
     asistentes: event.attendees_count || 0,
     organizador: event.creator?.username || "Desconocido",
-    categoria: event.categories?.[0]?.category || "Sin categoría",
+    categoria: event.category?.name|| "Sin categoría",
     estado: event.status || "Activo",
     local_info: event.location_info || "Por definir",   // detalle del local
     fechaCreacion:event.created_at || null,     // string ISO o similar
@@ -58,7 +58,7 @@ export const getEvents = async (closeModalHandler) => {
     const formattedFromApi = events.map(event => ({
       id: event.id || 0,
       imageUrl: event.main_image || "https://via.placeholder.com/300x200",
-      category: event.categories?.[0]?.category || "Sin categoría",
+      category: event.category?.name|| "Sin categoría",
       title: event.title || "Sin título",
       description: event.description || "Sin descripción",
       date: event.start_date ? diaMes(event.start_date) : "Por definir",

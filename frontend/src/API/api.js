@@ -69,6 +69,17 @@ export const getEventCreatedUser = () => {
 export const createEvent = (data) => {
 	return axios.post(`${BASE_URL}event/events/`, data, { withCredentials: true });
 }
+
+export const getCategories = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}event/categories/`, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.error("Error en getCategories:", error);
+    return [];
+  }
+}
+
 export const getAllEvents = async () => {
   try {
     const response = await axios.get(`${BASE_URL}event/active/`, { withCredentials: true });
