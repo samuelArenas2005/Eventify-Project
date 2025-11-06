@@ -1,10 +1,6 @@
-body{
-  background-color: --hover-menu;
-}
-
 .cardContainer {
   /* Tarjeta más ancha y cuadrada */
-  width: 410px; 
+  width: 420px; 
   /* Radio más pequeño para aspecto más cuadrado */
   border-radius: 20px; 
   background-color: #fff;
@@ -18,7 +14,7 @@ body{
   position: relative;
   /* Transición añadida para el hover */
   transition: translate 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
-  color: --texto-menu;
+  min-height: 550px;
 }
 
 /* --- NUEVO EFECTO HOVER --- */
@@ -81,8 +77,12 @@ body{
 }
 
 .contentWrapper {
-  /* Padding escalado (antes 5px) */
   padding: 0 6px; 
+
+  /* --- AÑADE ESTAS 3 LÍNEAS --- */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; 
 }
 
 .titleHeartContainer {
@@ -103,6 +103,11 @@ body{
   transition: color 1s ease;
   position: relative; 
   display: inline-block; 
+
+  width: 300px; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis;
 }
 
 .eventTitle::after {
@@ -154,6 +159,11 @@ body{
   /* Margen escalado (antes 15px) */
   margin-bottom: 18px; 
   line-height: 1.4;
+  overflow: hidden; 
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  
+  -webkit-line-clamp: 1;
 }
 
 .detailItem {
@@ -200,6 +210,7 @@ body{
   cursor: pointer;
   position: relative;
   display: inline-block;
+  margin-top: auto;
 }
 
 .organizerName::after {
@@ -231,10 +242,10 @@ body{
   box-shadow: 0px 3px 12px rgba(11, 114, 185, 0.3); 
   transition: all 0.3s ease-in-out;
   display: block;
-  margin: 0 auto;
-  margin-top: auto;
+  margin:0;
   position: relative;
   overflow: hidden;
+  
 }
 
 .registerButton::before {

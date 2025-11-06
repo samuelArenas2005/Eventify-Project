@@ -34,11 +34,11 @@ const formattedDetailEvent = (event, onCloseHandler) => {
     fechaCreacion:event.created_at || null,     // string ISO o similar
 
     onClose: onCloseHandler,
-    showEditar: true,
+    showEditar: false,
     onEditar: () => console.log(`Editar evento ${event.id}`),
-    showBorrar: true,
+    showBorrar: false,
     onBorrar: () => console.log(`Borrar evento ${event.id}`),
-    showRegistrar: false,
+    showRegistrar: true,
     onRegistrar: () => console.log(`Registrar en evento ${event.id}`)
   };
 };

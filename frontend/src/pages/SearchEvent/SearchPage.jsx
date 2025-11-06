@@ -87,7 +87,6 @@ export default function SearchPage() {
                     <div
                         key={event.id}
                         style={{ "--card-index": index }}
-                        onClick={event.onClick ?? event.handleImageTitleClick}
                     >
                         <EventCard {...event} />
                     </div>
