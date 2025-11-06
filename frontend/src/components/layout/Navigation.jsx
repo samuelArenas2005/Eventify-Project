@@ -58,7 +58,7 @@ export default function Navigation({ user, logout }) {
               <Link onClick={toggleMenuHamburguesa} to="/calendario">Calendario</Link>
             </li>
             <li>
-              <Link onClick={toggleMenuHamburguesa} to="/dashboard">Dashboard</Link>
+              <Link onClick={toggleMenuHamburguesa} to="/dashboard">Panel de Usuario</Link>
             </li>
             <li>
               <Link onClick={toggleMenuHamburguesa} to="/createEvent">Crear Evento</Link>
@@ -93,13 +93,13 @@ export default function Navigation({ user, logout }) {
 
       {/* Contenedor principal de todos los elementos de la derecha */}
       <div className="nav-derecha">
-        <div className="IconoTema" >
+        {/* <div className="IconoTema" >
           {temaOscuro ? (
             <Moon className="iconDesactive" />
           ) : (
             <Sun className="iconDesactive" />
           )}
-        </div>
+        </div> */}
         {user ? <LoggedInControls /> : <LoggedOutControls />}
       </div>
 

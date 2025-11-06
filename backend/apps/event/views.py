@@ -4,6 +4,14 @@ from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, JsonResponse
+import json
+import base64
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
+
 from .models import Event, Category, EventAttendee, EventImage
 from .serializers import (
     CategorySerializer,
@@ -233,5 +241,46 @@ class AllCreatedEventsList(generics.ListAPIView):
         user = self.request.user
         return Event.objects.filter(creator=user)
 
+# ...existing code...
 
 
+load_dotenv()
+HARDCODED_API_KEY = os.getenv("OPENAI_API_KEY")
+
+@csrf_exempt
+def generate_image(request):
+    """
+    Versión MODIFICADA para prueba rápida con clave fija.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+
+    try:
+        payload = json.loads(request.body.decode('utf-8') or '{}')
+        prompt = payload.get('prompt')
+        if not prompt:
+            return JsonResponse({'error': 'prompt required'}, status=400)
+
+        # 💡 CAMBIO CLAVE: Pasa la clave directamente al constructor de OpenAI
+        client = OpenAI(api_key=HARDCODED_API_KEY)
+
+        # ⚠️ Nota: El modelo 'gpt-image-1' no existe. 
+        # Cámbialo a 'dall-e-2' o 'dall-e-3'. Usaré dall-e-2.
+        resp = client.images.generate(
+            model="dall-e-3", 
+            prompt=prompt,
+            n=1,
+            size="1024x1024",
+            response_format="b64_json"
+        )
+
+        b64 = resp.data[0].b64_json
+        if not b64:
+            return JsonResponse({'error': 'No image returned from provider'}, status=502)
+
+        image_bytes = base64.b64decode(b64)
+        return HttpResponse(image_bytes, content_type='image/png') 
+
+    except Exception as e:
+        # traceback.print_exc() # Descomentar para debug
+        return JsonResponse({'error': str(e)}, status=500)

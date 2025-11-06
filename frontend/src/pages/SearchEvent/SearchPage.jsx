@@ -13,6 +13,9 @@ export default function SearchPage() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
 
+    // Nuevo: estado para el input de búsqueda en tiempo real
+    const [searchTerm, setSearchTerm] = useState('');
+
     const toggleFilter = () => {
         setIsFilterOpen(prevState => !prevState);
     };
@@ -34,17 +37,31 @@ export default function SearchPage() {
         loadEvents();
     }, []);
 
+    // Filtrado en tiempo real por título (case-insensitive)
+    const displayedEvents = eventsData.filter(ev => {
+        if (!searchTerm) return true;
+        const title = (ev.title || ev.titulo || '').toString().toLowerCase();
+        return title.includes(searchTerm.toLowerCase());
+    });
+
+    // Evita que el form recargue la página al presionar Enter
+    const handleSubmit = (e) => {
+        e.preventDefault();
+    };
+
     return (
         <div>
             <TextPop></TextPop>
             <div className={style.search}>
-                <form action="buscar" className={style.searchForm}>
+                <form action="buscar" className={style.searchForm} onSubmit={handleSubmit}>
                     <div className={style.searchContainer}>
                         <input
-                            type="search"
+                            type="text"
                             name="buscar"
                             className={style.searchInput}
                             placeholder="Buscar un evento..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         <button type="submit" className={style.searchButton}>
                             <Search style={{ margin: '10px' }}></Search>
@@ -66,8 +83,12 @@ export default function SearchPage() {
                 </div>
             </div>
             <div className={style.eventCards}>
-                {eventsData.map((event, index) => (
-                    <div key={event.id} style={{ "--card-index": index }} onClick={event.onClick}>
+                {displayedEvents.map((event, index) => (
+                    <div
+                        key={event.id}
+                        style={{ "--card-index": index }}
+                        onClick={event.onClick ?? event.handleImageTitleClick}
+                    >
                         <EventCard {...event} />
                     </div>
                 ))}
