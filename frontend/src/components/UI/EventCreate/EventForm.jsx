@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Toaster, toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
-import { createEvent, getAllEvents,getEventCreatedUser } from '../../../API/api';
+import { createEvent, getAllEvents,getEventCreatedUser } from '../../../api/api';
 import {
   LayoutDashboard,
   FileText,
@@ -26,6 +26,7 @@ const EventDashboard = ({onClose=null}) => {
   const [images, setImages] = useState([]); // Almacena { url: '...', file: File }
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false); // <-- nuevo estado
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -80,25 +81,105 @@ const EventDashboard = ({onClose=null}) => {
     toast.success(`${files.length} imagen(es) añadida(s)`);
   };
 
-  const handleRemoveImage = (indexToRemove) => {
-    // Revocar URL para liberar memoria
-    URL.revokeObjectURL(images[indexToRemove].url);
-
-    setImages((prevImages) =>
-      prevImages.filter((_, index) => index !== indexToRemove)
-    );
-
-    // Ajustar el índice de la imagen principal si es necesario
-    if (mainImageIndex === indexToRemove) {
-      setMainImageIndex(0); // Vuelve a la primera
-    } else if (mainImageIndex > indexToRemove) {
-      setMainImageIndex((prevIndex) => prevIndex - 1);
-    }
-  };
-
   const setAsMainImage = (index) => {
     setMainImageIndex(index);
-    toast('Imagen principal actualizada', { icon: '⭐' });
+    toast.success('Imagen principal actualizada');
+  };
+
+  const handleRemoveImage = (index) => {
+    // Revocar el ObjectURL para liberar memoria
+    URL.revokeObjectURL(images[index].url);
+
+    setImages((prevImages) => {
+      const newImages = prevImages.filter((_, i) => i !== index);
+      
+      // Si eliminamos la imagen principal, reseteamos a la primera
+      if (index === mainImageIndex) {
+        setMainImageIndex(0);
+      } 
+      // Si eliminamos una imagen ANTERIOR a la principal, ajustamos el índice
+      else if (index < mainImageIndex) {
+        setMainImageIndex((prev) => prev - 1);
+      }
+      
+      return newImages;
+    });
+
+    toast.error('Imagen eliminada');
+  };
+
+  // --- Generar imagen con IA ---
+  const buildPromptFromForm = () => {
+  const vals = formValues || {};
+  const title = vals.title || 'Evento Especial';
+  const category = vals.category || 'Conferencia';
+  const description = vals.description?.slice(0, 50) || ''; // Acortar la descripción si es muy larga
+  const date = vals.startDate || 'Fecha por confirmar';
+  const time = vals.startTime || 'Hora por confirmar';
+  const location = vals.venueInfo || 'Lugar por confirmar';
+
+  return `Diseño de post publicitario profesional para "${title}". Muestra ${category}. Incluye claramente la fecha "${date}", la hora "${time}" y el lugar "${location}". Estilo moderno, colores vibrantes, tipografía legible y atractiva. Ideal para marketing y redes sociales. ${description}.`;
+  };
+
+  const generateImageWithAI = async () => {
+    if (isGenerating) return;
+    setIsGenerating(true);
+    const toastId = toast.loading("Generando imagen con IA...");
+
+    try {
+      const prompt = buildPromptFromForm();
+
+      // Base API configurable (Vite env). Fallback a localhost:8000
+      const apiBase = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || 'http://127.0.0.1:8000';
+
+      // Intentos: primero /api/event/generate-image/, si 404 prueba /api/generate-image/
+      const candidates = [
+        `${apiBase}/api/event/generate-image/`,
+        `${apiBase}/api/generate-image/`
+      ];
+
+      let res = null;
+      let lastErr = null;
+      for (const url of candidates) {
+        try {
+          res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt }),
+          });
+          // si no es 404 salimos del bucle (si es otro error, manejamos abajo)
+          if (res.status !== 404) break;
+        } catch (err) {
+          lastErr = err;
+        }
+      }
+
+      if (!res) throw new Error('No se pudo conectar al backend de generación de imágenes');
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => null);
+        throw new Error(`Error en generación de imagen: ${res.status} ${txt || ''}`);
+      }
+
+      const blob = await res.blob();
+      const filename = `ai-generated-${Date.now()}.jpg`;
+      const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+
+      setImages((prev) => {
+        const newImg = { url: URL.createObjectURL(file), file };
+        const updated = [...prev, newImg];
+        setMainImageIndex(updated.length - 1);
+        return updated;
+      });
+
+      toast.success("Imagen generada y añadida como principal");
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "No se pudo generar la imagen con IA.");
+    } finally {
+      toast.dismiss(toastId);
+      setIsGenerating(false);
+    }
   };
 
   // Limpiar URLs al desmontar el componente
@@ -434,6 +515,28 @@ const onSubmit = async (data) => {
                 </p>
               </div>
 
+              {/* NUEVO: Botón Generar Imagen con IA */}
+              <div style={{ marginTop: 10 }}>
+                <button
+                  type="button"
+                  className={styles.submitButton}
+                  onClick={generateImageWithAI}
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Generando...
+                    </>
+                  ) : (
+                    <>
+                      <ImageIcon size={16} />
+                      Generar imagen con IA
+                    </>
+                  )}
+                </button>
+              </div>
+
               {/* Previsualización */}
               {images.length > 0 && (
                 <div className={styles.imagePreviewContainer}>
@@ -510,3 +613,4 @@ const onSubmit = async (data) => {
 };
 
 export default EventDashboard;
+

@@ -13,6 +13,7 @@ from .views import (
     ActiveEventsList,
     AllRegisteredEventsList,
     AllCreatedEventsList,
+    generate_image
 )
 
 
@@ -29,4 +30,5 @@ urlpatterns = [
     path('active/', ActiveEventsList.as_view(), name='active-events'),
     path('registered/all/', AllRegisteredEventsList.as_view(), name='all-registered-events'),
     path('created/all/', AllCreatedEventsList.as_view(), name='all-created-events'),
+    path('generate-image/', generate_image),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
