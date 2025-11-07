@@ -1,98 +1,253 @@
-import { use, useEffect, useState } from 'react';
-import React from 'react';
-import { getEvents } from './searchPage.js';
-import EventCard from '../../components/UI/EventCard/EventCard.jsx';
-import TextPop from '../../components/UI/TextPop/TextPop.jsx';
-import { set } from 'react-hook-form';
+import { use, useEffect, useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { getEvents } from "./searchPage.js";
+import EventCard from "../../components/UI/EventCard/EventCard.jsx";
+import TextPop from "../../components/UI/TextPop/TextPop.jsx";
 import style from "./SearchPage.module.css";
-import { Search, Filter } from 'lucide-react';
-import EventModal from '../../components/UI/DetailedEvent/DetailedEvent.jsx'; // Import the DetailedEvent component
+import {
+  Search,
+  Filter,
+  Plus,
+  Sparkles,
+  Tag,
+  Calendar,
+  MapPin,
+  ChevronDown,
+  X,
+} from "lucide-react";
+import EventModal from "../../components/UI/DetailedEvent/DetailedEvent.jsx";
+import { getCategories } from "../../API/api.js";
 
 export default function SearchPage() {
-    const [eventsData, setEventsData] = useState([]);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [selectedEvent, setSelectedEvent] = useState(null);
+  const navigate = useNavigate();
+  const [eventsData, setEventsData] = useState([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [categories, setCategories] = useState([]);
 
-    // Nuevo: estado para el input de búsqueda en tiempo real
-    const [searchTerm, setSearchTerm] = useState('');
+  // Estados para los filtros
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
 
-    const toggleFilter = () => {
-        setIsFilterOpen(prevState => !prevState);
-    };
+  // Nuevo: estado para el input de búsqueda en tiempo real
+  const [searchTerm, setSearchTerm] = useState("");
 
-    const handleCloseModal = () => {
-        setSelectedEvent(null);
-    };
+  const toggleFilter = () => {
+    setIsFilterOpen((prevState) => !prevState);
+  };
 
-    useEffect(() => {
-        async function loadEvents() {
-            const events = await getEvents(handleCloseModal); // Pass the close handler function
-            console.log("Eventos formateados para el frontend:", events);
-            setEventsData(events.map(event => ({
-                ...event,
-                handleImageTitleClick: () => setSelectedEvent(event.formattedDetailEvent)
-            })));
-        }
+  const handleCloseModal = () => {
+    setSelectedEvent(null);
+  };
 
-        loadEvents();
-    }, []);
+  const clearFilters = () => {
+    setSelectedCategory("");
+    setSelectedDate("");
+    setSelectedLocation("");
+  };
 
-    // Filtrado en tiempo real por título (case-insensitive)
-    const displayedEvents = eventsData.filter(ev => {
-        if (!searchTerm) return true;
-        const title = (ev.title || ev.titulo || '').toString().toLowerCase();
-        return title.includes(searchTerm.toLowerCase());
-    });
+  useEffect(() => {
+    async function loadEvents() {
+      const events = await getEvents(handleCloseModal);
+      console.log("Eventos formateados para el frontend:", events);
+      setEventsData(
+        events.map((event) => ({
+          ...event,
+          handleImageTitleClick: () =>
+            setSelectedEvent(event.formattedDetailEvent),
+        }))
+      );
+    }
 
-    // Evita que el form recargue la página al presionar Enter
-    const handleSubmit = (e) => {
-        e.preventDefault();
-    };
+    async function loadCategories() {
+      const cats = await getCategories();
+      setCategories(cats);
+    }
 
-    return (
-        <div>
-            <TextPop></TextPop>
-            <div className={style.search}>
-                <form action="buscar" className={style.searchForm} onSubmit={handleSubmit}>
-                    <div className={style.searchContainer}>
-                        <input
-                            type="text"
-                            name="buscar"
-                            className={style.searchInput}
-                            placeholder="Buscar un evento..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <button type="submit" className={style.searchButton}>
-                            <Search style={{ margin: '10px' }}></Search>
-                        </button>
-                    </div>
-                </form>
-                <div className={style.filterContainer}>
-                    <button className={style.filter} onClick={toggleFilter}>
-                        Filtros <Filter></Filter>
-                    </button>
-                    {isFilterOpen && (
-                        <ul className={style.filterDropdown}>
-                            <li><a href="#">Por Fecha</a></li>
-                            <li><a href="#">Por Ubicación</a></li>
-                            <li><a href="#">Categoría: Deportivo</a></li>
-                            <li><a href="#">Categoría: Musical</a></li>
-                        </ul>
-                    )}
+    loadEvents();
+    loadCategories();
+  }, []);
+
+  // Filtrado en tiempo real por título, categoría, fecha y ubicación
+  const displayedEvents = eventsData.filter((ev) => {
+    // Filtro por búsqueda de texto
+    if (searchTerm) {
+      const title = (ev.title || ev.titulo || "").toString().toLowerCase();
+      if (!title.includes(searchTerm.toLowerCase())) return false;
+    }
+
+    // Filtro por categoría
+    if (selectedCategory) {
+      const eventCategory = ev.category || ev.categoria || "";
+      if (eventCategory !== selectedCategory) return false;
+    }
+
+    // Filtro por fecha (puedes ajustar esta lógica según tus necesidades)
+    if (selectedDate) {
+      const eventDate = ev.date || ev.fecha || "";
+      if (eventDate !== selectedDate) return false;
+    }
+
+    // Filtro por ubicación
+    if (selectedLocation) {
+      const eventLocation = (ev.location || ev.ubicacion || "")
+        .toString()
+        .toLowerCase();
+      if (!eventLocation.includes(selectedLocation.toLowerCase())) return false;
+    }
+
+    return true;
+  });
+
+  // Evita que el form recargue la página al presionar Enter
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  };
+
+  return (
+    <div>
+      <TextPop></TextPop>
+      <div className={style.search}>
+        <form
+          action="buscar"
+          className={style.searchForm}
+          onSubmit={handleSubmit}
+        >
+          <div className={style.searchContainer}>
+            <input
+              type="text"
+              name="buscar"
+              className={style.searchInput}
+              placeholder="Buscar un evento..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button type="submit" className={style.searchButton}>
+              <Search style={{ margin: "10px" }}></Search>
+            </button>
+          </div>
+        </form>
+        <div className={style.filterContainer}>
+          <button
+            className={style.filter}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleFilter();
+            }}
+          >
+            Filtros <Filter></Filter>
+          </button>
+          {isFilterOpen && (
+            <div
+              className={style.filterDropdown}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={style.filterHeader}>
+                <h3>Filtrar eventos</h3>
+                <button className={style.clearButton} onClick={clearFilters}>
+                  Limpiar
+                </button>
+              </div>
+
+              {/* Filtro por Categoría */}
+              <div className={style.filterSection}>
+                <label className={style.filterLabel}>
+                  <Tag size={18} />
+                  Categoría
+                </label>
+                <div className={style.selectWrapper}>
+                  <select
+                    className={style.filterSelect}
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                  >
+                    <option value="">Todas las categorías</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className={style.selectIcon} size={18} />
                 </div>
+              </div>
+
+              {/* Filtro por Fecha */}
+              <div className={style.filterSection}>
+                <label className={style.filterLabel}>
+                  <Calendar size={18} />
+                  Fecha
+                </label>
+                <div className={style.dateInputWrapper}>
+                  <input
+                    type="date"
+                    className={style.filterInput}
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    placeholder="Seleccionar fecha"
+                  />
+                </div>
+              </div>
+
+              {/* Filtro por Ubicación */}
+              <div className={style.filterSection}>
+                <label className={style.filterLabel}>
+                  <MapPin size={18} />
+                  Ubicación
+                </label>
+                <div className={style.selectWrapper}>
+                  <select
+                    className={style.filterSelect}
+                    value={selectedLocation}
+                    onChange={(e) => setSelectedLocation(e.target.value)}
+                  >
+                    <option value="">Todas las ubicaciones</option>
+                    <option value="campus norte">Campus Norte</option>
+                    <option value="campus sur">Campus Sur</option>
+                    <option value="auditorio">Auditorio</option>
+                    <option value="biblioteca">Biblioteca</option>
+                  </select>
+                  <ChevronDown className={style.selectIcon} size={18} />
+                </div>
+              </div>
             </div>
-            <div className={style.eventCards}>
-                {displayedEvents.map((event, index) => (
-                    <div
-                        key={event.id}
-                        style={{ "--card-index": index }}
-                    >
-                        <EventCard {...event} />
-                    </div>
-                ))}
-            </div>
-            {selectedEvent && <EventModal {...selectedEvent}/>}
+          )}
         </div>
-    );
+      </div>
+      <div className={style.eventCards}>
+        {displayedEvents.map((event, index) => (
+          <div key={event.id} style={{ "--card-index": index }}>
+            <EventCard {...event} />
+          </div>
+        ))}
+      </div>
+
+      {/* Call to Action Section */}
+      <div className={style.ctaContainer}>
+        <div className={style.ctaCard}>
+          <div className={style.ctaIcon}>
+            <Sparkles size={32} />
+          </div>
+          <h3 className={style.ctaTitle}>
+            ¿No encuentras un evento de tu interés?
+          </h3>
+          <p className={style.ctaSubtitle}>
+            Crea tu propio evento y comparte experiencias únicas con la
+            comunidad
+          </p>
+          <button
+            className={style.ctaButton}
+            onClick={() => navigate("/createEvent")}
+          >
+            <Plus size={20} />
+            Crear Evento Ahora
+          </button>
+        </div>
+      </div>
+
+      {selectedEvent && <EventModal {...selectedEvent} />}
+    </div>
+  );
 }

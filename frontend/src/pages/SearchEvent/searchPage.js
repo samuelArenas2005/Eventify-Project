@@ -1,4 +1,4 @@
-import { getAllEvents } from '../../api/api'
+import { getAllEvents } from '../../API/api'
 
 
 function diaMes(iso) {

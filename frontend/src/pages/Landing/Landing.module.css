@@ -1,86 +1,17 @@
-.discover{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(45deg, #E11D9E, #0B72B9);
-    width: 100%;
-    margin-top: 32px;
-    padding: 16px 16px 24px 16px;
-    color: white;
-}
-body{
-    padding: 0;
-    margin: 0;
-}
-.exploreButton{
-    all: unset;
-    cursor: pointer;
-    background-color: #0B72B9;
-    padding: 12px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) ;
-    border-color: var(--fondo-menu);
-    border-style: solid;
-    color: var(--fondo-menu);
-    margin-bottom: 16px;
-}
-.exploreButton:hover{
-    box-shadow: 0 20px 10px rgba(0, 0, 0, 0.1) ;
-    transform: scale(1, 1);
-}
-.createButton{
-    all: unset;
-    cursor: pointer;
-    background-color: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) ;
-    border-color: var(--fondo-menu);
-    border-style: solid;
-    color: var(--fondo-menu);
-    margin-bottom: 16px;
-}
-.createButton:hover{
-    box-shadow: 0 20px 10px rgba(0, 0, 0, 0.1) ;
-    transform: scale(1, 1);
-}
-.estadisticas{
-    margin-top: 24px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-evenly;
-}
-.eventosMes{
-    border-radius: 8px;
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
-    width: 300px;
-    height: 150px;
-    padding: 10px;
-}
-.personasTotal{
-    border-radius: 8px;
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
-    width: 300px;
-    height: 150px;
-    padding: 10px;
-}
-.calificacion{
-    border-radius: 8px;
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
-    width: 300px;
-    height: 150px;
-    padding: 10px;
+/* ============================================
+   LANDING PAGE - EVENTIFY
+   Diseño minimalista y moderno con UX/UI optimizado
+   ============================================ */
+
+/* --- Container Principal --- */
+.landingContainer {
+  width: 100%;
+  overflow-x: hidden;
 }
 
-
-/*
- * HomePage.module.css
- * Estilos para la sección Hero de la Home
- */
-
-
+/* ============================================
+   HERO SECTION CON FORMA TRIANGULAR
+   ============================================ */
 .heroContainer {
   height: 100vh;
   width: 100%;
@@ -93,13 +24,11 @@ body{
   background-size: cover;
   background-position: center;
   color: var(--color-white);
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+  margin-bottom: 80px;
 }
 
-/*
- * --- ¡AQUÍ ESTÁ EL CAMBIO! ---
- * Este es el degradado semitransparente.
- * Se coloca sobre la imagen de fondo pero debajo del contenido.
- */
+/* Overlay con degradado */
 .heroContainer::before {
   content: '';
   position: absolute;
@@ -107,119 +36,691 @@ body{
   left: 0;
   right: 0;
   bottom: 0;
-  
-  /* 1. Aplicamos el degradado con tus colores */
   background: linear-gradient(
-    135deg, /* Un ángulo diagonal se ve bien */
-    var(--color-primary) 0%, 
-    var(--color-secondary) 100%
+    135deg,
+    rgba(11, 114, 185, 0.85) 0%,
+    rgba(225, 29, 158, 0.45) 50%,
+    rgba(0, 194, 179, 0.85) 100%
   );
-  
-  /* 2. Hacemos el degradado semitransparente */
-  /* Ajusta este valor (0.0 a 1.0) como prefieras */
-  opacity: 0.75; 
-  
   z-index: 1;
 }
 
-/*
- * Contenedor para el texto y los botones
- * (Todo lo demás sigue igual)
- */
+/* Contenido del Hero */
 .heroContent {
   position: relative;
   z-index: 2;
   text-align: center;
-  max-width: 700px;
+  max-width: 800px;
+  animation: fadeInUp 1s ease-out;
 }
 
 .logoText {
   font-family: var(--font-title);
-  font-size: clamp(3.5rem, 12vw, 5.5rem);
+  font-size: clamp(3.5rem, 12vw, 6rem);
   font-weight: 800;
   color: var(--color-white);
   line-height: 1.1;
-  margin-bottom: 0.5rem;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+  margin-bottom: 1rem;
+  text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.4);
+  letter-spacing: -2px;
 }
 
 .sloganText {
   font-family: var(--font-base);
-  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
   font-weight: 400;
   color: var(--color-white);
   opacity: 0.95;
-  margin-bottom: 2.5rem;
-  max-width: 500px;
+  margin-bottom: 3rem;
+  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+  line-height: 1.6;
 }
 
 .buttonContainer {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.2rem;
   flex-wrap: wrap;
 }
 
 .button {
-  display: inline-block;
-  padding: 0.9rem 2.2rem;
-  border-radius: var(--border-radius-md);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
   font-family: var(--font-title);
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
-/* El botón primario ahora contrasta mejor con el fondo */
 .buttonPrimary {
-  /* Lo cambiamos a blanco para que resalte sobre el degradado de color */
   background-color: var(--color-white);
-  color: var(--color-primary); /* Texto en color primario */
+  color: var(--color-primary);
 }
 
 .buttonPrimary:hover {
-  background-color: #f4f4f4;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  background-color: #f8f8f8;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
 }
 
-/* El botón secundario ahora necesita un borde para verse */
 .buttonSecondary {
-  background-color: transparent; /* Transparente */
-  color: var(--color-white); /* Texto blanco */
+  background-color: transparent;
+  color: var(--color-white);
   border: 2px solid var(--color-white);
 }
 
 .buttonSecondary:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* Ligero fondo blanco */
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
 }
 
-.heroContainer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  
-  /* 1. Aplicamos el degradado que va de TUS COLORES a transparente */
-  background: linear-gradient(
-    to top, /* Dirección: de abajo hacia arriba */
-    /* Empieza abajo con el color primario (100% opaco) */
-    var(--color-primary) 0%, 
-    /* El segundo color (secundario) con un poco de transparencia a media altura */
-    var(--color-secondary) 40%, 
-    /* Transparente al 100% en la parte superior */
-    transparent 100%
-  );
-  z-index: 1;
+/* Forma triangular (ya incluida en clip-path) */
+.triangleShape {
+  display: none;
+}
+
+/* ============================================
+   SECCIÓN DE ESTADÍSTICAS
+   ============================================ */
+.statsSection {
+  padding: 0 2rem 80px;
+  margin-top: -50px;
+  position: relative;
+  z-index: 3;
+}
+
+.statsContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.statCard {
+  background: linear-gradient(135deg, rgba(11, 114, 185, 0.05) 0%, rgba(0, 194, 179, 0.08) 100%);
+  border: 1px solid rgba(11, 114, 185, 0.15);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  animation: fadeInUp 0.8s ease-out backwards;
+}
+
+.statCard:nth-child(1) { animation-delay: 0.1s; }
+.statCard:nth-child(2) { animation-delay: 0.2s; }
+.statCard:nth-child(3) { animation-delay: 0.3s; }
+
+.statCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 35px rgba(11, 114, 185, 0.15);
+  border-color: rgba(11, 114, 185, 0.3);
+}
+
+.statIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-tertiary));
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+  color: white;
+}
+
+.statNumber {
+  font-family: var(--font-title);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.statLabel {
+  font-family: var(--font-base);
+  font-size: 1rem;
+  color: var(--text-secundary);
+  margin: 0;
+}
+
+/* ============================================
+   SECCIÓN DE CARACTERÍSTICAS
+   ============================================ */
+.featuresSection {
+  padding: 20px 2rem;
+  background: linear-gradient(180deg, transparent 0%, rgba(11, 114, 185, 0.02) 100%);
+}
+
+.sectionHeader {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 4rem;
+}
+
+.sectionTitle {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+.sectionSubtitle {
+  font-family: var(--font-base);
+  font-size: 1.15rem;
+  color: var(--text-secundary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.featuresGrid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.featureCard {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  animation: fadeInUp 0.8s ease-out backwards;
+}
+
+.featureCard:nth-child(1) { animation-delay: 0.1s; }
+.featureCard:nth-child(2) { animation-delay: 0.2s; }
+.featureCard:nth-child(3) { animation-delay: 0.3s; }
+.featureCard:nth-child(4) { animation-delay: 0.4s; }
+.featureCard:nth-child(5) { animation-delay: 0.5s; }
+.featureCard:nth-child(6) { animation-delay: 0.6s; }
+
+.featureCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 35px rgba(11, 114, 185, 0.12);
+  border-color: var(--color-primary);
+}
+
+.featureIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, rgba(11, 114, 185, 0.1), rgba(0, 194, 179, 0.1));
+  border-radius: 12px;
+  color: var(--color-primary);
+  margin-bottom: 1.5rem;
+}
+
+.featureTitle {
+  font-family: var(--font-title);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.featureDescription {
+  font-family: var(--font-base);
+  font-size: 1rem;
+  color: var(--text-secundary);
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* ============================================
+   SECCIÓN DE EVENTOS DESTACADOS
+   ============================================ */
+.eventsShowcase {
+  padding: 80px 2rem;
+  background: var(--color-bg);
+}
+
+.eventsGrid {
+  max-width: 1200px;
+  margin: 0 auto 3rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  justify-items: center;
+}
+
+/* Cuando hay 1 card */
+.eventsGrid:has(.eventCardWrapper:only-child) {
+  grid-template-columns: 1fr;
+  max-width: 400px;
+}
+
+/* Cuando hay 2 cards */
+.eventsGrid:has(.eventCardWrapper:nth-child(2):last-child) {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 850px;
+}
+
+.eventCardWrapper {
+  animation: fadeInUp 0.8s ease-out backwards;
+  width: 100%;
+  max-width: 400px;
+}
+
+.eventCardWrapper:nth-child(1) { animation-delay: 0.1s; }
+.eventCardWrapper:nth-child(2) { animation-delay: 0.2s; }
+.eventCardWrapper:nth-child(3) { animation-delay: 0.3s; }
+
+.showMoreContainer {
+  text-align: center;
+}
+
+.showMoreButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-tertiary));
+  color: white;
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(11, 114, 185, 0.3);
+}
+
+.showMoreButton:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(11, 114, 185, 0.4);
+}
+
+/* ============================================
+   CTA CREAR EVENTOS
+   ============================================ */
+.createEventCTA {
+  padding: 80px 2rem;
+  background: linear-gradient(135deg, rgba(11, 114, 185, 0.03) 0%, rgba(225, 29, 158, 0.05) 100%);
+}
+
+.ctaContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.ctaLeft {
+  animation: fadeInLeft 1s ease-out;
+}
+
+.ctaSparkle {
+  color: var(--color-secondary);
+  margin-bottom: 1rem;
+}
+
+.ctaTitle {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+.ctaDescription {
+  font-family: var(--font-base);
+  font-size: 1.1rem;
+  color: var(--text-secundary);
+  margin: 0 0 2rem 0;
+  line-height: 1.7;
+}
+
+.ctaFeaturesList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2.5rem 0;
+}
+
+.ctaFeaturesList li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+  font-family: var(--font-base);
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+
+.ctaFeaturesList li svg {
+  color: var(--color-success);
+  flex-shrink: 0;
+}
+
+.ctaPrimaryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+  color: white;
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 1.2rem 3rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 25px rgba(225, 29, 158, 0.3);
+}
+
+.ctaPrimaryButton:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(225, 29, 158, 0.4);
+}
+
+.ctaRight {
+  animation: fadeInRight 1s ease-out;
+}
+
+.ctaImagePlaceholder {
+  background: linear-gradient(135deg, rgba(11, 114, 185, 0.1), rgba(0, 194, 179, 0.15));
+  border: 2px dashed rgba(11, 114, 185, 0.3);
+  border-radius: 20px;
+  padding: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.ctaPlaceholderIcon {
+  color: var(--color-primary);
+  opacity: 0.5;
+}
+
+/* ============================================
+   SECCIÓN SOBRE NOSOTROS
+   ============================================ */
+.aboutSection {
+  padding: 80px 2rem;
+  background: var(--color-bg);
+}
+
+.aboutContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.aboutLeft {
+  animation: fadeInLeft 1s ease-out;
+}
+
+.aboutImageContainer {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-tertiary));
+  border-radius: 20px;
+  padding: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 40px rgba(11, 114, 185, 0.2);
+}
+
+.aboutIcon {
+  color: white;
+}
+
+.aboutRight {
+  animation: fadeInRight 1s ease-out;
+}
+
+.aboutTitle {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.2;
+}
+
+.aboutDescription {
+  font-family: var(--font-base);
+  font-size: 1.1rem;
+  color: var(--text-secundary);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.8;
+}
+
+.aboutValues {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.valueItem {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.valueItem svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.valueItem h4 {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.valueItem p {
+  font-family: var(--font-base);
+  font-size: 1rem;
+  color: var(--text-secundary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ============================================
+   CTA FINAL
+   ============================================ */
+.finalCTA {
+  padding: 100px 2rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-tertiary));
+  text-align: center;
+  color: white;
+}
+
+.finalCTATitle {
+  font-family: var(--font-title);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 800;
+  margin: 0 0 1rem 0;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.finalCTASubtitle {
+  font-family: var(--font-base);
+  font-size: 1.2rem;
+  margin: 0 0 3rem 0;
+  opacity: 0.95;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.finalCTAButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.finalCTAPrimary,
+.finalCTASecondary {
+  display: inline-block;
+  padding: 1.2rem 3rem;
+  border-radius: 50px;
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.finalCTAPrimary {
+  background-color: white;
+  color: var(--color-primary);
+}
+
+.finalCTAPrimary:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+}
+
+.finalCTASecondary {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.finalCTASecondary:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1024px) {
+  .ctaContent,
+  .aboutContent {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .ctaRight,
+  .aboutLeft {
+    order: -1;
+  }
+
+  .ctaImagePlaceholder,
+  .aboutImageContainer {
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroContainer {
+    height: 80vh;
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+    margin-bottom: 60px;
+  }
+
+  .statsContainer {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .featuresGrid,
+  .eventsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .sectionHeader {
+    margin-bottom: 2.5rem;
+  }
+
+  .featuresSection,
+  .eventsShowcase,
+  .createEventCTA,
+  .aboutSection {
+    padding: 60px 1.5rem;
+  }
+
+  .finalCTA {
+    padding: 80px 1.5rem;
+  }
+
+  .finalCTAButtons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .finalCTAPrimary,
+  .finalCTASecondary {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+  }
 }

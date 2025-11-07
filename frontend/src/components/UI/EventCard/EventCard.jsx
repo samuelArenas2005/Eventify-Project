@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./EventCard.module.css";
 import { Calendar, Clock, MapPin, Users, Heart, UserPlus } from "lucide-react";
-import { getCategories } from "../../../api/api";
+import { getCategories } from "../../../API/api";
 
 const EventCard = ({
   imageUrl,

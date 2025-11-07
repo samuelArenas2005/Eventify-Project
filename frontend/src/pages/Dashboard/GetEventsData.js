@@ -1,4 +1,4 @@
-import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '../../api/api'
+import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '../../API/api'
  
  /* export const registeredEventsDataObjet = [
 
