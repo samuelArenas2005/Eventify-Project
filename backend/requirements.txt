@@ -1,13 +1,20 @@
-# Core Django
+#Core Django
 Django==5.0.6
 
-# Django REST Framework for API development
+#Django REST Framework for API development
 djangorestframework==3.15.2
 
-# CORS handling for frontend-backend communication
+#CORS handling for frontend-backend communication
 django-cors-headers==4.4.0
 
-# Image handling for ImageField
+#Image handling for ImageField
 Pillow==10.4.0
 
+#JWT authentication
 djangorestframework-simplejwt==5.3.1
+
+#OpenAI API integration
+openai==1.52.2
+
+#Environment variable management
+python-dotenv==1.0.1
