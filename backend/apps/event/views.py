@@ -250,6 +250,7 @@ def generate_image(request):
     """
     Versión MODIFICADA para prueba rápida con clave fija.
     """
+    
     if request.method != 'POST':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
 
@@ -259,7 +260,6 @@ def generate_image(request):
         if not prompt:
             return JsonResponse({'error': 'prompt required'}, status=400)
 
-        # 💡 CAMBIO CLAVE: Pasa la clave directamente al constructor de OpenAI
         client = OpenAI(api_key=HARDCODED_API_KEY)
 
         # ⚠️ Nota: El modelo 'gpt-image-1' no existe. 

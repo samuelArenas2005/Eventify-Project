@@ -7,7 +7,7 @@ import {
   getAllEvents,
   getEventCreatedUser,
   getCategories,
-} from "../../../API/api";
+} from "../../../api/api";
 import {
   LayoutDashboard,
   FileText,
