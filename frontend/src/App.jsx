@@ -19,6 +19,7 @@ import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import Analytics from "./pages/Analytics/Analytics";
 import NotFoundPage from "./pages/NotFound/NotFoundPage";
 import SearchPage from "./pages/SearchEvent/SearchPage.jsx";
+import ScrollToTop from "./components/UI/ScrollTop/ScrollToTop";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -66,6 +67,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Toaster position="top-center" reverseOrder={false} />
       <Navigation user={user} logout={handleLogOut} />
       <Routes>
