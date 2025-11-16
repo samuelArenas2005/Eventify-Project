@@ -160,9 +160,35 @@ const RegisterUser = () => {
       toast.success("¡Registro exitoso!");
       navigate("/login");
     } catch (err) {
-      console.error("Registro error:", err);
-      const message = err.response?.data || err.message || "Error en registro";
-      toast.error(JSON.stringify(message));
+      console.error("Error de registro desde el backend:", err.response?.data);
+      
+      const errors = err.response?.data;
+      if (errors) {
+        
+        for (const field in errors) {
+          const message = errors[field][0]; 
+
+          if (field === 'username' && message.includes('already exists')) {
+            toast.error('El nombre de usuario ya está en uso. Por favor, elige otro.');
+          } else if (field === 'email') {
+            toast.error('El correo electrónico ya está registrado o no es válido.');
+          } else if (field === 'password') {
+            toast.error('La contraseña no cumple los requisitos.');
+          } else if (field === 'non_field_errors') {
+            
+            toast.error(message);
+          } else {
+            // Mensaje genérico para un error que no se identifique
+            toast.error(`Error en el campo ${field}: ${message}`);
+          }
+          
+          return; 
+        }
+      }
+      
+      
+      toast.error("Ocurrió un error inesperado durante el registro.");
+      
     }
   };
 
