@@ -141,7 +141,8 @@ class EventAttendee(models.Model):
         ('REGISTERED', 'Registered'),
         ('CONFIRMED', 'Confirmed'),
         ('CANCELLED', 'Cancelled'),
-        ('FAVORITE', 'Favorite')
+        ('FAVORITE', 'Favorite'),
+        ('PENDING','Pending')
     ]
 
     user = models.ForeignKey(

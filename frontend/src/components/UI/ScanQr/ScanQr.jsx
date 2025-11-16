@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { X, CheckCircle, XCircle } from 'lucide-react';
+import { confirmAttendance } from '../../../api/api';
 import styles from './ScanQr.module.css';
 
-const ScanQr = ({ isOpen, onClose, eventId }) => {
+const ScanQr = ({ isOpen, onClose, eventId, redirection}) => {
   const scannerRef = useRef(null);
   const html5QrCodeRef = useRef(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -105,10 +106,20 @@ const ScanQr = ({ isOpen, onClose, eventId }) => {
       const cardEventId = String(eventId);
       
       if (qrEventId === cardEventId) {
-        setResultModal({
-          type: 'success',
-          message: 'Tu asistencia ha sido confirmada.'
-        });
+        // Actualizar el status a CONFIRMED en el backend
+        try {
+          await confirmAttendance(eventId, 'CONFIRMED');
+          setResultModal({
+            type: 'success',
+            message: 'Tu asistencia ha sido confirmada.'
+          });
+        } catch (error) {
+          console.error('Error al confirmar asistencia:', error);
+          setResultModal({
+            type: 'error',
+            message: 'Error al confirmar asistencia. Por favor, inténtalo de nuevo.'
+          });
+        }
       } else {
         setResultModal({
           type: 'error',
@@ -121,10 +132,20 @@ const ScanQr = ({ isOpen, onClose, eventId }) => {
       const cardId = String(eventId).trim();
       
       if (decodedId === cardId) {
-        setResultModal({
-          type: 'success',
-          message: 'Tu asistencia ha sido confirmada.'
-        });
+        // Actualizar el status a CONFIRMED en el backend
+        try {
+          await confirmAttendance(eventId, 'CONFIRMED');
+          setResultModal({
+            type: 'success',
+            message: 'Tu asistencia ha sido confirmada.'
+          });
+        } catch (error) {
+          console.error('Error al confirmar asistencia:', error);
+          setResultModal({
+            type: 'error',
+            message: 'Error al confirmar asistencia. Por favor, inténtalo de nuevo.'
+          });
+        }
       } else {
         setResultModal({
           type: 'error',
@@ -139,7 +160,6 @@ const ScanQr = ({ isOpen, onClose, eventId }) => {
     if (errorMessage.includes('No QR code found')) {
       return;
     }
-    // Solo loguear otros errores sin mostrar toast para no saturar
     console.log('Error de escaneo:', errorMessage);
   };
 
@@ -162,6 +182,7 @@ const ScanQr = ({ isOpen, onClose, eventId }) => {
     
     if (modalType === 'success') {
       onClose();
+      redirection();
     } else {
       // Si es error, permitir escanear de nuevo
       setHasScanned(false);

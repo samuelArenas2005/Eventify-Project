@@ -4,7 +4,7 @@ import styles from './Dashboard.module.css';
 import EventCard from '../../components/UI/EventCard/EventCard';
 import { Edit, Settings, Calendar, User, Star, Filter, CirclePlus, Plus, CalendarCheck2 } from 'lucide-react';
 import { getRegisteredEvents, getPendingEvents, getCreatedEvent } from './GetEventsData';
-import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../API/api';
+import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../api/api';
 import EventDashboard from '../../components/UI/EventCreate/EventForm'
 import Loanding from '../../components/UI/Loanding/Loanding';
 import ModalQr from '../../components/UI/modalQR/ModalQr';
@@ -31,6 +31,10 @@ const UserProfileDashboard = ({ user }) => {
   const FullName = user ? `${user.name} ${user.last_name}` : 'Usuario';
   const initials = user ? `${user.name.charAt(0)}${user.last_name.charAt(0)}` : 'UU';
   const dateRegister = user ? `${user.date_joined.substring(0, 4)}` : 'fecha no disponible';
+
+  const hardRefresh = () => {
+    window.location.reload(true);
+  };
 
   const handleFilterClick = () => {
     alert('Abrir modal de filtros');
@@ -313,6 +317,7 @@ const UserProfileDashboard = ({ user }) => {
         isOpen={isScanQRModalOpen}
         onClose={handleCloseScanQRModal}
         eventId={selectedEventForScan?.id}
+        redirection={hardRefresh}
       />
 
     </div>

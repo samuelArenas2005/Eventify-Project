@@ -99,3 +99,17 @@ export const getAllCreatedEventsCount = () => {
   // Suponiendo que tienes un endpoint que trae TODOS los eventos creados (activos y finalizados)
   return axios.get(`${BASE_URL}event/created/all/`, { withCredentials: true });
 }
+
+export const confirmAttendance = async (eventId, status = 'CONFIRMED') => {
+  try {
+    const response = await axios.put(
+      `${BASE_URL}event/events/${eventId}/confirm_attendance/`,
+      { status: status },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error al confirmar asistencia:", error);
+    throw error;
+  }
+}
