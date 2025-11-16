@@ -132,3 +132,158 @@
   transform: translate(30%, 0) scale(1);
   transition-delay: 0.2s; /* Delay secuencial */
 }
+/* =======================================
+  RESPONSIVE DESIGN
+  =======================================
+*/
+
+/* Tablet (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .container {
+    padding: 30px 20px;
+  }
+
+  .title {
+    font-size: 2.5rem;
+    letter-spacing: 4px;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .svgIcon {
+    width: 120px;
+    height: 120px;
+  }
+
+  .textWrapper:hover {
+    padding-top: 110px;
+  }
+}
+
+/* Móvil grande (max-width: 768px) */
+@media (max-width: 768px) {
+  .container {
+    padding: 25px 15px;
+  }
+
+  .textWrapper {
+    padding-top: 15px;
+  }
+
+  .title {
+    font-size: 2rem;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+    padding-top: 8px;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+    margin: -8px 0 0 0;
+  }
+
+  .svgIcon {
+    width: 100px;
+    height: 100px;
+  }
+
+  .textWrapper:hover {
+    padding-top: 90px;
+  }
+
+  .textWrapper:hover .svg1 {
+    transform: translate(-120%, -170%) scale(0.9);
+  }
+
+  .textWrapper:hover .svg2 {
+    transform: translate(-50%, -172%) scale(0.9);
+  }
+
+  .textWrapper:hover .svg3 {
+    transform: translate(30%, -170%) scale(0.9);
+  }
+}
+
+/* Móvil pequeño (max-width: 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 20px 10px;
+  }
+
+  .textWrapper {
+    padding-top: 10px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    padding-top: 6px;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    margin: -6px 0 0 0;
+  }
+
+  .svgIcon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .textWrapper:hover {
+    padding-top: 70px;
+  }
+
+  .textWrapper:hover .svg1 {
+    transform: translate(-120%, -170%) scale(0.8);
+  }
+
+  .textWrapper:hover .svg2 {
+    transform: translate(-50%, -172%) scale(0.8);
+  }
+
+  .textWrapper:hover .svg3 {
+    transform: translate(30%, -170%) scale(0.8);
+  }
+
+  /* Ajustar posiciones iniciales para móviles pequeños */
+  .svg1 {
+    transform: translate(-120%, 20px) scale(0.4);
+  }
+
+  .svg2 {
+    transform: translate(-50%, 20px) scale(0.4);
+  }
+
+  .svg3 {
+    transform: translate(20%, 20px) scale(0.4);
+  }
+}
+
+/* Pantallas muy pequeñas (max-width: 360px) */
+@media (max-width: 360px) {
+  .container {
+    padding: 15px 8px;
+  }
+
+  .title {
+    font-size: 1.2rem;
+    letter-spacing: 1.5px;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+  }
+
+  .svgIcon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .textWrapper:hover {
+    padding-top: 60px;
+  }
+}

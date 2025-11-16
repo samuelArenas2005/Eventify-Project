@@ -22,7 +22,6 @@ export default function ModalQr({ isOpen, onClose, eventId, eventTitle }) {
   };
 
   const handlePrint = () => {
-    // Obtener el SVG del QR del DOM específicamente del contenedor del QR
     let qrSVG = '';
     if (qrRef.current) {
       const svgElement = qrRef.current.querySelector('svg');
