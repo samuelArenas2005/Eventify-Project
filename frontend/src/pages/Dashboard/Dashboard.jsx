@@ -7,6 +7,7 @@ import { getRegisteredEvents, getPendingEvents, getCreatedEvent } from './GetEve
 import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../API/api';
 import EventDashboard from '../../components/UI/EventCreate/EventForm'
 import Loanding from '../../components/UI/Loanding/Loanding';
+import ModalQr from '../../components/UI/modalQR/ModalQr';
 
 const historyData = [];
 
@@ -21,6 +22,8 @@ const UserProfileDashboard = ({ user }) => {
   const [totalCreatedCount, setTotalCreatedCount] = useState(0);
   const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
   const [isCreatePanelClosing, setIsCreatePanelClosing] = useState(false);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+  const [selectedEventForQR, setSelectedEventForQR] = useState(null);
 
   const FullName = user ? `${user.name} ${user.last_name}` : 'Usuario';
   const initials = user ? `${user.name.charAt(0)}${user.last_name.charAt(0)}` : 'UU';
@@ -47,7 +50,21 @@ const UserProfileDashboard = ({ user }) => {
       setIsCreatePanelClosing(false);
       setActiveTab('misEventos');
     }, 220);
+  };
 
+  // Manejar apertura del modal QR
+  const handleQRCodeClick = (event) => {
+    setSelectedEventForQR({
+      id: event.id,
+      title: event.title
+    });
+    setIsQRModalOpen(true);
+  };
+
+  // Manejar cierre del modal QR
+  const handleCloseQRModal = () => {
+    setIsQRModalOpen(false);
+    setSelectedEventForQR(null);
   };
 
   console.log(user);
@@ -130,7 +147,11 @@ const UserProfileDashboard = ({ user }) => {
         {data.length > 0 ? (
           <div className={`${styles.eventList} ${styles.grid}`}>
             {data.map((event) => (
-              <EventCard key={event.id} {...event} />
+              <EventCard 
+                key={event.id} 
+                {...event}
+                handleQRCodeClick={() => handleQRCodeClick(event)}
+              />
             ))}
           </div>
         ) : (
@@ -260,6 +281,13 @@ const UserProfileDashboard = ({ user }) => {
           </div>
         </div> : null}
 
+      {/* Modal QR */}
+      <ModalQr
+        isOpen={isQRModalOpen}
+        onClose={handleCloseQRModal}
+        eventId={selectedEventForQR?.id}
+        eventTitle={selectedEventForQR?.title}
+      />
 
     </div>
   );

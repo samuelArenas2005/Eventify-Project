@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./EventCard.module.css";
-import { Calendar, Clock, MapPin, Users, Heart, UserPlus } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Heart, UserPlus, QrCode } from "lucide-react";
 import { getCategories } from "../../../API/api";
 
 const EventCard = ({
@@ -20,6 +20,8 @@ const EventCard = ({
   showRegisterButton,
   activeHeart = true,
   handleImageTitleClick,
+  generateQRCode = false,
+  handleQRCodeClick,
 }) => {
   const [isHeartActive, setIsHeartActive] = useState(activeHeart);
   const [categoryColors, setCategoryColors] = useState({});
@@ -78,6 +80,11 @@ const EventCard = ({
                 size={28}
                 className={`${isHeartActive ? styles.heartActive : ""}`}
               />
+            </div>
+          ) : null}
+          {generateQRCode ? (
+            <div className={styles.qrCodeContainer} onClick={handleQRCodeClick}>
+              <QrCode size={28} className={styles.qrCodeIcon} />
             </div>
           ) : null}
         </div>

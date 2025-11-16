@@ -93,6 +93,7 @@ export default function Navigation({ user, logout }) {
                 Crear Evento
               </Link>
             </li>
+            <li className="menu-divider"></li>
             <li>
               <Link
                 onClick={(e) => {
@@ -113,12 +114,56 @@ export default function Navigation({ user, logout }) {
   function LoggedOutControls() {
     return (
       <>
-        <Link to="/login" className="NavBarLoginButton">
-          Iniciar Sesión
-        </Link>
-        <Link to="/register" className="NavBarRegisterButton">
-          Regístrate
-        </Link>
+        {/* Botones visibles en desktop */}
+        <div className="desktop-buttons">
+          <Link to="/login" className="NavBarLoginButton">
+            Iniciar Sesión
+          </Link>
+          <Link to="/register" className="NavBarRegisterButton">
+            Regístrate
+          </Link>
+        </div>
+
+        {/* Menú hamburguesa visible solo en móviles */}
+        <div className="menuHamburguesa mobile-only" onClick={toggleMenuHamburguesa}>
+          {menuOpen ? (
+            <i className="fa-solid fa-square-xmark fa-spin"></i>
+          ) : (
+            <i className="fa-solid fa-bars"></i>
+          )}
+        </div>
+
+        {/* Menú desplegable para móviles */}
+        {menuOpen && (
+          <ul className="menuLinks">
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/">
+                Inicio
+              </Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/searchPage">
+                Eventos
+              </Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/calendario">
+                Calendario
+              </Link>
+            </li>
+            <li className="menu-divider"></li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/login">
+                Iniciar Sesión
+              </Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/register">
+                Regístrate
+              </Link>
+            </li>
+          </ul>
+        )}
       </>
     );
   }

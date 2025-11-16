@@ -1,0 +1,344 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContainer {
+  position: relative;
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8fafc 100%);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.closeButton:hover {
+  background-color: var(--color-danger);
+  color: white;
+  border-color: var(--color-danger);
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.closeButton:active {
+  transform: scale(0.95) rotate(90deg);
+}
+
+.modalContent {
+  padding: 3rem 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.qrWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: var(--color-white);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--color-border);
+}
+
+.qrCode {
+  width: 100%;
+  height: auto;
+  max-width: 256px;
+}
+
+.textSection {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.modalTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary);
+  margin: 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.eventTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+  margin: 0;
+}
+
+.instructionText {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--text-secundary);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0 1rem;
+}
+
+.printButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(11, 114, 185, 0.3);
+  margin-top: 0.5rem;
+}
+
+.printButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(11, 114, 185, 0.4);
+}
+
+.printButton:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modalOverlay {
+    padding: 0.5rem;
+  }
+
+  .modalContainer {
+    max-width: 100%;
+    border-radius: 16px;
+    max-height: 95vh;
+  }
+
+  .modalContent {
+    padding: 2.5rem 1.5rem 2rem;
+    gap: 1.5rem;
+  }
+
+  .qrWrapper {
+    padding: 1rem;
+  }
+
+  .qrCode {
+    max-width: 220px;
+  }
+
+  .modalTitle {
+    font-size: 1.25rem;
+  }
+
+  .eventTitle {
+    font-size: 1rem;
+  }
+
+  .instructionText {
+    font-size: 0.9rem;
+    padding: 0 0.5rem;
+  }
+
+  .closeButton {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 36px;
+    height: 36px;
+  }
+
+  .closeButton svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalOverlay {
+    padding: 0;
+  }
+
+  .modalContainer {
+    border-radius: 16px 16px 0 0;
+    max-height: 100vh;
+    margin-top: auto;
+  }
+
+  .modalContent {
+    padding: 2rem 1rem 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .qrWrapper {
+    padding: 0.75rem;
+  }
+
+  .qrCode {
+    max-width: 200px;
+  }
+
+  .modalTitle {
+    font-size: 1.1rem;
+  }
+
+  .eventTitle {
+    font-size: 0.95rem;
+  }
+
+  .instructionText {
+    font-size: 0.85rem;
+    padding: 0;
+  }
+
+  .printButton {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .printButton svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Scrollbar personalizado para el modal */
+.modalContainer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modalContainer::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.modalContainer::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos para impresión */
+@media print {
+  .modalOverlay {
+    position: static;
+    background: white;
+    padding: 0;
+  }
+
+  .modalContainer {
+    box-shadow: none;
+    border: none;
+    max-width: 100%;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .closeButton,
+  .printButton {
+    display: none;
+  }
+
+  .modalContent {
+    padding: 2rem;
+    gap: 1.5rem;
+  }
+
+  .qrWrapper {
+    padding: 1rem;
+    border: 2px solid #000;
+  }
+
+  .textSection {
+    margin-top: 1rem;
+  }
+
+  .instructionText {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  .instructionText::after {
+    content: '';
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #6B7280;
+    content: 'Encuentra el botón de leer QR en la card de este evento cerca del título.';
+  }
+}
+
