@@ -191,6 +191,7 @@ export const getRegisteredEvents = async () => {
       onHeartClick: () => console.log(`Heart ${hora12Colombia(events.event.start_date)}`),
       showRegisterButton: false,
       showHeartButton: false,
+      readQRCode: true,
     }));
 
 

@@ -8,6 +8,7 @@ import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../API
 import EventDashboard from '../../components/UI/EventCreate/EventForm'
 import Loanding from '../../components/UI/Loanding/Loanding';
 import ModalQr from '../../components/UI/modalQR/ModalQr';
+import ScanQr from '../../components/UI/ScanQr/ScanQr';
 
 const historyData = [];
 
@@ -24,6 +25,8 @@ const UserProfileDashboard = ({ user }) => {
   const [isCreatePanelClosing, setIsCreatePanelClosing] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [selectedEventForQR, setSelectedEventForQR] = useState(null);
+  const [isScanQRModalOpen, setIsScanQRModalOpen] = useState(false);
+  const [selectedEventForScan, setSelectedEventForScan] = useState(null);
 
   const FullName = user ? `${user.name} ${user.last_name}` : 'Usuario';
   const initials = user ? `${user.name.charAt(0)}${user.last_name.charAt(0)}` : 'UU';
@@ -65,6 +68,21 @@ const UserProfileDashboard = ({ user }) => {
   const handleCloseQRModal = () => {
     setIsQRModalOpen(false);
     setSelectedEventForQR(null);
+  };
+
+  // Manejar apertura del modal de escaneo QR
+  const handleReadQrCodeClick = (event) => {
+    setSelectedEventForScan({
+      id: event.id,
+      title: event.title
+    });
+    setIsScanQRModalOpen(true);
+  };
+
+  // Manejar cierre del modal de escaneo QR
+  const handleCloseScanQRModal = () => {
+    setIsScanQRModalOpen(false);
+    setSelectedEventForScan(null);
   };
 
   console.log(user);
@@ -151,6 +169,7 @@ const UserProfileDashboard = ({ user }) => {
                 key={event.id} 
                 {...event}
                 handleQRCodeClick={() => handleQRCodeClick(event)}
+                handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
               />
             ))}
           </div>
@@ -287,6 +306,13 @@ const UserProfileDashboard = ({ user }) => {
         onClose={handleCloseQRModal}
         eventId={selectedEventForQR?.id}
         eventTitle={selectedEventForQR?.title}
+      />
+
+      {/* Modal Scan QR */}
+      <ScanQr
+        isOpen={isScanQRModalOpen}
+        onClose={handleCloseScanQRModal}
+        eventId={selectedEventForScan?.id}
       />
 
     </div>
