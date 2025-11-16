@@ -138,9 +138,10 @@ class Event(models.Model):
 
 class EventAttendee(models.Model):
     STATUS_CHOICES = [
-        ('PENDING', 'Pending'),
+        ('REGISTERED', 'Registered'),
         ('CONFIRMED', 'Confirmed'),
-        ('CANCELLED', 'Cancelled')
+        ('CANCELLED', 'Cancelled'),
+        ('FAVORITE', 'Favorite')
     ]
 
     user = models.ForeignKey(

@@ -151,7 +151,7 @@ class ConfirmedAttendeesList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user, status='CONFIRMED', event__status=Event.ACTIVE)
+            .filter(user=user, status='REGISTERED', event__status=Event.ACTIVE)
         )
 
 class PendingAttendeesList(generics.ListAPIView):
@@ -166,7 +166,7 @@ class PendingAttendeesList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user, status='PENDING', event__status=Event.ACTIVE)
+            .filter(user=user, status='FAVORITE', event__status=Event.ACTIVE)
         )
 
 class EventsByCreatorList(generics.ListAPIView):
@@ -225,7 +225,7 @@ class AllRegisteredEventsList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user)
+            .filter(user=user, status='CONFIRMED', event__status=Event.ACTIVE or Event.FINISHED)
         )
 
 class AllCreatedEventsList(generics.ListAPIView):

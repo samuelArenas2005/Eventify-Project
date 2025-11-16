@@ -8,7 +8,7 @@ export default function Navigation({ user, logout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showHomeButton, setShowHomeButton] = useState(true);
+  const [showHomeButton, setShowHomeButton] = useState(false);
   const initials = user
     ? `${user.name.charAt(0)}${user.last_name.charAt(0)}`
     : "UU";
