@@ -9,19 +9,49 @@
   --hover-menu: #f0f0f0;
 }
 
+/* Variables para modo oscuro */
+body.modo-oscuro {
+  --fondo-nav: #0f172a;
+  --icon-color: #f8fafc;
+  --fondo-menu: #1e293b;
+  --texto-menu: #f8fafc;
+  --hover-menu: #334155;
+}
+
+.nav-container {
+  min-height: 4rem;
+}
+
 
 /* 🧭 Barra de navegación principal */
 .NavBar {
   width: 100%;
-  padding: 1rem 2rem; /* Aumenté un poco el padding horizontal */
+  padding: 1rem 2rem; 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;
+  position: fixed;
   top: 0;
+  left: 0;
   background-color: var(--fondo-nav);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   z-index: 100;
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Estado cuando se hace scroll */
+.NavBar.scrolled {
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  opacity: 0.85;
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Estado scrolled en modo oscuro */
+body.modo-oscuro .NavBar.scrolled {
+  background-color: rgba(15, 23, 42, 0.85);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Logo con degradado */
@@ -302,5 +332,76 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Botón flotante para volver al inicio */
+.home-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(138, 99, 244, 0.4);
+  z-index: 99;
+  transition: all 0.3s ease;
+}
+
+.home-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 30px rgba(138, 99, 244, 0.5);
+  background: var(--color-secondary);
+}
+
+
+.home-button:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+
+/* Ajuste para el body cuando la nav está fixed */
+body {
+  padding-top: 0;
+}
+
+/* Asegurar que el contenido no quede oculto detrás de la nav */
+body > *:first-child {
+  margin-top: 0;
+}
+
+/* Responsive para el botón home */
+@media (max-width: 768px) {
+  .home-button {
+    width: 45px;
+    height: 45px;
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+  
+  .home-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-button {
+    width: 40px;
+    height: 40px;
+    bottom: 1rem;
+    right: 1rem;
+  }
+  
+  .home-button svg {
+    width: 16px;
+    height: 16px;
   }
 }

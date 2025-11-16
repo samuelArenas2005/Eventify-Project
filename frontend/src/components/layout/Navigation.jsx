@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./Navigation.css";
 import { Link, useNavigate } from "react-router-dom";
-import { Moon, Sun, Bell, Search } from "lucide-react";
+import { Moon, Sun, Bell, Search, Home } from "lucide-react";
 
 export default function Navigation({ user, logout }) {
   const [temaOscuro, setTemaOscuro] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showHomeButton, setShowHomeButton] = useState(true);
   const initials = user
     ? `${user.name.charAt(0)}${user.last_name.charAt(0)}`
     : "UU";
@@ -23,6 +25,16 @@ export default function Navigation({ user, logout }) {
       document.body.classList.remove("modo-oscuro");
     }
   }, [temaOscuro]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 100);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Componente para cuando el usuario está logueado
   function LoggedInControls() {
@@ -111,23 +123,48 @@ export default function Navigation({ user, logout }) {
     );
   }
 
-  return (
-    <nav className="NavBar">
-      <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-        <div className="NavBarLogo">Eventify</div>
-      </Link>
+  const scrollToTop = () => {
+    const currentPath = window.location.pathname;
+    if (currentPath !== "/") {
+      navigate("/");
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
-      {/* Contenedor principal de todos los elementos de la derecha */}
-      <div className="nav-derecha">
-        {/* <div className="IconoTema" >
-          {temaOscuro ? (
-            <Moon className="iconDesactive" />
-          ) : (
-            <Sun className="iconDesactive" />
-          )}
-        </div> */}
-        {user ? <LoggedInControls /> : <LoggedOutControls />}
+  return (
+    <>
+      <div className="nav-container">
+        <nav className={`NavBar ${isScrolled ? "scrolled" : ""}`}>
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <div className="NavBarLogo">Eventify</div>
+          </Link>
+
+          {/* Contenedor principal de todos los elementos de la derecha */}
+          <div className="nav-derecha">
+            {/* <div className="IconoTema" >
+            {temaOscuro ? (
+              <Moon className="iconDesactive" />
+            ) : (
+              <Sun className="iconDesactive" />
+            )}
+          </div> */}
+            {user ? <LoggedInControls /> : <LoggedOutControls />}
+          </div>
+        </nav>
       </div>
-    </nav>
+
+
+      {/* Botón flotante para volver al inicio */}
+      {showHomeButton && (
+        <button
+          className="home-button"
+          onClick={scrollToTop}
+          aria-label="Volver al inicio"
+        >
+          <Home size={20} />
+        </button>
+      )}
+    </>
   );
 }
