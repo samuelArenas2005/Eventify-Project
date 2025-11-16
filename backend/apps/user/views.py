@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import User
-from .serializers import UserSerializer, UserRegistrationSerializer
+from .serializers import UserSerializer, UserRegistrationSerializer, UserUpdateSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -29,6 +29,23 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['put', 'patch'])
+    def update_me(self, request):
+        """
+        Actualiza la información del usuario autenticado en /api/user/users/update_me/
+        Permite actualizar: password, email, username, name, last_name, phone, avatar, codigo
+        """
+        user = request.user
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            # Devolver los datos actualizados con el serializer principal
+            updated_serializer = UserSerializer(user)
+            return Response(updated_serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
 
