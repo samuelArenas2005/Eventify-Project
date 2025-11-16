@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 import EventCard from '../../components/UI/EventCard/EventCard';
-import { Edit, Settings, Calendar, User, Star, Filter, CirclePlus, Plus, CalendarCheck2 } from 'lucide-react';
+import { Edit, ChartColumnBig, Calendar, User, Star, Filter, CirclePlus, Plus, CalendarCheck2 } from 'lucide-react';
 import { getRegisteredEvents, getPendingEvents, getCreatedEvent } from './GetEventsData';
 import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../API/api';
 import EventDashboard from '../../components/UI/EventCreate/EventForm'
@@ -12,6 +12,7 @@ const historyData = [];
 
 // --- Componente Principal ---
 const UserProfileDashboard = ({ user }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('registrados');
   const [loading, setLoading] = useState(true);
   const [registeredEventsData, setregisteredEventsData] = useState([])
@@ -180,11 +181,14 @@ const UserProfileDashboard = ({ user }) => {
           <Link to="/createEvent" className={`${styles.actionButton} ${styles.createButton}`}>
             <CirclePlus size={18} /> Crear Evento
           </Link>
-          <button className={styles.actionButton}>
+          <button 
+            className={styles.actionButton}
+            onClick={() => navigate('/editProfile')}
+          >
             <Edit size={18} /> Editar Perfil
           </button>
           <button className={styles.actionButton}>
-            <Settings size={18} /> Configuración
+            <ChartColumnBig size={18} /> Analytics
           </button>
         </div>
       </header>

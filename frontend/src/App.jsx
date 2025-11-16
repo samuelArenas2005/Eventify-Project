@@ -13,6 +13,7 @@ import Footer from "./components/layout/Footer";
 import Landing from "./pages/Landing/Landing";
 import Login from "./pages/login";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import EditPerfilPage from "./pages/Dashboard/EditPerfilPage/EditPerfilPage";
 import RegisterUser from "./pages/RegisterUser";
 import CreateEventPage from "./pages/CreateEvent/CreateEventPage";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
@@ -113,6 +114,14 @@ function App() {
             element={
               <>
                 <Dashboard user = {user}/>
+              </>
+            }
+          />
+          <Route
+            path="/editProfile"
+            element={
+              <>
+                <EditPerfilPage />
               </>
             }
           />

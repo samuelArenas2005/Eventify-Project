@@ -93,3 +93,69 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer para actualizar información del usuario
+    Permite actualizar: password, email, username, name, last_name, phone, avatar, codigo
+    """
+    password = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True,
+        validators=[validate_password]
+    )
+    password2 = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'email',
+            'password',
+            'password2',
+            'name',
+            'last_name',
+            'phone',
+            'avatar',
+            'codigo'
+        )
+
+    def validate(self, attrs):
+        # Validar que las contraseñas coincidan si ambas están presentes
+        password = attrs.get('password')
+        password2 = attrs.get('password2')
+        
+        if password and password2:
+            if password != password2:
+                raise serializers.ValidationError({
+                    "password": "Las contraseñas no coinciden"
+                })
+        elif password or password2:
+            # Si solo una está presente, error
+            raise serializers.ValidationError({
+                "password": "Debe proporcionar ambas contraseñas para cambiarla"
+            })
+        
+        return attrs
+
+    def update(self, instance, validated_data):
+        # Remover password2 del diccionario
+        validated_data.pop('password2', None)
+        
+        # Manejar la contraseña de forma especial
+        password = validated_data.pop('password', None)
+        if password:
+            instance.set_password(password)
+        
+        # Actualizar los demás campos
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.save()
+        return instance

@@ -54,6 +54,47 @@ export const getUser = async () => {
 	return response.data;
 }
 
+export const updateUser = async (userData) => {
+	try {
+		// Si hay un avatar, usar FormData para enviar el archivo
+		const formData = new FormData();
+		
+		// Añadir campos al FormData
+		if (userData.username !== undefined) formData.append('username', userData.username);
+		if (userData.email !== undefined) formData.append('email', userData.email);
+		if (userData.name !== undefined) formData.append('name', userData.name);
+		if (userData.last_name !== undefined) formData.append('last_name', userData.last_name);
+		if (userData.phone !== undefined) formData.append('phone', userData.phone || '');
+		if (userData.codigo !== undefined) formData.append('codigo', userData.codigo || '');
+		
+		// Manejar contraseña (solo si se proporciona)
+		if (userData.password) {
+			formData.append('password', userData.password);
+			formData.append('password2', userData.password2 || userData.password);
+		}
+		
+		// Manejar avatar (solo si se proporciona un archivo)
+		if (userData.avatar instanceof File) {
+			formData.append('avatar', userData.avatar);
+		}
+		
+		const response = await axios.put(
+			`${BASE_URL}user/users/update_me/`,
+			formData,
+			{
+				withCredentials: true,
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error updating user:", error);
+		throw error;
+	}
+}
+
 export const getEventRegisteredUser = () => {
   return axios.get(`${BASE_URL}event/confirmed/`, { withCredentials: true });
 }
