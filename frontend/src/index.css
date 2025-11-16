@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chewy&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* --- Light Mode Variables (Default) --- */
+:root {
+  /* fuentes */
+  --font-title: 'Poppins', sans-serif;
+  --font-base: 'Montserrat', sans-serif;
+
+  /* Colores del Dashboard (Base) */
+  --color-primary: #0B72B9;
+  --color-secondary: #E11D9E;
+  --color-tertiary: #00C2B3;
+  --color-success: #16A34A;
+  --color-warning: #F59E0B;
+  --color-danger: #DC2626;
+  --color-info: #00C2B3;
+
+  /* Colores de Fondo y Texto */
+  --text-primary: #111827; /* Negro/Gris Oscuro */
+  --text-secundary: #6B7280; /* Gris */
+  --color-white: #fff; /* Fondo de columnas */
+  --color-bg: #ffffff; /* Fondo de la página */
+  --color-border: #D1D5DB; /* Borde de inputs (Gris claro) */
+  --color-light-bg: #fafcff; /* Fondo de dropZone */
+  --color-shadow: rgba(0, 0, 0, 0.05); /* Sombra clara */
+  
+  --color-placeholder: #9CA3AF;
+  --color-black: #000;
+
+  /* Dimensiones */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  --input-height: 44px;
+}
+
+
+/* --- Dark Mode Variables (Mapeo) --- */
+body.modo-oscuro {
+  /* Colores de fondo y texto generales del tema oscuro */
+  --dark-bg-level-1: #0f172a; /* Fondo principal (Tu --fondo-nav) */
+  --dark-bg-level-2: #1e293b; /* Fondo de tarjetas/contenedores (Tu --fondo-menu) */
+  --dark-text-light: #f8fafc; /* Texto principal (Tu color body) */
+  --dark-text-secondary: #94a3b8; /* Texto secundario/Placeholder */
+  --dark-border: #334155; /* Borde y hover (Tu --hover-menu) */
+  
+  /* Mapeo de variables usadas en EventDashboard.module.css */
+  --color-bg: var(--dark-bg-level-1);
+  --color-white: var(--dark-bg-level-2);
+  --text-primary: var(--dark-text-light);
+  --text-secundary: var(--dark-text-secondary);
+  --color-placeholder: var(--dark-text-secondary);
+  --color-border: var(--dark-border);
+  --color-light-bg: var(--dark-border);
+  --color-shadow: rgba(0, 0, 0, 0.3); /* Sombra más oscura */
+  
+  /* Variables adicionales para Dashboard */
+  --dark-card-bg: #1e293b; /* Fondo de tarjetas */
+  --dark-card-border: #334155; /* Borde de tarjetas */
+  --dark-hover-bg: #334155; /* Fondo hover */
+  --dark-shadow: rgba(0, 0, 0, 0.4); /* Sombra más intensa */
+  --dark-gradient-start: #1e293b; /* Inicio de gradientes */
+  --dark-gradient-end: #0f172a; /* Fin de gradientes */
+}
+
+
+/* --- Reseteo Básico --- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-base);
+  background-color: var(--color-bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Asegura que html y body ocupen todo y 
+  NO tengan scroll propio.
+*/
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+/* ¡ESTA ES LA REGLA CLAVE! */
+body {
+  font-family: var(--font-base);
+  background-color: var(--color-bg);
+  color: var(--text-primary);
+}
+
+
+/* Oculta los botones y establece un ancho muy pequeño (4-6px es común en Google) */
+::-webkit-scrollbar {
+  width: 6px; 
+  height: 6px; 
+}
+
+/* La pista/carril (el fondo de la barra) es totalmente transparente */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  /* Color muy sutil, gris translúcido, que se integra */
+  background-color: rgba(0, 0, 0, 0.2); 
+  border-radius: 10px; /* Bordes muy redondeados */
+  border: 2px solid transparent; 
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4); /* Se oscurece al hacer hover */
+}
+
+html {
+  overflow-y: auto; 
+  /* Ancho 'thin' (delgado) */
+  scrollbar-width: thin; 
+  /* Color del pulgar y luego color de la pista (transparente) */
+ scrollbar-color: rgba(255, 255, 255, 0.2) transparent; /* Para Firefox */
+}

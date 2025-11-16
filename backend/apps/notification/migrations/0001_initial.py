@@ -1,0 +1,35 @@
+
+import django.db.models.deletion
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+        ('event', '0001_initial'),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Notification',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('message', models.TextField()),
+                ('type', models.CharField(choices=[('INFO', 'Info'), ('REMINDER', 'Reminder'), ('ALERT', 'Alert')], default='INFO', max_length=60)),
+                ('sent_at', models.DateTimeField(auto_now_add=True, help_text='Datetime when the notification was created/sent.')),
+                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notifications', to='event.event')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='UserNotification',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('state', models.CharField(choices=[('DELIVERED', 'Delivered'), ('READ', 'Read')], default='DELIVERED', max_length=20)),
+                ('delivered_at', models.DateTimeField(blank=True, null=True)),
+                ('read_at', models.DateTimeField(blank=True, null=True)),
+                ('notification', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user_notifications', to='notification.notification')),
+            ],
+        ),
+    ]

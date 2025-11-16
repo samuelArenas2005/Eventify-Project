@@ -1,0 +1,75 @@
+
+import django.core.validators
+import django.db.models.deletion
+import django.utils.timezone
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Category',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=60, unique=True)),
+                ('color', models.CharField(default='#000000', help_text='Color en formato hexadecimal (ej: #FF5733)', max_length=7)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+            ],
+            options={
+                'verbose_name': 'Category',
+                'verbose_name_plural': 'Categories',
+                'ordering': ['name'],
+            },
+        ),
+        migrations.CreateModel(
+            name='EventAttendee',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('status', models.CharField(choices=[('PENDING', 'Pending'), ('CONFIRMED', 'Confirmed'), ('CANCELLED', 'Cancelled')], default='PENDING', max_length=20)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='EventImage',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('image', models.ImageField(upload_to='events/images/')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+            ],
+            options={
+                'verbose_name': 'Event Image',
+                'verbose_name_plural': 'Event Images',
+                'ordering': ['-created_at'],
+            },
+        ),
+        migrations.CreateModel(
+            name='Event',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('title', models.CharField(db_index=True, max_length=60)),
+                ('description', models.TextField()),
+                ('main_image', models.ImageField(blank=True, null=True, upload_to='events/')),
+                ('start_date', models.DateTimeField(validators=[django.core.validators.MinValueValidator(limit_value=django.utils.timezone.now)])),
+                ('end_date', models.DateTimeField()),
+                ('address', models.CharField(max_length=60)),
+                ('location_info', models.TextField(blank=True, null=True)),
+                ('capacity', models.PositiveIntegerField(default=0, validators=[django.core.validators.MinValueValidator(0)])),
+                ('status', models.CharField(choices=[('ACTIVE', 'Active'), ('CANCELLED', 'Cancelled'), ('FINISHED', 'Finished'), ('DRAFT', 'Draft')], default='DRAFT', max_length=20)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('category', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='events', to='event.category')),
+            ],
+            options={
+                'ordering': ['-start_date'],
+            },
+        ),
+    ]

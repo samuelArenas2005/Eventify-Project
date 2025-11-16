@@ -1,0 +1,72 @@
+/*
+ * Estilos para el componente NotFoundPage
+ * Estos estilos usan las variables CSS de tu archivo global (index.css)
+ */
+
+.notFoundContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Ocupa toda la altura de la vista */
+  width: 100%;
+  padding: 2rem;
+  /* El background-color viene del 'body' global (var(--color-bg)) */
+}
+
+.notFoundContent {
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  background-color: var(--color-white); /* Fondo de tarjeta */
+  padding: 3rem 2.5rem;
+  border-radius: var(--border-radius-lg); /* Bordes redondeados */
+  box-shadow: 0 10px 25px var(--color-shadow); /* Sombra suave */
+}
+
+.title {
+  font-family: var(--font-title); /* Fuente Poppins */
+  font-size: clamp(6rem, 20vw, 9rem); /* Tamaño fluido */
+  font-weight: 900; /* Extra-bold */
+  color: var(--color-primary); /* Color primario */
+  line-height: 1;
+  margin-bottom: 0;
+  /* Efecto de texto (opcional) */
+  text-shadow: 2px 2px 0px var(--color-bg), 4px 4px 0px var(--color-border, #E5E7EB);
+}
+
+.subtitle {
+  font-family: var(--font-title);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary); /* Color de texto principal */
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.description {
+  font-family: var(--font-base);
+  font-size: 1rem;
+  color: var(--text-secundary); /* Color de texto secundario */
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.homeButton {
+  display: inline-block;
+  font-family: var(--font-title);
+  font-weight: 500;
+  font-size: 1rem;
+  text-decoration: none;
+  color: #ffffff; /* Texto del botón siempre blanco */
+  background-color: var(--color-primary); /* Color primario */
+  padding: 0.8rem 2.5rem;
+  border-radius: var(--border-radius-md);
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.homeButton:hover {
+  /* Un truco simple para oscurecer el primario sin una variable hover */
+  filter: brightness(1.1); 
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px var(--color-shadow);
+}

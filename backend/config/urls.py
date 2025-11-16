@@ -16,8 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('apps.events.urls')),
-]
+    path('api/event/', include('apps.event.urls')),
+    path('api/rating/', include('apps.rating.urls')),
+    path('api/user/', include('apps.user.urls')),
+    path('api/notification/', include('apps.notification.urls')),
+    path('api/token/', include('apps.base.urls'))
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  

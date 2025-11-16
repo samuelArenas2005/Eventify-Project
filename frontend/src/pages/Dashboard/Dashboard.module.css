@@ -1,0 +1,607 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.dashboardContainer {
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+  background-color: #F9FAFB;
+  color: #111827;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+
+.quickCreatePanel{
+  z-index: 100;
+  position: relative;
+  top: auto;
+  right: auto;
+  margin-bottom: 2rem;
+  border-radius: 20px;
+}
+
+/* --- Perfil Mejorado --- */
+.profileHeader {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  animation: slideInUp 0.8s ease-out;
+}
+
+
+
+.profileHeader::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #E11D9E, #9333EA, #0B72B9);
+}
+
+.profileMain {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex: 1;
+}
+.profileImageContainer {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profileInitials {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #E11D9E, #9333EA);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  box-shadow: 0 8px 25px rgba(225, 29, 158, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor:pointer;
+}
+
+.profileInitials:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(225, 29, 158, 0.4);
+}
+
+.statusIndicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: #10B981;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  animation: pulse 2s infinite;
+}
+.profileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.profileTitle {
+  margin-bottom: 1rem;
+}
+
+.profileInfo h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.2;
+}
+
+.profileDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.emailText {
+  font-size: 1rem;
+  color: #6B7280;
+  margin: 0;
+  font-weight: 500;
+}
+
+.profileStats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.profileTags {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.roleTag {
+  background: linear-gradient(135deg, #E11D9E, #9333EA);
+  color: #ffffff;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(225, 29, 158, 0.3);
+}
+
+.codeTag {
+  background-color: #F3F4F6;
+  color: #374151;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid #E5E7EB;
+}
+.profileActions {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.profileAvatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 4px solid #ffffff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.profileAvatar:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-decoration: none;
+}
+
+.actionButton:hover {
+  background-color: #F8FAFC;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  border-color: #D1D5DB;
+}
+
+.createButton{
+  text-decoration: none;
+  border:none;
+  color: var(--color-white);
+  background-color: var(--color-primary);
+}
+
+.createButton:hover {
+  background-color: var(--color-primary);
+  box-shadow: 0 0px 5px var(--color-primary);
+}
+
+/* --- Estadísticas (Sin cambios) --- */
+.statsSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+.statCard {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid #E5E7EB;
+}
+.statInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.statInfo span {
+  font-size: 0.95rem;
+  color: #6B7280;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.statInfo b {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+  background: linear-gradient(135deg, #E11D9E, #9333EA);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fadeIn 0.6s ease-out;
+}
+.statIcon {
+  padding: 0.9rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.iconEvents {
+  color: var(--color-primary);
+}
+.iconCreated {
+  color: var(--color-secondary);
+}
+.iconRating {
+  color: var(--color-tertiary);
+}
+
+/* --- Tabs (Sin cambios) --- */
+.tabsNav {
+  display: flex;
+  gap: 2.5rem;
+  border-bottom: 2px solid #E5E7EB;
+  margin-bottom: 2rem;
+}
+.tabButton {
+  background: none;
+  border: none;
+  padding: 0.8rem 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6B7280;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+.tabButton:hover {
+  color: #0B72B9
+}
+.tabButton.active {
+  color: #0B72B9;
+  font-weight: 600;
+}
+.tabButton.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #0B72B9;
+}
+
+/* --- ¡NUEVO! Encabezado de Contenido --- */
+.contentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem; /* Aumentado para más espacio */
+  flex-wrap: wrap; /* Para pantallas pequeñas */
+  gap: 1rem;
+}
+
+.contentTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0; /* Quitamos margen para alinear bien */
+}
+
+.viewOptions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.filterButton:hover {
+  background-color: #F9FAFB;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+
+.layoutButton {
+  background: none;
+  border: none;
+  border-radius: 6px; /* Bordes internos */
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6B7280; /* Color de icono inactivo */
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.layoutButton:hover {
+  color: #111827;
+}
+
+.layoutButton.active {
+  background-color: #FFFFFF; /* Fondo blanco activo */
+  color: #4F46E5; /* Color primario */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.eventList {
+  display: flex;
+  justify-content: center;
+}
+
+/* Modificador para vista Grid */
+.eventList.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  justify-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 1200px) {
+  .dashboardContainer {
+    padding: 1.5rem 2rem;
+  }
+  
+  .profileHeader {
+    padding: 2rem;
+  }
+  
+  .profileMain {
+    gap: 1.5rem;
+  }
+  
+  .eventList.grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardContainer {
+    padding: 1rem;
+  }
+  
+  .profileHeader {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+  
+  .profileMain {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .profileActions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .actionButton {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+  
+  .profileInfo h1 {
+    font-size: 1.75rem;
+  }
+  
+  .profileStats {
+    justify-content: center;
+  }
+  
+  .statsSection {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .tabsNav {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .contentHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .viewOptions {
+    justify-content: center;
+  }
+  
+  .eventList.grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profileInitials,
+  .profileAvatar {
+    width: 72px;
+    height: 72px;
+    font-size: 1.8rem;
+  }
+  
+  .profileInfo h1 {
+    font-size: 1.5rem;
+  }
+  
+  .actionButton {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .profileTags {
+    justify-content: center;
+  }
+  
+  .profileStats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* --- Modal overlay y panel movidos desde inline styles --- */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.55);
+  z-index: 9999;
+  padding: 20px; /* espacio para que el modal no toque los bordes */
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes popOut {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0; }
+}
+
+.modalPanel {
+  animation: popOut 0.3s forwards;
+}
+
+.show .modalPanel {
+  animation: popIn 0.3s forwards;
+}
+
+.modalPanel {
+  background: #fff;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 1100px;
+  max-height: calc(100vh - 70px);
+  box-sizing: border-box;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalContent {
+  padding: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+

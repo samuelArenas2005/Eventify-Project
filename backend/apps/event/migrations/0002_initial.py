@@ -1,0 +1,63 @@
+
+
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+        ('event', '0001_initial'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.AddField(
+            model_name='event',
+            name='creator',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='created_events', to=settings.AUTH_USER_MODEL),
+        ),
+        migrations.AddField(
+            model_name='eventattendee',
+            name='event',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='event.event'),
+        ),
+        migrations.AddField(
+            model_name='eventattendee',
+            name='user',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+        ),
+        migrations.AddField(
+            model_name='event',
+            name='attendees',
+            field=models.ManyToManyField(related_name='attending_events', through='event.EventAttendee', to=settings.AUTH_USER_MODEL),
+        ),
+        migrations.AddField(
+            model_name='eventimage',
+            name='event',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='images', to='event.event'),
+        ),
+        migrations.AddIndex(
+            model_name='eventattendee',
+            index=models.Index(fields=['user', 'event'], name='event_event_user_id_7c05a2_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='eventattendee',
+            index=models.Index(fields=['status'], name='event_event_status_773269_idx'),
+        ),
+        migrations.AlterUniqueTogether(
+            name='eventattendee',
+            unique_together={('user', 'event')},
+        ),
+        migrations.AddConstraint(
+            model_name='event',
+            constraint=models.CheckConstraint(check=models.Q(('end_date__gt', models.F('start_date'))), name='end_date_after_start_date'),
+        ),
+        migrations.AddConstraint(
+            model_name='event',
+            constraint=models.CheckConstraint(check=models.Q(('capacity__gt', 0)), name='capacity_positive'),
+        ),
+    ]

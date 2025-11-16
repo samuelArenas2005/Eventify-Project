@@ -1,0 +1,306 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* 🎨 Variables globales */
+:root {
+  --fondo-nav: #ffffff;
+  --icon-color: #222;
+  --fondo-menu: #ffffff;
+  --texto-menu: #333;
+  --hover-menu: #f0f0f0;
+}
+
+
+/* 🧭 Barra de navegación principal */
+.NavBar {
+  width: 100%;
+  padding: 1rem 2rem; /* Aumenté un poco el padding horizontal */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  top: 0;
+  background-color: var(--fondo-nav);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+/* Logo con degradado */
+.NavBarLogo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #ff6ad5, #8a63f4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  cursor: pointer;
+}
+
+/* --- BUSCADOR MINIMALISTA EN NAV --- */
+.nav-search-form {
+  flex: 0 1 400px; /* Crece hasta 400px máximo */
+  max-width: 400px;
+}
+
+.nav-search-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.nav-search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-secundary);
+  pointer-events: none;
+  transition: color 0.2s;
+}
+
+.nav-search-input {
+  width: 100%;
+  padding: 8px 14px 8px 42px;
+  border: 1px solid transparent;
+  background-color: var(--color-light-bg);
+  border-radius: 24px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-search-input::placeholder {
+  color: var(--text-secundary);
+  opacity: 0.7;
+}
+
+.nav-search-input:focus {
+  background-color: var(--color-white);
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(11, 114, 185, 0.1);
+}
+
+.nav-search-input:focus + .nav-search-icon,
+.nav-search-container:focus-within .nav-search-icon {
+  color: var(--color-primary);
+}
+
+/* Responsive para el buscador */
+@media (max-width: 768px) {
+  .nav-search-form {
+    flex: 0 1 200px;
+    max-width: 200px;
+  }
+  
+  .nav-search-input {
+    font-size: 0.85rem;
+    padding: 6px 12px 6px 38px;
+  }
+  
+  .nav-search-icon {
+    left: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-search-form {
+    display: none; /* Ocultar en pantallas muy pequeñas */
+  }
+}
+
+/* --- NUEVA ESTRUCTURA DERECHA (LA CLAVE) --- */
+
+/* Contenedor para TODOS los elementos de la derecha */
+.nav-derecha {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* Espacio entre el ícono de tema y el grupo de usuario */
+}
+
+/* Contenedor específico para los controles del usuario (notificaciones, menú, avatar) */
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem; /* Espacio entre los íconos del usuario */
+}
+
+/* --- FIN DE LA NUEVA ESTRUCTURA --- */
+
+/* Íconos generales (Sol, Luna, Campana) */
+.icon {
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--icon-color);
+  transition: transform 0.2s, color 0.3s;
+  display: flex; /* Asegura buena alineación */
+  align-items: center;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+  color: var(--color-primary);
+}
+
+.iconDesactive {
+  font-size: 1.2rem;
+  color: gray;
+  opacity: 20;
+  transition: transform 0.2s, color 0.3s, opacity 0.3s;
+  display: flex; /* Asegura buena alineación */
+  align-items: center;
+
+}
+
+/* Menú hamburguesa */
+.menuHamburguesa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.4rem;
+  color: var(--icon-color);
+  transition: transform 0.2s, color 0.3s;
+  z-index: 200;
+  /* El margin-right FUE ELIMINADO */
+}
+
+.menuHamburguesa:hover {
+  transform: scale(1.1);
+  color: var(--color-primary);
+}
+
+
+.profileAvatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 4px solid #ffffff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.profileAvatar:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+.statusIndicator {
+  position: absolute;
+  bottom: 8px;
+  right: 30px;
+  width: 20px;
+  height: 20px;
+  background-color: #10B981;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  animation: pulse 2s infinite;
+}
+.profileInitials {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #E11D9E, #9333EA);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  box-shadow: 0 8px 25px rgba(225, 29, 158, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.profileInitials:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(225, 29, 158, 0.4);
+}
+
+
+
+
+
+/* Menú desplegable */
+.menuLinks {
+  position: absolute;
+  top: 70px; /* Ajustado para que no esté tan pegado */
+  right: 2rem; /* Alineado con el padding de la NavBar */
+  background: var(--fondo-menu);
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 0.5rem 0;
+  width: 180px;
+  animation: slideDown 0.3s ease forwards;
+  z-index: 999;
+}
+
+/* Items del menú */
+.menuLinks li {
+  padding: 0; /* Quitamos padding aquí para ponerlo en el 'a' */
+}
+
+.menuLinks li a {
+  text-decoration: none;
+  color: var(--texto-menu);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.7rem 1.2rem; /* Padding dentro del link para un área de click más grande */
+  transition: background-color 0.2s;
+}
+
+.menuLinks li:hover {
+  background-color: var(--hover-menu);
+}
+
+
+/* Botón de Iniciar Sesión */
+.NavBarLoginButton {
+  font-family: 'Poppins', sans-serif;
+  padding: 0.5rem 0.6rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  text-decoration: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: medium;
+}
+
+.NavBarRegisterButton {
+  font-family: 'Poppins', sans-serif;
+  padding: 0.5rem 0.6rem;
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  text-decoration: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: medium;
+}
+
+
+.NavBarLoginButton:hover , .NavBarRegisterButton:hover {
+  box-shadow: 0 4px 25px rgba(138, 99, 244, 0.3);
+  transform: scale(1.05);
+}
+
+/* Animación de entrada */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

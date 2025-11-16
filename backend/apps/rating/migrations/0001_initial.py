@@ -1,0 +1,32 @@
+
+import django.core.validators
+import django.db.models.deletion
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+        ('event', '0001_initial'),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Rating',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('score', models.PositiveSmallIntegerField(help_text='Integer score from 1 to 5.', validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(5)])),
+                ('comment', models.TextField(blank=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='ratings', to='event.event')),
+            ],
+            options={
+                'verbose_name': 'Rating',
+                'verbose_name_plural': 'Ratings',
+                'db_table': 'rating',
+            },
+        ),
+    ]
