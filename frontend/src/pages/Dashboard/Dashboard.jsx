@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 import EventCard from '../../components/UI/EventCard/EventCard';
-import { Edit, ChartColumnBig, Calendar, User, Star, Filter, CirclePlus, Plus, CalendarCheck2 } from 'lucide-react';
+import { Edit, ChartColumnBig, Calendar, User, Star, Filter, CirclePlus, Plus, CalendarCheck2, X, ChevronDown, CheckCircle2, FileText, XCircle, Archive } from 'lucide-react';
 import { getRegisteredEvents, getPendingEvents, getCreatedEvent } from './GetEventsData';
-import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../api/api';
+import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../API/api';
 import EventDashboard from '../../components/UI/EventCreate/EventForm'
 import Loanding from '../../components/UI/Loanding/Loanding';
 import ModalQr from '../../components/UI/modalQR/ModalQr';
@@ -28,6 +28,10 @@ const UserProfileDashboard = ({ user }) => {
   const [selectedEventForQR, setSelectedEventForQR] = useState(null);
   const [isScanQRModalOpen, setIsScanQRModalOpen] = useState(false);
   const [selectedEventForScan, setSelectedEventForScan] = useState(null);
+  
+  // Estados para filtros de "Mis Eventos"
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState("");
 
   const FullName = user ? `${user.name} ${user.last_name}` : 'Usuario';
   const initials = user ? `${user.name.charAt(0)}${user.last_name.charAt(0)}` : 'UU';
@@ -37,8 +41,16 @@ const UserProfileDashboard = ({ user }) => {
     window.location.reload(true);
   };
 
-  const handleFilterClick = () => {
-    alert('Abrir modal de filtros');
+  const toggleFilter = () => {
+    setIsFilterOpen((prevState) => !prevState);
+  };
+
+  const clearFilters = () => {
+    setSelectedStatusFilter("");
+  };
+
+  const removeStatusFilter = () => {
+    setSelectedStatusFilter("");
   };
 
   // Abrir panel de creación: limpiar estado de cierre
@@ -109,7 +121,12 @@ const UserProfileDashboard = ({ user }) => {
       setpendingEventData(PendingData)
       setMyEventsData(CreatedData)
       setTotalRegisteredCount(allRegistered.data.length);
-      setTotalCreatedCount(allCreated.data.length);
+      
+      // Contar solo eventos ACTIVE y FINISHED (no DRAFT ni CANCELLED)
+      const activeAndFinishedCount = allCreated.data.filter(
+        event => event.status === 'ACTIVE' || event.status === 'FINISHED'
+      ).length;
+      setTotalCreatedCount(activeAndFinishedCount);
       console.log(user)
     }
 
@@ -117,6 +134,59 @@ const UserProfileDashboard = ({ user }) => {
   }, []);
 
   if (loading) return <Loanding />;
+
+  // Función para obtener eventos filtrados por status
+  const getEventsByStatus = (status) => {
+    return myEventsData.filter(event => event.status === status);
+  };
+
+  // Función para obtener el nombre traducido del status
+  const getStatusLabel = (status) => {
+    const statusMap = {
+      'ACTIVE': 'Activos',
+      'DRAFT': 'Borradores',
+      'CANCELLED': 'Cancelados',
+      'FINISHED': 'Finalizados'
+    };
+    return statusMap[status] || status;
+  };
+
+  // Función para obtener el icono del status
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'ACTIVE':
+        return CheckCircle2;
+      case 'DRAFT':
+        return FileText;
+      case 'CANCELLED':
+        return XCircle;
+      case 'FINISHED':
+        return Archive;
+      default:
+        return Calendar;
+    }
+  };
+
+  // Obtener filtros activos
+  const activeFilters = [];
+  if (selectedStatusFilter) {
+    const StatusIcon = getStatusIcon(selectedStatusFilter);
+    activeFilters.push({
+      type: "status",
+      label: "Estado",
+      value: getStatusLabel(selectedStatusFilter),
+      onRemove: removeStatusFilter,
+      icon: StatusIcon,
+    });
+  }
+
+  // Filtrar eventos según el filtro seleccionado
+  const getFilteredEvents = () => {
+    if (!selectedStatusFilter) {
+      return myEventsData;
+    }
+    return myEventsData.filter(event => event.status === selectedStatusFilter);
+  };
 
   const renderContent = () => {
     let title = '';
@@ -150,17 +220,219 @@ const UserProfileDashboard = ({ user }) => {
         return null;
     }
 
+    // Render especial para "Mis Eventos" con secciones por status
+    if (type === 'myevent') {
+      const activeEvents = getEventsByStatus('ACTIVE');
+      const draftEvents = getEventsByStatus('DRAFT');
+      const cancelledEvents = getEventsByStatus('CANCELLED');
+      const finishedEvents = getEventsByStatus('FINISHED');
+      
+      const filteredEvents = getFilteredEvents();
+      const shouldShowFiltered = selectedStatusFilter && filteredEvents.length > 0;
+
+      return (
+        <>
+          <div className={styles.contentHeader}>
+            <h2 className={styles.contentTitle}>{title}</h2>
+            <div className={styles.viewOptions}>
+              <button onClick={openCreatePanel} className={`${styles.actionButton} ${styles.createButton}`}>
+                <Plus size={16} />
+              </button>
+              <div className={styles.filterContainer}>
+                <button
+                  className={styles.filterButton}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFilter();
+                  }}
+                >
+                  <Filter size={16} />
+                  Filtrar
+                </button>
+                {isFilterOpen && (
+                  <div
+                    className={styles.filterDropdown}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className={styles.filterHeader}>
+                      <h3>Filtrar por estado</h3>
+                      <button className={styles.clearButton} onClick={clearFilters}>
+                        Limpiar
+                      </button>
+                    </div>
+
+                    <div className={styles.filterSection}>
+                      <label className={styles.filterLabel}>
+                        <CheckCircle2 size={18} />
+                        Estado del evento
+                      </label>
+                      <div className={styles.selectWrapper}>
+                        <select
+                          className={styles.filterSelect}
+                          value={selectedStatusFilter}
+                          onChange={(e) => {
+                            setSelectedStatusFilter(e.target.value);
+                            setIsFilterOpen(false);
+                          }}
+                        >
+                          <option value="">Todos los estados</option>
+                          <option value="ACTIVE">Activos</option>
+                          <option value="DRAFT">Borradores</option>
+                          <option value="CANCELLED">Cancelados</option>
+                          <option value="FINISHED">Finalizados</option>
+                        </select>
+                        <ChevronDown className={styles.selectIcon} size={18} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Filtros aplicados */}
+          {activeFilters.length > 0 && (
+            <div className={styles.activeFiltersContainer}>
+              {activeFilters.map((filter, index) => {
+                const IconComponent = filter.icon;
+                return (
+                  <div key={index} className={styles.activeFilterTag}>
+                    <IconComponent size={14} className={styles.filterTagIcon} />
+                    <span className={styles.filterTagLabel}>{filter.label}:</span>
+                    <span className={styles.filterTagValue}>{filter.value}</span>
+                    <button
+                      className={styles.filterTagRemove}
+                      onClick={filter.onRemove}
+                      aria-label={`Eliminar filtro ${filter.label}`}
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Si hay un filtro aplicado, mostrar solo eventos filtrados */}
+          {shouldShowFiltered ? (
+            <div className={`${styles.eventList} ${styles.grid}`}>
+              {filteredEvents.map((event) => (
+                <EventCard 
+                  key={event.id} 
+                  {...event}
+                  handleQRCodeClick={() => handleQRCodeClick(event)}
+                  handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                />
+              ))}
+            </div>
+          ) : (
+            <>
+              {/* Sección de Eventos Activos */}
+              {activeEvents.length > 0 && (
+                <div className={styles.statusSection}>
+                  <div className={styles.statusSectionHeader}>
+                    <CheckCircle2 size={24} className={styles.statusIconActive} />
+                    <h3 className={styles.statusSectionTitle}>
+                      Eventos Activos ({activeEvents.length})
+                    </h3>
+                  </div>
+                  <div className={`${styles.eventList} ${styles.grid}`}>
+                    {activeEvents.map((event) => (
+                      <EventCard 
+                        key={event.id} 
+                        {...event}
+                        handleQRCodeClick={() => handleQRCodeClick(event)}
+                        handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Sección de Borradores */}
+              {draftEvents.length > 0 && (
+                <div className={styles.statusSection}>
+                  <div className={styles.statusSectionHeader}>
+                    <FileText size={24} className={styles.statusIconDraft} />
+                    <h3 className={styles.statusSectionTitle}>
+                      Borradores ({draftEvents.length})
+                    </h3>
+                  </div>
+                  <div className={`${styles.eventList} ${styles.grid}`}>
+                    {draftEvents.map((event) => (
+                      <EventCard 
+                        key={event.id} 
+                        {...event}
+                        handleQRCodeClick={() => handleQRCodeClick(event)}
+                        handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Sección de Eventos Cancelados */}
+              {cancelledEvents.length > 0 && (
+                <div className={styles.statusSection}>
+                  <div className={styles.statusSectionHeader}>
+                    <XCircle size={24} className={styles.statusIconCancelled} />
+                    <h3 className={styles.statusSectionTitle}>
+                      Eventos Cancelados ({cancelledEvents.length})
+                    </h3>
+                  </div>
+                  <div className={`${styles.eventList} ${styles.grid}`}>
+                    {cancelledEvents.map((event) => (
+                      <EventCard 
+                        key={event.id} 
+                        {...event}
+                        handleQRCodeClick={() => handleQRCodeClick(event)}
+                        handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Sección de Eventos Finalizados */}
+              {finishedEvents.length > 0 && (
+                <div className={styles.statusSection}>
+                  <div className={styles.statusSectionHeader}>
+                    <Archive size={24} className={styles.statusIconFinished} />
+                    <h3 className={styles.statusSectionTitle}>
+                      Eventos Finalizados ({finishedEvents.length})
+                    </h3>
+                  </div>
+                  <div className={`${styles.eventList} ${styles.grid}`}>
+                    {finishedEvents.map((event) => (
+                      <EventCard 
+                        key={event.id} 
+                        {...event}
+                        handleQRCodeClick={() => handleQRCodeClick(event)}
+                        handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Mensaje cuando no hay eventos */}
+              {activeEvents.length === 0 && draftEvents.length === 0 && 
+               cancelledEvents.length === 0 && finishedEvents.length === 0 && (
+                <p className={styles.emptyMessage}>{emptyMessage}</p>
+              )}
+            </>
+          )}
+        </>
+      );
+    }
+
+    // Render normal para otros tabs
     return (
       <>
         <div className={styles.contentHeader}>
           <h2 className={styles.contentTitle}>{title}</h2>
           <div className={styles.viewOptions}>
-            {type == 'myevent' ?
-              <button onClick={openCreatePanel} className={`${styles.actionButton} ${styles.createButton}`}>
-                <Plus size={16} />
-              </button>
-              : null}
-            <button className={styles.filterButton} onClick={handleFilterClick}>
+            <button className={styles.filterButton} onClick={toggleFilter}>
               <Filter size={16} />
               Filtrar
             </button>
@@ -179,7 +451,7 @@ const UserProfileDashboard = ({ user }) => {
             ))}
           </div>
         ) : (
-          <p>{emptyMessage}</p>
+          <p className={styles.emptyMessage}>{emptyMessage}</p>
         )}
       </>
     );

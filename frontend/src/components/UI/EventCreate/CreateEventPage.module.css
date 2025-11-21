@@ -377,6 +377,14 @@
   color: var(--color-warning);
 }
 
+/* Contenedor de botones de envío */
+.submitButtonsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
 /* Botón de envío */
 .submitButton {
   /* No necesita cambios, usa colores primarios y secundarios */
@@ -385,7 +393,7 @@
   padding: 0 1.5rem;
   border: none;
   border-radius: var(--border-radius-md);
-  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  background: var(--color-primary);
   color: var(--color-white);
   font-family: var(--font-title);
   font-size: 1rem;
@@ -396,7 +404,6 @@
   justify-content: center;
   gap: 0.5rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin-top: 1rem;
 }
 
 .submitButton:hover {
@@ -406,6 +413,42 @@
 
 .submitButton:disabled {
   /* Usar un color neutro que se vea bien en oscuro también */
+  background: var(--color-border);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.submitButtonIa {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary)) !important;
+}
+
+/* Botón de borrador */
+.draftButton {
+  width: 100%;
+  height: var(--input-height);
+  padding: 0 1.5rem;
+  border: none;
+  border-radius: var(--border-radius-md);
+  background: #9CA3AF;
+  color: var(--color-white);
+  font-family: var(--font-title);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.draftButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(107, 114, 128, 0.3);
+}
+
+.draftButton:disabled {
   background: var(--color-border);
   cursor: not-allowed;
   transform: none;
@@ -437,6 +480,10 @@
   .backButton {
     padding: 0.5rem 1rem;
     font-size: 0.85rem;
+  }
+
+  .submitButtonsContainer {
+    grid-template-columns: 1fr;
   }
 }
 
