@@ -3,6 +3,8 @@ import "./Navigation.css";
 import { Link, useNavigate } from "react-router-dom";
 import { Moon, Sun, Bell, Search, Home } from "lucide-react";
 
+import Notifications from "../Notification/Notifications";
+
 export default function Navigation({ user, logout }) {
   const [temaOscuro, setTemaOscuro] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -42,7 +44,7 @@ export default function Navigation({ user, logout }) {
       <>
         {/* Este es el contenedor que agrupa los controles del usuario */}
         <div className="user-controls">
-          <Bell className="icon" />
+          <Notifications />
 
           <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
             {menuOpen ? (
