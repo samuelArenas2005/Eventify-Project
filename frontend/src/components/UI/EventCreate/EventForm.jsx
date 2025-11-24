@@ -222,7 +222,8 @@ const EventDashboard = ({ onClose = null }) => {
 
   // --- Manejador de Envío ---
 
-  const onSubmit = async (data, status = "ACTIVE") => {
+  const onSubmit = async (data, statusOverride = null) => {
+    const status = (typeof statusOverride === 'string') ? statusOverride : 'ACTIVE';
     setIsSubmitting(true);
     const loadingToast = toast.loading(
       status === "DRAFT" 
@@ -315,6 +316,10 @@ const EventDashboard = ({ onClose = null }) => {
     await onSubmit(data, "DRAFT");
   };
 
+  const handleCreateEvent = (data) => {
+    onSubmit(data, "ACTIVE");
+}
+
   const onError = (formErrors) => {
     console.log("Errores de validación:", formErrors);
     toast.error("Por favor, revisa los campos marcados en rojo.");
@@ -342,7 +347,7 @@ const EventDashboard = ({ onClose = null }) => {
           </div>
 
           <form
-            onSubmit={handleSubmit(onSubmit, onError)}
+            onSubmit={handleSubmit(handleCreateEvent, onError)}
             className={styles.formGrid}
           >
             {/* Columna Izquierda: Detalles del Evento */}
