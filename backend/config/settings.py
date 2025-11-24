@@ -144,12 +144,12 @@ CORS_ALLOWED_ORIGINS = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "http://192.168.18.16:5173",
-  "https://eventify-project-gray.vercel.app/",
+  "https://eventify-project-eight.vercel.app/",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://eventify-backend-ucag.onrender.com",
-    "https://eventify-project-gray.vercel.app/",
+    "https://eventify-project-eight.vercel.app/",
 ]
 
 
