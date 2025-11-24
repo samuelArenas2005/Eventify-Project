@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/';
+
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -39,7 +41,7 @@ axios.interceptors.response.use(
 
       try {
         // Intenta refresh
-        const refreshResponse = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {}, { 
+        const refreshResponse = await axios.post(`${BASE_URL}token/refresh/`, {}, { 
           withCredentials: true 
         });
 
@@ -57,7 +59,7 @@ axios.interceptors.response.use(
         processQueue(refreshError, null);
         
         try {
-          await axios.post('http://127.0.0.1:8000/api/token/logout/', {}, {
+          await axios.post(`${BASE_URL}token/logout/`, {}, {
             withCredentials: true
           });
         } catch (logoutError) {
