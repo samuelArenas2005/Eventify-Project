@@ -3,6 +3,8 @@ from django.db.models import Count, Prefetch
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, JsonResponse
@@ -302,7 +304,33 @@ class AllCreatedEventsList(generics.ListAPIView):
         user = self.request.user
         return Event.objects.filter(creator=user)
 
-# ...existing code...
+class ConfirmEventRegistrationView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, event_id):
+        event = get_object_or_404(Event, pk=event_id)
+        
+        # Verificar si el usuario ya está inscrito
+        existing_attendee = EventAttendee.objects.filter(
+            event=event,
+            user=request.user
+        ).first()
+        
+        if existing_attendee:
+            return Response(
+                {"detail": "Ya estás inscrito en este evento."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Crear nueva inscripción
+        attendee = EventAttendee.objects.create(
+            event=event,
+            user=request.user,
+            status='REGISTERED'
+        )
+        
+        serializer = EventAttendeeSerializer(attendee, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 load_dotenv()
