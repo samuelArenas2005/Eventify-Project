@@ -7,6 +7,8 @@ const LOGOUT_URL = `${BASE_URL}token/logout/`
 const AUTH_CHECK_URL = `${BASE_URL}token/authenticated/`
 const USER_URL = `${BASE_URL}user/users/me/`
 
+// Forzando actualización de git
+
 export const login = async (email, password) => {
 	const response = await axios.post(LOGIN_URL, { email: email, password: password }, { withCredentials: true });
 	return response.data.success;
