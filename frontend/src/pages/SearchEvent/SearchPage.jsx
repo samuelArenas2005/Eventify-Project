@@ -17,7 +17,7 @@ import {
   X,
 } from "lucide-react";
 import EventModal from "../../components/UI/DetailedEvent/DetailedEvent.jsx";
-import { getCategories } from "../../API/api.js";
+import { getCategories } from "../../api/api.js";
 
 export default function SearchPage() {
   const navigate = useNavigate();
