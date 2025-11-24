@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { Link as RouterLink } from "react-router-dom";
 import Link from "@mui/material/Link";
-import axios from "../API/axiosConfig"; // añadido
+import axios from "../api/axiosConfig"; // añadido
 
 const roles = [
   { value: "ESTUDIANTE", label: "Estudiante" },
@@ -141,6 +141,7 @@ const RegisterUser = () => {
       return;
     }
 
+    const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/';
     // Preparar payload para backend (incluye password2)
     const payload = {
       username: data.username,
@@ -156,7 +157,7 @@ const RegisterUser = () => {
     };
 
     try {
-      await axios.post("http://127.0.0.1:8000/api/user/users/", payload);
+      await axios.post(`${BASE_URL}user/users/`, payload);
       toast.success("¡Registro exitoso!");
       navigate("/login");
     } catch (err) {

@@ -4,7 +4,7 @@ import styles from './Dashboard.module.css';
 import EventCard from '../../components/UI/EventCard/EventCard';
 import { Edit, ChartColumnBig, Calendar, User, Star, Filter, CirclePlus, Plus, CalendarCheck2, X, ChevronDown, CheckCircle2, FileText, XCircle, Archive } from 'lucide-react';
 import { getRegisteredEvents, getPendingEvents, getCreatedEvent } from './GetEventsData';
-import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../API/api';
+import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../api/api';
 import EventDashboard from '../../components/UI/EventCreate/EventForm'
 import Loanding from '../../components/UI/Loanding/Loanding';
 import ModalQr from '../../components/UI/modalQR/ModalQr';
