@@ -16,7 +16,7 @@ import {
   EyeOff,
   Image as ImageIcon
 } from 'lucide-react';
-import { getUser, updateUser } from '../../../API/api';
+import { getUser, updateUser } from '../../../api/api';
 
 export default function EditPerfilPage() {
   const navigate = useNavigate();

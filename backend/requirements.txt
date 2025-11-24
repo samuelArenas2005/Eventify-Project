@@ -20,5 +20,3 @@ openai==1.52.2
 python-dotenv==1.0.1
 
 gunicorn
-
-gunicorn

@@ -5,7 +5,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
-import "./API/axiosConfig"; // Importa el interceptor de Axios
+import "./api/axiosConfig"; // Importa el interceptor de Axios
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

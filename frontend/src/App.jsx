@@ -6,7 +6,7 @@ import {
   login as apilogin,
   logout as apilogout,
   getUser
-} from "./API/api";
+} from "./api/api";
 
 import Navigation from "./components/layout/Navigation";
 import Footer from "./components/layout/Footer";

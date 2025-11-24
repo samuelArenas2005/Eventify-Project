@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { Link as RouterLink } from "react-router-dom";
 import Link from "@mui/material/Link";
-import axios from "../API/axiosConfig"; // añadido
+import axios from "../api/axiosConfig"; // añadido
 
 const roles = [
   { value: "ESTUDIANTE", label: "Estudiante" },
