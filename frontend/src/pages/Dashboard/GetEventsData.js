@@ -1,4 +1,4 @@
-import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '../../API/api'
+import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '../../api/api'
  
  /* export const registeredEventsDataObjet = [
 
@@ -191,6 +191,7 @@ export const getRegisteredEvents = async () => {
       onHeartClick: () => console.log(`Heart ${hora12Colombia(events.event.start_date)}`),
       showRegisterButton: false,
       showHeartButton: false,
+      readQRCode: true,
     }));
 
 
@@ -263,6 +264,7 @@ export const getCreatedEvent = async () => {
       onHeartClick: () => console.log(`Heart ${hora12Colombia(event.start_date)}`),
       showRegisterButton: false,
       showHeartButton: false,
+      generateQRCode: true,
     }));
 
 

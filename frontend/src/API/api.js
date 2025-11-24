@@ -8,7 +8,7 @@ const AUTH_CHECK_URL = `${BASE_URL}token/authenticated/`
 const USER_URL = `${BASE_URL}user/users/me/`
 
 export const login = async (email, password) => {
-	const response = await axios.post(LOGIN_URL, {email: email, password: password}, {withCredentials: true});
+	const response = await axios.post(LOGIN_URL, { email: email, password: password }, { withCredentials: true });
 	return response.data.success;
 }
 
@@ -31,7 +31,7 @@ export const logout = async () => {
 	} catch (error) {
 		console.error("Error during logout:", error);
 		return false;
-	}		
+	}
 }
 
 export const isAuthenticated = async () => {
@@ -54,16 +54,57 @@ export const getUser = async () => {
 	return response.data;
 }
 
+export const updateUser = async (userData) => {
+	try {
+		// Si hay un avatar, usar FormData para enviar el archivo
+		const formData = new FormData();
+
+		// Añadir campos al FormData
+		if (userData.username !== undefined) formData.append('username', userData.username);
+		if (userData.email !== undefined) formData.append('email', userData.email);
+		if (userData.name !== undefined) formData.append('name', userData.name);
+		if (userData.last_name !== undefined) formData.append('last_name', userData.last_name);
+		if (userData.phone !== undefined) formData.append('phone', userData.phone || '');
+		if (userData.codigo !== undefined) formData.append('codigo', userData.codigo || '');
+
+		// Manejar contraseña (solo si se proporciona)
+		if (userData.password) {
+			formData.append('password', userData.password);
+			formData.append('password2', userData.password2 || userData.password);
+		}
+
+		// Manejar avatar (solo si se proporciona un archivo)
+		if (userData.avatar instanceof File) {
+			formData.append('avatar', userData.avatar);
+		}
+
+		const response = await axios.put(
+			`${BASE_URL}user/users/update_me/`,
+			formData,
+			{
+				withCredentials: true,
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error updating user:", error);
+		throw error;
+	}
+}
+
 export const getEventRegisteredUser = () => {
-  return axios.get(`${BASE_URL}event/confirmed/`, { withCredentials: true });
+	return axios.get(`${BASE_URL}event/confirmed/`, { withCredentials: true });
 }
 
 export const getEventPendingUser = () => {
-  return axios.get(`${BASE_URL}event/pending/`, { withCredentials: true });
+	return axios.get(`${BASE_URL}event/pending/`, { withCredentials: true });
 }
 
 export const getEventCreatedUser = () => {
-  return axios.get(`${BASE_URL}event/created/`, { withCredentials: true });
+	return axios.get(`${BASE_URL}event/created/`, { withCredentials: true });
 }
 
 export const createEvent = (data) => {
@@ -71,31 +112,85 @@ export const createEvent = (data) => {
 }
 
 export const getCategories = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}event/categories/`, { withCredentials: true });
-    return response.data;
-  } catch (error) {
-    console.error("Error en getCategories:", error);
-    return [];
-  }
+	try {
+		const response = await axios.get(`${BASE_URL}event/categories/`, { withCredentials: true });
+		return response.data;
+	} catch (error) {
+		console.error("Error en getCategories:", error);
+		return [];
+	}
 }
 
 export const getAllEvents = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}event/active/`, { withCredentials: true });
-    return response.data;  // Axios envuelve la respuesta en .data
-  } catch (error) {
-    console.error("Error en getAllEvents:", error);
-    return [];  // Retornamos array vacío en caso de error
-  }
+	try {
+		const response = await axios.get(`${BASE_URL}event/active/`, { withCredentials: true });
+		return response.data;  // Axios envuelve la respuesta en .data
+	} catch (error) {
+		console.error("Error en getAllEvents:", error);
+		return [];  // Retornamos array vacío en caso de error
+	}
 }
 
 export const getAllRegisteredEventsCount = () => {
-  // Suponiendo que tienes un endpoint que trae TODOS los eventos registrados (activos y finalizados)
-  return axios.get(`${BASE_URL}event/registered/all/`, { withCredentials: true });
+	// Suponiendo que tienes un endpoint que trae TODOS los eventos registrados (activos y finalizados)
+	return axios.get(`${BASE_URL}event/registered/all/`, { withCredentials: true });
 }
 
 export const getAllCreatedEventsCount = () => {
-  // Suponiendo que tienes un endpoint que trae TODOS los eventos creados (activos y finalizados)
-  return axios.get(`${BASE_URL}event/created/all/`, { withCredentials: true });
+	// Suponiendo que tienes un endpoint que trae TODOS los eventos creados (activos y finalizados)
+	return axios.get(`${BASE_URL}event/created/all/`, { withCredentials: true });
+}
+
+export const confirmAttendance = async (eventId, status = 'CONFIRMED') => {
+	try {
+		const response = await axios.put(
+			`${BASE_URL}event/events/${eventId}/confirm_attendance/`,
+			{ status: status },
+			{ withCredentials: true }
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error al confirmar asistencia:", error);
+		throw error;
+	}
+}
+
+export const getUserNotifications = async () => {
+	try {
+		const response = await axios.get(`${BASE_URL}notification/user-notifications/`, { withCredentials: true });
+		return response.data;
+	} catch (error) {
+		console.error("Error fetching notifications:", error);
+		return [];
+	}
+}
+
+export const markAllNotificationsAsRead = async () => {
+	try {
+		await axios.post(`${BASE_URL}notification/user-notifications/mark_all_as_read/`, {}, { withCredentials: true });
+		return true;
+	} catch (error) {
+		console.error("Error marking all notifications as read:", error);
+		return false;
+	}
+}
+
+export const deleteUserNotification = async (notificationId) => {
+	try {
+		await axios.delete(`${BASE_URL}notification/user-notifications/${notificationId}/`, { withCredentials: true });
+		return true;
+	} catch (error) {
+		console.error("Error deleting notification:", error);
+		return false;
+	}
+}
+
+export const markNotificationAsRead = async (notificationId) => {
+	try {
+		await axios.post(`${BASE_URL}notification/user-notifications/${notificationId}/mark_as_read/`, {}, { withCredentials: true });
+		return true;
+	} catch (error) {
+		console.error("Error marking notification as read:", error);
+		return false;
+	}
 }

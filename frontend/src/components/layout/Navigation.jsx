@@ -3,12 +3,14 @@ import "./Navigation.css";
 import { Link, useNavigate } from "react-router-dom";
 import { Moon, Sun, Bell, Search, Home } from "lucide-react";
 
+import Notifications from "../Notification/Notifications";
+
 export default function Navigation({ user, logout }) {
   const [temaOscuro, setTemaOscuro] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showHomeButton, setShowHomeButton] = useState(true);
+  const [showHomeButton, setShowHomeButton] = useState(false);
   const initials = user
     ? `${user.name.charAt(0)}${user.last_name.charAt(0)}`
     : "UU";
@@ -42,7 +44,7 @@ export default function Navigation({ user, logout }) {
       <>
         {/* Este es el contenedor que agrupa los controles del usuario */}
         <div className="user-controls">
-          <Bell className="icon" />
+          <Notifications />
 
           <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
             {menuOpen ? (
@@ -93,6 +95,7 @@ export default function Navigation({ user, logout }) {
                 Crear Evento
               </Link>
             </li>
+            <li className="menu-divider"></li>
             <li>
               <Link
                 onClick={(e) => {
@@ -113,12 +116,56 @@ export default function Navigation({ user, logout }) {
   function LoggedOutControls() {
     return (
       <>
-        <Link to="/login" className="NavBarLoginButton">
-          Iniciar Sesión
-        </Link>
-        <Link to="/register" className="NavBarRegisterButton">
-          Regístrate
-        </Link>
+        {/* Botones visibles en desktop */}
+        <div className="desktop-buttons">
+          <Link to="/login" className="NavBarLoginButton">
+            Iniciar Sesión
+          </Link>
+          <Link to="/register" className="NavBarRegisterButton">
+            Regístrate
+          </Link>
+        </div>
+
+        {/* Menú hamburguesa visible solo en móviles */}
+        <div className="menuHamburguesa mobile-only" onClick={toggleMenuHamburguesa}>
+          {menuOpen ? (
+            <i className="fa-solid fa-square-xmark fa-spin"></i>
+          ) : (
+            <i className="fa-solid fa-bars"></i>
+          )}
+        </div>
+
+        {/* Menú desplegable para móviles */}
+        {menuOpen && (
+          <ul className="menuLinks">
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/">
+                Inicio
+              </Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/searchPage">
+                Eventos
+              </Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/calendario">
+                Calendario
+              </Link>
+            </li>
+            <li className="menu-divider"></li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/login">
+                Iniciar Sesión
+              </Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/register">
+                Regístrate
+              </Link>
+            </li>
+          </ul>
+        )}
       </>
     );
   }

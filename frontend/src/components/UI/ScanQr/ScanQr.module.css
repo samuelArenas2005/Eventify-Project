@@ -1,0 +1,373 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContainer {
+  position: relative;
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  transition: all 0.3s ease;
+}
+
+.closeButton:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
+}
+
+.modalContent {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.modalTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  text-align: center;
+}
+
+.modalSubtitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--text-secundary);
+  margin: 0;
+  text-align: center;
+}
+
+.scannerContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  background: var(--color-light-bg);
+  border: 2px solid var(--color-border);
+}
+
+.scanner {
+  width: 100%;
+  height: 100%;
+}
+
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-light-bg);
+  color: var(--text-secundary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+}
+
+.instructions {
+  text-align: center;
+}
+
+.instructionText {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-secundary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Estilos para modo oscuro */
+body.modo-oscuro .modalContainer {
+  background: var(--color-white);
+}
+
+body.modo-oscuro .scannerContainer {
+  background: var(--color-light-bg);
+  border-color: var(--color-border);
+}
+
+body.modo-oscuro .loadingOverlay {
+  background: var(--color-light-bg);
+  color: var(--text-secundary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modalOverlay {
+    padding: 0.5rem;
+  }
+
+  .modalContainer {
+    max-width: 100%;
+    max-height: 95vh;
+  }
+
+  .modalContent {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+
+  .modalTitle {
+    font-size: 1.3rem;
+  }
+
+  .modalSubtitle {
+    font-size: 0.9rem;
+  }
+
+  .scannerContainer {
+    border-width: 1px;
+  }
+
+  .instructionText {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalContent {
+    padding: 1rem;
+  }
+
+  .modalTitle {
+    font-size: 1.2rem;
+  }
+
+  .closeButton {
+    width: 35px;
+    height: 35px;
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .closeButton svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Estilos para el lector QR de html5-qrcode */
+#qr-reader {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#qr-reader__dashboard {
+  display: none !important;
+}
+
+#qr-reader__camera_selection {
+  display: none !important;
+}
+
+#qr-reader__scan_region {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#qr-reader__scan_region video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* Estilos para el modal de resultado */
+.resultModalContent {
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.5rem;
+  min-height: 300px;
+}
+
+.resultIconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.successIcon {
+  color: var(--color-success);
+  animation: scaleIn 0.3s ease;
+}
+
+.errorIcon {
+  color: var(--color-danger);
+  animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.resultTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.resultMessage {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-secundary);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.acceptButton {
+  font-family: 'Poppins', sans-serif;
+  padding: 0.75rem 2rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(11, 114, 185, 0.3);
+  margin-top: 0.5rem;
+}
+
+.acceptButton:hover {
+  background: var(--color-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(11, 114, 185, 0.4);
+}
+
+.acceptButton:active {
+  transform: translateY(0);
+}
+
+/* Responsive para el modal de resultado */
+@media (max-width: 768px) {
+  .resultModalContent {
+    padding: 2rem 1.5rem;
+    min-height: 250px;
+    gap: 1.25rem;
+  }
+
+  .resultIconContainer svg {
+    width: 56px;
+    height: 56px;
+  }
+
+  .resultTitle {
+    font-size: 1.5rem;
+  }
+
+  .resultMessage {
+    font-size: 0.95rem;
+  }
+
+  .acceptButton {
+    padding: 0.65rem 1.75rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .resultModalContent {
+    padding: 1.5rem 1rem;
+    min-height: 200px;
+    gap: 1rem;
+  }
+
+  .resultIconContainer svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .resultTitle {
+    font-size: 1.3rem;
+  }
+
+  .resultMessage {
+    font-size: 0.9rem;
+  }
+
+  .acceptButton {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+

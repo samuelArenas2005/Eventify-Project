@@ -70,7 +70,7 @@
 
 
 
-.profileHeader::before {
+/* .profileHeader::before {
   content: '';
   position: absolute;
   top: 0;
@@ -78,7 +78,7 @@
   right: 0;
   height: 4px;
   background: linear-gradient(90deg, #E11D9E, #9333EA, #0B72B9);
-}
+} */
 
 .profileMain {
   display: flex;

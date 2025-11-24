@@ -1,0 +1,348 @@
+/* Contenedor principal del componente (campana + dropdown) */
+.notifications-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* El botón de la campana */
+.notification-bell {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--icon-color);
+    transition: transform 0.2s, color 0.3s;
+}
+
+.notification-bell:hover {
+    transform: scale(1.1);
+    color: var(--color-primary);
+}
+
+/* El puntito rojo con el número */
+.notification-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--fondo-nav);
+    padding: 0 4px;
+}
+
+/* El Dropdown (la tarjeta flotante) */
+.notifications-dropdown {
+    position: absolute;
+    top: 50px;
+    right: -10px;
+    width: 360px;
+    background-color: var(--fondo-menu);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+    overflow: hidden;
+    animation: slideDown 0.2s ease forwards;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Cabecera del dropdown */
+.notifications-header {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notifications-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--texto-menu);
+}
+
+.notifications-settings-icon {
+    cursor: pointer;
+    color: #666;
+}
+
+/* Lista de notificaciones */
+.notifications-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Item individual de notificación */
+.notification-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    position: relative;
+}
+
+.notification-item:hover {
+    background-color: var(--hover-menu);
+}
+
+.notification-item.unread {
+    background-color: rgba(var(--color-primary-rgb), 0.05);
+}
+
+/* El puntito azul de "no leído" */
+.unread-dot {
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+}
+
+/* Avatar o Icono de la notificación */
+.notification-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.notification-icon-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #e0e7ff;
+    color: #4f46e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Contenido de texto */
+.notification-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.notification-text {
+    font-size: 0.9rem;
+    color: var(--texto-menu);
+    line-height: 1.4;
+}
+
+.notification-text strong {
+    font-weight: 600;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+/* Imagen del evento (thumbnail a la derecha) */
+.notification-thumbnail {
+    width: 90px;
+    height: 50px;
+    border-radius: 4px;
+    object-fit: cover;
+    margin-left: auto;
+    align-self: top;
+}
+
+/* Scrollbar bonito */
+.notifications-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notifications-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+/* Icono de eliminar (basura) */
+.notification-delete {
+    margin-left: 8px;
+    color: #9ca3af;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    align-self: center;
+}
+
+.notification-delete:hover {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Modo oscuro ajustes */
+body.modo-oscuro .notifications-dropdown {
+    background-color: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.modo-oscuro .notification-text {
+    color: #f1f5f9;
+}
+
+body.modo-oscuro .notification-time {
+    color: #94a3b8;
+}
+
+body.modo-oscuro .notification-item:hover {
+    background-color: #334155;
+}
+
+/* Arreglo para el hover: Aseguramos que el hover funcione tanto en leídas como no leídas */
+.notification-item:hover,
+.notification-item.unread:hover {
+    background-color: var(--hover-menu);
+}
+
+/* En modo oscuro, el hover debe ser diferente */
+body.modo-oscuro .notification-item:hover,
+body.modo-oscuro .notification-item.unread:hover {
+    background-color: #334155;
+}
+
+/* ========== RESPONSIVE MÓVILES ========== */
+
+/* Para tablets y móviles grandes (768px o menos) */
+@media (max-width: 768px) {
+    .notifications-dropdown {
+        width: 340px;
+        right: -20px;
+    }
+
+    .notification-thumbnail {
+        width: 70px;
+        height: 40px;
+    }
+}
+
+/* Para móviles medianos (480px o menos) */
+@media (max-width: 480px) {
+    .notifications-dropdown {
+        position: fixed;
+        top: 60px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-width: none;
+        transform: none;
+    }
+
+    .notifications-header {
+        padding: 0.75rem;
+    }
+
+    .notifications-header h3 {
+        font-size: 0.95rem;
+    }
+
+    .notifications-list {
+        max-height: 350px;
+    }
+
+    .notification-item {
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+
+    .notification-avatar,
+    .notification-icon-placeholder {
+        width: 40px;
+        height: 40px;
+    }
+
+    .notification-text {
+        font-size: 0.85rem;
+    }
+
+    .notification-time {
+        font-size: 0.7rem;
+    }
+
+    .notification-thumbnail {
+        width: 60px;
+        height: 35px;
+    }
+
+    .notification-delete {
+        width: 28px;
+        height: 28px;
+    }
+
+    .notification-badge {
+        font-size: 0.65rem;
+        min-width: 16px;
+        height: 16px;
+    }
+}
+
+/* Para móviles pequeños (360px o menos) */
+@media (max-width: 360px) {
+    .notifications-dropdown {
+        left: 5px;
+        right: 5px;
+    }
+
+    .notification-item {
+        padding: 0.65rem;
+        gap: 0.6rem;
+    }
+
+    .notification-avatar,
+    .notification-icon-placeholder {
+        width: 36px;
+        height: 36px;
+    }
+
+    .notification-text {
+        font-size: 0.8rem;
+        line-height: 1.3;
+    }
+
+    .notification-time {
+        font-size: 0.65rem;
+    }
+
+    .notification-thumbnail {
+        width: 50px;
+        height: 30px;
+    }
+
+    .notification-delete {
+        width: 24px;
+        height: 24px;
+        margin-left: 4px;
+    }
+
+    .notification-delete svg {
+        width: 16px;
+        height: 16px;
+    }
+}

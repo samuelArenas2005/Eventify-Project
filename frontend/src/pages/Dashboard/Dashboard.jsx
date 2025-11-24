@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 import EventCard from '../../components/UI/EventCard/EventCard';
-import { Edit, Settings, Calendar, User, Star, Filter, CirclePlus, Plus, CalendarCheck2 } from 'lucide-react';
+import { Edit, ChartColumnBig, Calendar, User, Star, Filter, CirclePlus, Plus, CalendarCheck2 } from 'lucide-react';
 import { getRegisteredEvents, getPendingEvents, getCreatedEvent } from './GetEventsData';
-import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../API/api';
+import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../api/api';
 import EventDashboard from '../../components/UI/EventCreate/EventForm'
 import Loanding from '../../components/UI/Loanding/Loanding';
+import ModalQr from '../../components/UI/modalQR/ModalQr';
+import ScanQr from '../../components/UI/ScanQr/ScanQr';
 
 const historyData = [];
 
 // --- Componente Principal ---
 const UserProfileDashboard = ({ user }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('registrados');
   const [loading, setLoading] = useState(true);
   const [registeredEventsData, setregisteredEventsData] = useState([])
@@ -21,10 +24,18 @@ const UserProfileDashboard = ({ user }) => {
   const [totalCreatedCount, setTotalCreatedCount] = useState(0);
   const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
   const [isCreatePanelClosing, setIsCreatePanelClosing] = useState(false);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+  const [selectedEventForQR, setSelectedEventForQR] = useState(null);
+  const [isScanQRModalOpen, setIsScanQRModalOpen] = useState(false);
+  const [selectedEventForScan, setSelectedEventForScan] = useState(null);
 
   const FullName = user ? `${user.name} ${user.last_name}` : 'Usuario';
   const initials = user ? `${user.name.charAt(0)}${user.last_name.charAt(0)}` : 'UU';
   const dateRegister = user ? `${user.date_joined.substring(0, 4)}` : 'fecha no disponible';
+
+  const hardRefresh = () => {
+    window.location.reload(true);
+  };
 
   const handleFilterClick = () => {
     alert('Abrir modal de filtros');
@@ -47,7 +58,36 @@ const UserProfileDashboard = ({ user }) => {
       setIsCreatePanelClosing(false);
       setActiveTab('misEventos');
     }, 220);
+  };
 
+  // Manejar apertura del modal QR
+  const handleQRCodeClick = (event) => {
+    setSelectedEventForQR({
+      id: event.id,
+      title: event.title
+    });
+    setIsQRModalOpen(true);
+  };
+
+  // Manejar cierre del modal QR
+  const handleCloseQRModal = () => {
+    setIsQRModalOpen(false);
+    setSelectedEventForQR(null);
+  };
+
+  // Manejar apertura del modal de escaneo QR
+  const handleReadQrCodeClick = (event) => {
+    setSelectedEventForScan({
+      id: event.id,
+      title: event.title
+    });
+    setIsScanQRModalOpen(true);
+  };
+
+  // Manejar cierre del modal de escaneo QR
+  const handleCloseScanQRModal = () => {
+    setIsScanQRModalOpen(false);
+    setSelectedEventForScan(null);
   };
 
   console.log(user);
@@ -130,7 +170,12 @@ const UserProfileDashboard = ({ user }) => {
         {data.length > 0 ? (
           <div className={`${styles.eventList} ${styles.grid}`}>
             {data.map((event) => (
-              <EventCard key={event.id} {...event} />
+              <EventCard 
+                key={event.id} 
+                {...event}
+                handleQRCodeClick={() => handleQRCodeClick(event)}
+                handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+              />
             ))}
           </div>
         ) : (
@@ -180,11 +225,14 @@ const UserProfileDashboard = ({ user }) => {
           <Link to="/createEvent" className={`${styles.actionButton} ${styles.createButton}`}>
             <CirclePlus size={18} /> Crear Evento
           </Link>
-          <button className={styles.actionButton}>
+          <button 
+            className={styles.actionButton}
+            onClick={() => navigate('/editProfile')}
+          >
             <Edit size={18} /> Editar Perfil
           </button>
           <button className={styles.actionButton}>
-            <Settings size={18} /> Configuración
+            <ChartColumnBig size={18} /> Analytics
           </button>
         </div>
       </header>
@@ -260,6 +308,21 @@ const UserProfileDashboard = ({ user }) => {
           </div>
         </div> : null}
 
+      {/* Modal QR */}
+      <ModalQr
+        isOpen={isQRModalOpen}
+        onClose={handleCloseQRModal}
+        eventId={selectedEventForQR?.id}
+        eventTitle={selectedEventForQR?.title}
+      />
+
+      {/* Modal Scan QR */}
+      <ScanQr
+        isOpen={isScanQRModalOpen}
+        onClose={handleCloseScanQRModal}
+        eventId={selectedEventForScan?.id}
+        redirection={hardRefresh}
+      />
 
     </div>
   );
