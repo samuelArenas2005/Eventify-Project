@@ -31,7 +31,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost", 
     "127.0.0.1", 
-    "192.168.18.16"
+    "192.168.18.16",
+    'eventify-backend-ucag.onrender.com', # Tu dominio específico
+    '.onrender.com'
 ]
 
 
@@ -143,6 +145,11 @@ CORS_ALLOWED_ORIGINS = [
   "http://127.0.0.1:5173",
   "http://192.168.18.16:5173",
   "https://eventify-project-gray.vercel.app/",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://eventify-backend-ucag.onrender.com",
+    "https://eventify-project-gray.vercel.app/",
 ]
 
 
