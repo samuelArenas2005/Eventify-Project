@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('event', '0003_alter_eventattendee_status'),
+        ('event', '0002_initial'),
         ('notification', '0002_initial'),
     ]
 
