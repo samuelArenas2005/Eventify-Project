@@ -12,6 +12,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 
+from datetime import timedelta
+from apps.notification.models import Notification, UserNotification
 from .models import Event, Category, EventAttendee, EventImage
 from .serializers import (
     CategorySerializer,
@@ -67,7 +69,25 @@ class EventViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Guardar el creator (cadena simple, util en ejercicios)
         # Si tu serializer ya intenta asignarlo desde context, esto no hará daño.
-        serializer.save(creator=self.request.user)
+        event = serializer.save(creator=self.request.user)
+
+        # --- Lógica de Notificación ---
+        # Crear recordatorio programado para 1 día antes
+        reminder_date = event.start_date - timedelta(days=1)
+        
+        notification = Notification.objects.create(
+            event=event,
+            type=Notification.NotificationType.REMINDER,
+            message=f"¡Recordatorio! Tu evento '{event.title}' es mañana a las {event.start_date.strftime('%H:%M')}.",
+            visible_at=reminder_date
+        )
+
+        # Suscribir al creador al recordatorio
+        UserNotification.objects.create(
+            user=event.creator,
+            notification=notification,
+            state=UserNotification.State.DELIVERED
+        )
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def attend(self, request, pk=None):
@@ -78,7 +98,20 @@ class EventViewSet(viewsets.ModelViewSet):
         event = self.get_object()
         attendee, created = EventAttendee.objects.get_or_create(event=event, user=request.user)
         serializer = EventAttendeeSerializer(attendee, context={'request': request})
+        
         if created:
+            # Buscar si ya existe una notificación de recordatorio para este evento
+            reminder_notif = Notification.objects.filter(
+                event=event, 
+                type=Notification.NotificationType.REMINDER
+            ).first()
+            
+            if reminder_notif:
+                # Suscribir al usuario a esa notificación existente
+                UserNotification.objects.get_or_create(
+                    user=request.user,
+                    notification=reminder_notif
+                )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
