@@ -5,7 +5,7 @@ import {
     deleteUserNotification,
     markNotificationAsRead,
     markAllNotificationsAsRead
-} from '../../API/api';
+} from '../../api/api';
 import './Notifications.css';
 
 export default function Notifications() {

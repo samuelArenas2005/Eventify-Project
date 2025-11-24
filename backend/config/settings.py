@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
-
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +31,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost", 
     "127.0.0.1", 
-    "192.168.18.16"
+    "192.168.18.16",
+    'eventify-backend-ucag.onrender.com', # Tu dominio específico
+    '.onrender.com'
 ]
 
 
@@ -90,10 +92,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
 }
 
 
@@ -142,6 +144,12 @@ CORS_ALLOWED_ORIGINS = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "http://192.168.18.16:5173",
+  "https://eventify-project-eight.vercel.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://eventify-backend-ucag.onrender.com",
+    "https://eventify-project-eight.vercel.app/",
 ]
 
 
