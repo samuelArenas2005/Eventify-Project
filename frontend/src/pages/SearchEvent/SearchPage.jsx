@@ -19,7 +19,7 @@ import {
 import EventModal from "../../components/UI/DetailedEvent/DetailedEvent.jsx";
 import { getCategories } from "../../API/api.js";
 
-export default function SearchPage() {
+export default function SearchPage({user}) {
   const navigate = useNavigate();
   const [eventsData, setEventsData] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -107,16 +107,24 @@ export default function SearchPage() {
       icon: MapPin,
     });
   }
+  
+  const onRegistrar = () => {
+    if(!user){
+    navigate("/login");}
+    else{
+    navigate("/dashboard");
+    }
+  };
 
   useEffect(() => {
     async function loadEvents() {
-      const events = await getEvents(handleCloseModal);
+      const events = await getEvents(handleCloseModal, onRegistrar);
       console.log("Eventos formateados para el frontend:", events);
       setEventsData(
         events.map((event) => ({
           ...event,
           handleImageTitleClick: () =>
-            setSelectedEvent(event.formattedDetailEvent),
+            setSelectedEvent(event.formattedDetailEvent),onRegisterClick: onRegistrar
         }))
       );
     }

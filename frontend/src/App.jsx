@@ -100,7 +100,7 @@ function App() {
           path="/searchPage"
           element={
             <>
-              <SearchPage />
+              <SearchPage /> 
             </>
           }
         />

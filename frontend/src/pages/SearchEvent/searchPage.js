@@ -16,7 +16,7 @@ function hora12Colombia(iso) {
   }).toLowerCase();
 }
 
-const formattedDetailEvent = (event, onCloseHandler) => {
+const formattedDetailEvent = (event, onCloseHandler, onRegistrar) => {
   return {
 
     titulo: event.title || "Sin título",
@@ -39,7 +39,7 @@ const formattedDetailEvent = (event, onCloseHandler) => {
     showBorrar: false,
     onBorrar: () => console.log(`Borrar evento ${event.id}`),
     showRegistrar: true,
-    onRegistrar: () => console.log(`Registrar en evento ${event.id}`)
+    onRegistrar: onRegistrar
   };
 };
 
@@ -48,7 +48,7 @@ const showDetailedEvent = (event) => {
 
 }
 
-export const getEvents = async (closeModalHandler) => {
+export const getEvents = async (closeModalHandler, onRegistrar) => {
   try {
     const response = await getAllEvents();
     console.log("Respuesta cruda del backend:", response);
@@ -72,7 +72,7 @@ export const getEvents = async (closeModalHandler) => {
       showRegisterButton: true,
       showHeartButton: true,
       activeHeart: false,
-      formattedDetailEvent: formattedDetailEvent(event, closeModalHandler) // Pass the close handler
+      formattedDetailEvent: formattedDetailEvent(event, closeModalHandler, onRegistrar) // Pass the close handler
     }));
 
     console.log("Eventos formateados:", formattedFromApi);
