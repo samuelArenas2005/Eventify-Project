@@ -1,4 +1,4 @@
-import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '../../api/api'
+import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser} from '../../API/api'
  
  /* export const registeredEventsDataObjet = [
 
@@ -260,6 +260,7 @@ export const getCreatedEvent = async () => {
       currentParticipants: event.attendees_count || 0,
       totalParticipants: event.capacity || 100,
       organizer: event.creator.username || "Desconocido",
+      status: event.status || "DRAFT", // Incluir el status del evento
       onRegisterClick: () => alert(`Ver detalle de registro ${event.id}`),
       onHeartClick: () => console.log(`Heart ${hora12Colombia(event.start_date)}`),
       showRegisterButton: false,
