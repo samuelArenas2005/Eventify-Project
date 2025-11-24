@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 from apps.event.models import Event 
 
-
 class Notification(models.Model):
     """
     A notification associated to an event (e.g., reminders, updates).
@@ -27,12 +26,18 @@ class Notification(models.Model):
         auto_now_add=True,
         help_text="Datetime when the notification was created/sent."
     )
+    visible_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when this notification becomes visible/active. Used for scheduled reminders."
+    )
 
     class Meta:
         indexes = [
             models.Index(fields=['event']),
             models.Index(fields=['type']),
             models.Index(fields=['-sent_at']),
+            models.Index(fields=['visible_at']),
         ]
 
     def str(self) -> str:

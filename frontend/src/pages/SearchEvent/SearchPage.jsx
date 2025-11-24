@@ -48,6 +48,66 @@ export default function SearchPage() {
     setSelectedLocation("");
   };
 
+  // Funciones para eliminar filtros individuales
+  const removeCategoryFilter = () => {
+    setSelectedCategory("");
+  };
+
+  const removeDateFilter = () => {
+    setSelectedDate("");
+  };
+
+  const removeLocationFilter = () => {
+    setSelectedLocation("");
+  };
+
+  // Formatear fecha para mostrar
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  // Obtener filtros activos
+  const activeFilters = [];
+  if (selectedCategory) {
+    activeFilters.push({
+      type: "category",
+      label: "Categoría",
+      value: selectedCategory,
+      onRemove: removeCategoryFilter,
+      icon: Tag,
+    });
+  }
+  if (selectedDate) {
+    activeFilters.push({
+      type: "date",
+      label: "Fecha",
+      value: formatDate(selectedDate),
+      onRemove: removeDateFilter,
+      icon: Calendar,
+    });
+  }
+  if (selectedLocation) {
+    // Capitalizar la primera letra de cada palabra
+    const formattedLocation = selectedLocation
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+    
+    activeFilters.push({
+      type: "location",
+      label: "Ubicación",
+      value: formattedLocation,
+      onRemove: removeLocationFilter,
+      icon: MapPin,
+    });
+  }
+
   useEffect(() => {
     async function loadEvents() {
       const events = await getEvents(handleCloseModal);
@@ -161,7 +221,10 @@ export default function SearchPage() {
                   <select
                     className={style.filterSelect}
                     value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedCategory(e.target.value)
+                      setIsFilterOpen(false);
+                    }}
                   >
                     <option value="">Todas las categorías</option>
                     {categories.map((cat) => (
@@ -216,6 +279,30 @@ export default function SearchPage() {
           )}
         </div>
       </div>
+
+      {/* Filtros aplicados */}
+      {activeFilters.length > 0 && (
+        <div className={style.activeFiltersContainer}>
+          {activeFilters.map((filter, index) => {
+            const IconComponent = filter.icon;
+            return (
+              <div key={index} className={style.activeFilterTag}>
+                <IconComponent size={14} className={style.filterTagIcon} />
+                <span className={style.filterTagLabel}>{filter.label}:</span>
+                <span className={style.filterTagValue}>{filter.value}</span>
+                <button
+                  className={style.filterTagRemove}
+                  onClick={filter.onRemove}
+                  aria-label={`Eliminar filtro ${filter.label}`}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <div className={style.eventCards}>
         {displayedEvents.map((event, index) => (
           <div key={event.id} style={{ "--card-index": index }}>

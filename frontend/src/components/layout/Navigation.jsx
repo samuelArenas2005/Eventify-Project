@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "./Navigation.css";
 import { Link, useNavigate } from "react-router-dom";
-import { Moon, Sun, Bell, Search } from "lucide-react";
+import { Moon, Sun, Bell, Search, Home } from "lucide-react";
+
+import Notifications from "../Notification/Notifications";
 
 export default function Navigation({ user, logout }) {
   const [temaOscuro, setTemaOscuro] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showHomeButton, setShowHomeButton] = useState(false);
   const initials = user
     ? `${user.name.charAt(0)}${user.last_name.charAt(0)}`
     : "UU";
@@ -24,13 +28,23 @@ export default function Navigation({ user, logout }) {
     }
   }, [temaOscuro]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 100);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // Componente para cuando el usuario está logueado
   function LoggedInControls() {
     return (
       <>
         {/* Este es el contenedor que agrupa los controles del usuario */}
         <div className="user-controls">
-          <Bell className="icon" />
+          <Notifications />
 
           <div className="menuHamburguesa" onClick={toggleMenuHamburguesa}>
             {menuOpen ? (
@@ -81,6 +95,7 @@ export default function Navigation({ user, logout }) {
                 Crear Evento
               </Link>
             </li>
+            <li className="menu-divider"></li>
             <li>
               <Link
                 onClick={(e) => {
@@ -101,33 +116,102 @@ export default function Navigation({ user, logout }) {
   function LoggedOutControls() {
     return (
       <>
-        <Link to="/login" className="NavBarLoginButton">
-          Iniciar Sesión
-        </Link>
-        <Link to="/register" className="NavBarRegisterButton">
-          Regístrate
-        </Link>
+        {/* Botones visibles en desktop */}
+        <div className="desktop-buttons">
+          <Link to="/login" className="NavBarLoginButton">
+            Iniciar Sesión
+          </Link>
+          <Link to="/register" className="NavBarRegisterButton">
+            Regístrate
+          </Link>
+        </div>
+
+        {/* Menú hamburguesa visible solo en móviles */}
+        <div className="menuHamburguesa mobile-only" onClick={toggleMenuHamburguesa}>
+          {menuOpen ? (
+            <i className="fa-solid fa-square-xmark fa-spin"></i>
+          ) : (
+            <i className="fa-solid fa-bars"></i>
+          )}
+        </div>
+
+        {/* Menú desplegable para móviles */}
+        {menuOpen && (
+          <ul className="menuLinks">
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/">
+                Inicio
+              </Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/searchPage">
+                Eventos
+              </Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/calendario">
+                Calendario
+              </Link>
+            </li>
+            <li className="menu-divider"></li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/login">
+                Iniciar Sesión
+              </Link>
+            </li>
+            <li>
+              <Link onClick={toggleMenuHamburguesa} to="/register">
+                Regístrate
+              </Link>
+            </li>
+          </ul>
+        )}
       </>
     );
   }
 
-  return (
-    <nav className="NavBar">
-      <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-        <div className="NavBarLogo">Eventify</div>
-      </Link>
+  const scrollToTop = () => {
+    const currentPath = window.location.pathname;
+    if (currentPath !== "/") {
+      navigate("/");
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
-      {/* Contenedor principal de todos los elementos de la derecha */}
-      <div className="nav-derecha">
-        {/* <div className="IconoTema" >
-          {temaOscuro ? (
-            <Moon className="iconDesactive" />
-          ) : (
-            <Sun className="iconDesactive" />
-          )}
-        </div> */}
-        {user ? <LoggedInControls /> : <LoggedOutControls />}
+  return (
+    <>
+      <div className="nav-container">
+        <nav className={`NavBar ${isScrolled ? "scrolled" : ""}`}>
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <div className="NavBarLogo">Eventify</div>
+          </Link>
+
+          {/* Contenedor principal de todos los elementos de la derecha */}
+          <div className="nav-derecha">
+            {/* <div className="IconoTema" >
+            {temaOscuro ? (
+              <Moon className="iconDesactive" />
+            ) : (
+              <Sun className="iconDesactive" />
+            )}
+          </div> */}
+            {user ? <LoggedInControls /> : <LoggedOutControls />}
+          </div>
+        </nav>
       </div>
-    </nav>
+
+
+      {/* Botón flotante para volver al inicio */}
+      {showHomeButton && (
+        <button
+          className="home-button"
+          onClick={scrollToTop}
+          aria-label="Volver al inicio"
+        >
+          <Home size={20} />
+        </button>
+      )}
+    </>
   );
 }

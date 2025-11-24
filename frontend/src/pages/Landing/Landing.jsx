@@ -72,32 +72,6 @@ function Landing() {
         <div className={style.triangleShape}></div>
       </section>
 
-      {/* Estadísticas */}
-      {/* <section className={style.statsSection}>
-        <div className={style.statsContainer}>
-          <div className={style.statCard}>
-            <div className={style.statIcon}>
-              <Calendar size={32} />
-            </div>
-            <h3 className={style.statNumber}>500+</h3>
-            <p className={style.statLabel}>Eventos Activos</p>
-          </div>
-          <div className={style.statCard}>
-            <div className={style.statIcon}>
-              <Users size={32} />
-            </div>
-            <h3 className={style.statNumber}>2,500+</h3>
-            <p className={style.statLabel}>Estudiantes Participando</p>
-          </div>
-          <div className={style.statCard}>
-            <div className={style.statIcon}>
-              <Star size={32} />
-            </div>
-            <h3 className={style.statNumber}>4.8</h3>
-            <p className={style.statLabel}>Calificación Promedio</p>
-          </div>
-        </div>
-      </section> */}
 
       {/* Sección de Características */}
       <section className={style.featuresSection}>

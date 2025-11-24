@@ -12,6 +12,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 
+from datetime import timedelta
+from apps.notification.models import Notification, UserNotification
 from .models import Event, Category, EventAttendee, EventImage
 from .serializers import (
     CategorySerializer,
@@ -67,7 +69,25 @@ class EventViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Guardar el creator (cadena simple, util en ejercicios)
         # Si tu serializer ya intenta asignarlo desde context, esto no hará daño.
-        serializer.save(creator=self.request.user)
+        event = serializer.save(creator=self.request.user)
+
+        # --- Lógica de Notificación ---
+        # Crear recordatorio programado para 1 día antes
+        reminder_date = event.start_date - timedelta(days=1)
+        
+        notification = Notification.objects.create(
+            event=event,
+            type=Notification.NotificationType.REMINDER,
+            message=f"¡Recordatorio! Tu evento '{event.title}' es mañana a las {event.start_date.strftime('%H:%M')}.",
+            visible_at=reminder_date
+        )
+
+        # Suscribir al creador al recordatorio
+        UserNotification.objects.create(
+            user=event.creator,
+            notification=notification,
+            state=UserNotification.State.DELIVERED
+        )
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def attend(self, request, pk=None):
@@ -78,7 +98,20 @@ class EventViewSet(viewsets.ModelViewSet):
         event = self.get_object()
         attendee, created = EventAttendee.objects.get_or_create(event=event, user=request.user)
         serializer = EventAttendeeSerializer(attendee, context={'request': request})
+        
         if created:
+            # Buscar si ya existe una notificación de recordatorio para este evento
+            reminder_notif = Notification.objects.filter(
+                event=event, 
+                type=Notification.NotificationType.REMINDER
+            ).first()
+            
+            if reminder_notif:
+                # Suscribir al usuario a esa notificación existente
+                UserNotification.objects.get_or_create(
+                    user=request.user,
+                    notification=reminder_notif
+                )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -129,6 +162,36 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+    @action(detail=True, methods=['put', 'patch'], permission_classes=[permissions.IsAuthenticated])
+    def confirm_attendance(self, request, pk=None):
+        """
+        Actualiza el status del EventAttendee del usuario autenticado a 'CONFIRMED'.
+        Recibe el nuevo status en el body (opcional, por defecto 'CONFIRMED').
+        """
+        event = self.get_object()
+        user = request.user
+        new_status = request.data.get('status', 'CONFIRMED')
+        
+        # Validar que el status sea válido
+        valid_statuses = [choice[0] for choice in EventAttendee.STATUS_CHOICES]
+        if new_status not in valid_statuses:
+            return Response(
+                {'detail': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            attendee = EventAttendee.objects.get(event=event, user=user)
+            attendee.status = new_status
+            attendee.save()
+            serializer = EventAttendeeSerializer(attendee, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except EventAttendee.DoesNotExist:
+            return Response(
+                {'detail': 'You are not registered to this event'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
 
 class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -151,7 +214,7 @@ class ConfirmedAttendeesList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user, status='CONFIRMED', event__status=Event.ACTIVE)
+            .filter(user=user, status='REGISTERED', event__status=Event.ACTIVE)
         )
 
 class PendingAttendeesList(generics.ListAPIView):
@@ -166,7 +229,7 @@ class PendingAttendeesList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user, status='PENDING', event__status=Event.ACTIVE)
+            .filter(user=user, status='FAVORITE', event__status=Event.ACTIVE)
         )
 
 class EventsByCreatorList(generics.ListAPIView):
@@ -225,7 +288,7 @@ class AllRegisteredEventsList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user)
+            .filter(user=user, status='CONFIRMED', event__status=Event.ACTIVE or Event.FINISHED)
         )
 
 class AllCreatedEventsList(generics.ListAPIView):

@@ -222,9 +222,13 @@ const EventDashboard = ({ onClose = null }) => {
 
   // --- Manejador de Envío ---
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data, status = "ACTIVE") => {
     setIsSubmitting(true);
-    const loadingToast = toast.loading("Registrando tu evento...");
+    const loadingToast = toast.loading(
+      status === "DRAFT" 
+        ? "Guardando borrador..." 
+        : "Registrando tu evento..."
+    );
 
     if (images.length === 0) {
       toast.error("Debes subir al menos una imagen.");
@@ -245,7 +249,7 @@ const EventDashboard = ({ onClose = null }) => {
       formData.append("address", data.address);
       formData.append("location_info", data.venueInfo || "");
       formData.append("capacity", String(data.capacity));
-      formData.append("status", "ACTIVE");
+      formData.append("status", status);
 
       // Ahora category es un solo ID (relación uno a muchos)
       formData.append("category", data.category);
@@ -285,18 +289,30 @@ const EventDashboard = ({ onClose = null }) => {
           "El evento se creó pero no se pudo verificar. Por favor, revisa el dashboard."
         );
       }
-      toast.success("¡Evento creado exitosamente!");
+      toast.success(
+        status === "DRAFT" 
+          ? "¡Borrador guardado exitosamente!" 
+          : "¡Evento creado exitosamente!"
+      );
       reset();
       images.forEach((image) => URL.revokeObjectURL(image.url));
       setImages([]);
       setMainImageIndex(0);
     } catch (error) {
       console.error("❌ Error al enviar evento:", error);
-      toast.error("Hubo un error al registrar tu evento.");
+      toast.error(
+        status === "DRAFT" 
+          ? "Hubo un error al guardar el borrador." 
+          : "Hubo un error al registrar tu evento."
+      );
     } finally {
       toast.dismiss(loadingToast);
       setIsSubmitting(false);
     }
+  };
+
+  const onSaveDraft = async (data) => {
+    await onSubmit(data, "DRAFT");
   };
 
   const onError = (formErrors) => {
@@ -580,24 +596,46 @@ const EventDashboard = ({ onClose = null }) => {
                 </div>
               </div>
 
-              {/* Botón de Envío */}
+              {/* Botones de Envío */}
+              <div className={styles.submitButtonsContainer}>
               <button
-                type="submit"
-                className={styles.submitButton}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 size={20} className="animate-spin" />
-                    Registrando...
-                  </>
-                ) : (
-                  <>
-                    <Send size={20} />
-                    Crear Evento
-                  </>
-                )}
-              </button>
+                  type="button"
+                  onClick={handleSubmit(onSaveDraft, onError)}
+                  className={styles.draftButton}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      Guardando...
+                    </>
+                  ) : (
+                    <>
+                      <FileText size={20} />
+                      Guardar como borrador
+                    </>
+                  )}
+                </button>
+              <button
+                  type="submit"
+                  className={styles.submitButton}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      Registrando...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={20} />
+                      Crear Evento
+                    </>
+                  )}
+                </button>
+                
+                
+              </div>
             </section>
 
             {/* Columna Derecha: Imágenes */}
@@ -637,7 +675,7 @@ const EventDashboard = ({ onClose = null }) => {
               <div style={{ marginTop: 10 }}>
                 <button
                   type="button"
-                  className={styles.submitButton}
+                  className={`${styles.submitButton} ${styles.submitButtonIa}`}
                   onClick={generateImageWithAI}
                   disabled={isGenerating}
                 >

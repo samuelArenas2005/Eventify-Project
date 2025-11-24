@@ -14,9 +14,10 @@ class NotificationSerializer(serializers.ModelSerializer):
             'event_id',
             'message',
             'type',
-            'sent_at'
+            'sent_at',
+            'visible_at'
         )
-        read_only_fields = ('sent_at',)
+        read_only_fields = ('sent_at', 'visible_at')
 
 class UserNotificationSerializer(serializers.ModelSerializer):
     notification = NotificationSerializer(read_only=True)

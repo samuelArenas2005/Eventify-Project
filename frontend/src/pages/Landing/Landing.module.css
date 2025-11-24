@@ -303,7 +303,7 @@
   margin: 0 auto 3rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
+  gap: 5rem;
   justify-items: center;
 }
 
@@ -685,6 +685,7 @@
     clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
     margin-bottom: 60px;
   }
+
 
   .statsContainer {
     grid-template-columns: 1fr;
