@@ -18,6 +18,9 @@ import {
 } from "lucide-react";
 import EventModal from "../../components/UI/DetailedEvent/DetailedEvent.jsx";
 import { getCategories } from "../../api/api.js";
+import ConfirmarModal from "../../components/UI/ConfirmarModal/ConfirmarModal";
+import { confirmEventRegistration } from "../../api/api";
+import { toast } from "react-hot-toast";
 
 export default function SearchPage({user}) {
   const navigate = useNavigate();
@@ -25,6 +28,7 @@ export default function SearchPage({user}) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [confirmState, setConfirmState] = useState({ open: false, event: null });
 
   // Estados para los filtros
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -107,14 +111,42 @@ export default function SearchPage({user}) {
       icon: MapPin,
     });
   }
-  
-  const onRegistrar = () => {
-    if(!user){
-    navigate("/login");}
-    else{
-    navigate("/dashboard");
+  const onRegistrar = (event) => {
+    if (!user) {
+      console.log(user);
+      navigate("/login");
+      return;
+    }
+    setConfirmState({ open: true, event });
+  };
+
+  const handleCancelConfirm = () => {
+    setConfirmState({ open: false, event: null });
+  };
+
+  const handleConfirmRegistration = async () => {
+    const eventId = confirmState.event?.id;
+    if (!eventId) return;
+
+    try {
+      await confirmEventRegistration(eventId);
+      toast.success("¡Tu registro al evento ha sido exitoso!");
+      setConfirmState({ open: false, event: null });
+      navigate("/dashboard");
+    } catch (error) {
+      // Manejar el error específico de inscripción duplicada
+      const errorMessage = error?.detail || error?.message || "No pudimos completar tu registro, inténtalo nuevamente.";
+      
+      if (errorMessage.includes("Ya estás inscrito")) {
+        toast.error("Ya estás inscrito en este evento.");
+      } else {
+        toast.error(errorMessage);
+      }
+      
+      setConfirmState({ open: false, event: null });
     }
   };
+ 
 
   useEffect(() => {
     async function loadEvents() {
@@ -173,6 +205,8 @@ export default function SearchPage({user}) {
   const handleSubmit = (e) => {
     e.preventDefault();
   };
+
+  
 
   return (
     <div>
@@ -314,7 +348,10 @@ export default function SearchPage({user}) {
       <div className={style.eventCards}>
         {displayedEvents.map((event, index) => (
           <div key={event.id} style={{ "--card-index": index }}>
-            <EventCard {...event} />
+            <EventCard
+              {...event}
+              onRegisterClick={() => onRegistrar(event)} // <- pasa el evento aquí
+            />
           </div>
         ))}
       </div>
@@ -343,6 +380,15 @@ export default function SearchPage({user}) {
       </div>
 
       {selectedEvent && <EventModal {...selectedEvent} />}
+      <ConfirmarModal
+        isOpen={confirmState.open}
+        title="Confirmar registro"
+        description="¿Deseas registrarte en este evento? Recibirás todas las actualizaciones en tu panel."
+        confirmLabel="Confirmar"
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmRegistration}
+        onCancel={handleCancelConfirm}
+      />
     </div>
   );
 }
