@@ -17,7 +17,8 @@ import EditPerfilPage from "./pages/Dashboard/EditPerfilPage/EditPerfilPage";
 import RegisterUser from "./pages/RegisterUser";
 import CreateEventPage from "./pages/CreateEvent/CreateEventPage";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
-import Analytics from "./pages/Analytics/Analytics";
+import AdminAnalytics from "./pages/AdminAnalytics/AdminAnalytics.jsx";
+import EventAnalytics from "./pages/EventAnalytics/EventAnalytics.jsx";
 import NotFoundPage from "./pages/NotFound/NotFoundPage";
 import SearchPage from "./pages/SearchEvent/SearchPage.jsx";
 import ScrollToTop from "./components/UI/ScrollTop/ScrollToTop";
@@ -133,6 +134,14 @@ function App() {
               </>
             }
           />
+          <Route
+            path="/eventAnalytics"
+            element={
+              <>
+                <EventAnalytics />
+              </>
+            }
+          />
         </Route>
         <Route
           path={"/analytics"}
@@ -142,7 +151,7 @@ function App() {
               loading={loading}
               redirectTo="/dashboard"
             >
-              <Analytics />
+              <AdminAnalytics />
             </ProtectedRoute>
           }
         />
