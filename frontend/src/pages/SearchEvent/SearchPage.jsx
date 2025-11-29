@@ -134,15 +134,19 @@ export default function SearchPage({user}) {
       setConfirmState({ open: false, event: null });
       navigate("/dashboard");
     } catch (error) {
-      // Manejar el error específico de inscripción duplicada
-      const errorMessage = error?.detail || error?.message || "No pudimos completar tu registro, inténtalo nuevamente.";
-      
-      if (errorMessage.includes("Ya estás inscrito")) {
+      // Extrae el detalle desde axios
+      const detail =
+        error?.response?.data?.detail ||
+        error?.detail ||
+        error?.message ||
+        "No pudimos completar tu registro, inténtalo nuevamente.";
+
+      if (typeof detail === 'string' && detail.toLowerCase().includes('ya estás inscrito')) {
         toast.error("Ya estás inscrito en este evento.");
       } else {
-        toast.error(errorMessage);
+        toast.error(detail);
       }
-      
+
       setConfirmState({ open: false, event: null });
     }
   };
@@ -155,8 +159,15 @@ export default function SearchPage({user}) {
       setEventsData(
         events.map((event) => ({
           ...event,
-          handleImageTitleClick: () =>
-            setSelectedEvent(event.formattedDetailEvent),onRegisterClick: onRegistrar
+          handleImageTitleClick: () => {
+            setSelectedEvent({
+              ...event.formattedDetailEvent,
+              showRegistrar: true,
+              onRegistrar: () => onRegistrar(event),
+              onClose: handleCloseModal,
+            });
+          },
+          onRegisterClick: () => onRegistrar(event), // botón de la card
         }))
       );
     }
