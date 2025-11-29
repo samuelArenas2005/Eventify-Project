@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Users, TrendingUp, MessageCircle } from "lucide-react";
-import AnalyticsLayout from "../../components/Analytics/AnalyticsLayout";
-import EventAnalyticsHeader from "../../components/Analytics/EventAnalyticsHeader";
-import UserListView from "../../components/Analytics/UserListView";
-import TimeSeriesChart from "../../components/Analytics/TimeSeriesChart";
-import CommentsPlaceholder from "../../components/Analytics/CommentsPlaceholder";
+import AnalyticsLayout from "../../components/Analytics/layout/AnalyticsLayout";
+import EventAnalyticsHeader from "../../components/Analytics/headers/EventAnalyticsHeader";
+import UserListView from "../../components/Analytics/views/UserListView";
+import TimeSeriesChart from "../../components/Analytics/charts/TimeSeriesChart";
+import CommentsPlaceholder from "../../components/Analytics/views/CommentsPlaceholder";
 
 const EventAnalytics = () => {
   const [activeView, setActiveView] = useState("users");

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Users, Calendar, UserPlus } from "lucide-react";
-import AnalyticsLayout from "../../components/Analytics/AnalyticsLayout";
-import AdminAnalyticsHeader from "../../components/Analytics/AdminAnalyticsHeader";
-import TimeSeriesChart from "../../components/Analytics/TimeSeriesChart";
-import AddAdminView from "../../components/Analytics/AddAdminView";
+import AnalyticsLayout from "../../components/Analytics/layout/AnalyticsLayout";
+import AdminAnalyticsHeader from "../../components/Analytics/headers/AdminAnalyticsHeader";
+import TimeSeriesChart from "../../components/Analytics/charts/TimeSeriesChart";
+import AddAdminView from "../../components/Analytics/views/AddAdminView";
 
 const AdminAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
