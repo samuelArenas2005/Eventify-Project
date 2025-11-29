@@ -328,6 +328,19 @@ class ConfirmEventRegistrationView(APIView):
             user=request.user,
             status='REGISTERED'
         )
+
+        # Buscar si ya existe una notificación de recordatorio para este evento
+        reminder_notif = Notification.objects.filter(
+            event=event, 
+            type=Notification.NotificationType.REMINDER
+        ).first()
+        
+        if reminder_notif:
+            # Suscribir al usuario a esa notificación existente
+            UserNotification.objects.get_or_create(
+                user=request.user,
+                notification=reminder_notif
+            )
         
         serializer = EventAttendeeSerializer(attendee, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
