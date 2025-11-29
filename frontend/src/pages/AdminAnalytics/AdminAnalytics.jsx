@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Users, Calendar } from "lucide-react";
+import { Users, Calendar, UserPlus } from "lucide-react";
 import AnalyticsLayout from "../../components/Analytics/AnalyticsLayout";
 import AdminAnalyticsHeader from "../../components/Analytics/AdminAnalyticsHeader";
 import TimeSeriesChart from "../../components/Analytics/TimeSeriesChart";
+import AddAdminView from "../../components/Analytics/AddAdminView";
 
 const AdminAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
+  const [adminSearchId, setAdminSearchId] = useState("");
 
   // Opciones del menú
   const menuItems = [
@@ -18,6 +20,11 @@ const AdminAnalytics = () => {
       id: "events",
       icon: <Calendar size={20} />,
       label: "Eventos Creados",
+    },
+    {
+      id: "add-admin",
+      icon: <UserPlus size={20} />,
+      label: "Añadir admin",
     },
   ];
 
@@ -121,6 +128,14 @@ const AdminAnalytics = () => {
           title="Eventos Creados por Día"
           subtitle="Últimos 14 días"
           stats={eventsStats}
+        />
+      );
+    }
+    if (activeView === "add-admin") {
+      return (
+        <AddAdminView
+          searchId={adminSearchId}
+          onSearchChange={setAdminSearchId}
         />
       );
     }

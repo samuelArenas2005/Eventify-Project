@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Users, TrendingUp } from "lucide-react";
+import { Users, TrendingUp, MessageCircle } from "lucide-react";
 import AnalyticsLayout from "../../components/Analytics/AnalyticsLayout";
 import EventAnalyticsHeader from "../../components/Analytics/EventAnalyticsHeader";
 import UserListView from "../../components/Analytics/UserListView";
 import TimeSeriesChart from "../../components/Analytics/TimeSeriesChart";
+import CommentsPlaceholder from "../../components/Analytics/CommentsPlaceholder";
 
 const EventAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
@@ -27,6 +28,11 @@ const EventAnalytics = () => {
       id: "registrations",
       icon: <TrendingUp size={20} />,
       label: "Inscripciones por Día",
+    },
+    {
+      id: "comments",
+      icon: <MessageCircle size={20} />,
+      label: "Comentarios",
     },
   ];
 
@@ -144,6 +150,9 @@ const EventAnalytics = () => {
           stats={chartStats}
         />
       );
+    }
+    if (activeView === "comments") {
+      return <CommentsPlaceholder />;
     }
     return null;
   };

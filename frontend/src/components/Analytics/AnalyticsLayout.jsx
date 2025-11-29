@@ -26,10 +26,6 @@ const AnalyticsLayout = ({
 
         <div className={styles.sidebarDivider}></div>
 
-        <div className={styles.sidebarHeader}>
-          <h3>Estadísticas</h3>
-        </div>
-
         <ul className={styles.sidebarMenu}>
           {menuItems.map((item) => (
             <li

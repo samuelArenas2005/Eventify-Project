@@ -135,7 +135,7 @@ function App() {
             }
           />
           <Route
-            path="/eventAnalytics"
+            path="/event/:eventId/analytics"
             element={
               <>
                 <EventAnalytics />
@@ -144,7 +144,7 @@ function App() {
           />
         </Route>
         <Route
-          path={"/analytics"}
+          path={"/admin"}
           element={
             <ProtectedRoute
               isAllowed={user ? user.is_admin : false}

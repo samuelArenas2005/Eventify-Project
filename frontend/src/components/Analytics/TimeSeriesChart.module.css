@@ -97,58 +97,27 @@
   position: relative;
 }
 
-.fakeChart {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, rgba(11, 114, 185, 0.05) 0%, transparent 100%);
+/* Custom Tooltip */
+.customTooltip {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  position: relative;
-  overflow: hidden;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.chartLine {
-  stroke: var(--color-primary);
-  stroke-width: 3;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 2px 4px rgba(11, 114, 185, 0.3));
+.tooltipLabel {
+  font-size: 0.85rem;
+  color: var(--text-secundary);
+  margin: 0 0 0.25rem 0;
+  font-weight: 500;
 }
 
-.chartFill {
-  fill: url(#gradient);
-  opacity: 0.3;
-}
-
-.chartGrid {
-  stroke: var(--color-border);
-  stroke-width: 1;
-  opacity: 0.5;
-}
-
-.chartAxis {
-  stroke: var(--color-border);
-  stroke-width: 1;
-}
-
-.chartLabel {
-  font-size: 0.75rem;
-  fill: var(--text-secundary);
-  font-family: 'Poppins', sans-serif;
-}
-
-.chartPoint {
-  fill: var(--color-white);
-  stroke: var(--color-primary);
-  stroke-width: 3;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.chartPoint:hover {
-  fill: var(--color-primary);
-  r: 6;
-  filter: drop-shadow(0 2px 8px rgba(11, 114, 185, 0.5));
+.tooltipValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
 }
 
 /* Responsive */
