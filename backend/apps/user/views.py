@@ -171,6 +171,35 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=False,
+        methods=['post'],
+        url_path='admin/remove-by-cedula',
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def remove_admin(self, request):
+        """Desactiva is_admin para el usuario con la cédula indicada."""
+        if not getattr(request.user, 'is_admin', False):
+            return Response(
+                {'detail': 'Solo los administradores pueden realizar esta acción.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        cedula = request.data.get('cedula')
+        if not cedula:
+            return Response(
+                {'detail': 'El campo "cedula" es obligatorio.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        usuario = get_object_or_404(User, cedula=cedula)
+        if usuario.is_admin:
+            usuario.is_admin = False
+            usuario.save(update_fields=['is_admin'])
+
+        serializer = UserSerializer(usuario)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(
+        detail=False,
         methods=['get'],
         url_path='lookup/by-cedula',
         permission_classes=[permissions.IsAuthenticated],

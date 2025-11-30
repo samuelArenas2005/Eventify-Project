@@ -139,6 +139,13 @@
   box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
 }
 
+.actionButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .promoteButton {
   background: #10b981;
   color: white;
@@ -156,4 +163,23 @@
 
 .noResults {
   font-weight: 500;
+}
+
+.loadingContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

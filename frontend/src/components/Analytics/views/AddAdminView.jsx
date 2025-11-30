@@ -1,12 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import styles from "./AddAdminView.module.css";
-import { getUserByCedula } from "../../../api/api";
+import {
+  getUserByCedula,
+  promoteAdminByCedula,
+  removeAdminByCedula,
+} from "../../../api/api";
 
 const AddAdminView = ({ searchId, onSearchChange }) => {
   const [userResult, setUserResult] = useState(null);
   const [statusMessage, setStatusMessage] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [isUpdatingAdmin, setIsUpdatingAdmin] = useState(false);
 
   useEffect(() => {
     if (!searchId?.trim()) {
@@ -50,6 +55,48 @@ const AddAdminView = ({ searchId, onSearchChange }) => {
       setIsSearching(false);
     }
   }, [searchId]);
+
+  const refreshUserData = useCallback(async () => {
+    const trimmed = searchId?.trim();
+    if (!trimmed) return;
+    try {
+      const response = await getUserByCedula(trimmed);
+      setUserResult(response?.data ?? null);
+    } catch (error) {
+      console.error("Error refreshing user info:", error);
+      setUserResult(null);
+      setStatusMessage("No se pudo refrescar la información del usuario.");
+    }
+  }, [searchId]);
+
+  const handleAdminToggle = async (shouldPromote) => {
+    if (!userResult?.cedula || isUpdatingAdmin) return;
+
+    try {
+      setIsUpdatingAdmin(true);
+      setStatusMessage("");
+
+      if (shouldPromote) {
+        await promoteAdminByCedula(userResult.cedula);
+      } else {
+        await removeAdminByCedula(userResult.cedula);
+      }
+
+      await refreshUserData();
+      setStatusMessage(
+        shouldPromote
+          ? "Usuario promovido a administrador."
+          : "Permisos de administrador removidos."
+      );
+    } catch (error) {
+      console.error("Error updating admin status:", error);
+      setStatusMessage(
+        "No se pudo actualizar el estado de administrador. Intenta nuevamente."
+      );
+    } finally {
+      setIsUpdatingAdmin(false);
+    }
+  };
 
   const getInitials = (name) => {
     return name
@@ -112,14 +159,32 @@ const AddAdminView = ({ searchId, onSearchChange }) => {
             {!userResult.is_admin ? (
               <button
                 className={`${styles.actionButton} ${styles.promoteButton}`}
+                onClick={() => handleAdminToggle(true)}
+                disabled={isUpdatingAdmin}
               >
-                Hacer admin
+                {isUpdatingAdmin ? (
+                  <span className={styles.loadingContent}>
+                    <Loader2 className={styles.spinner} size={16} />
+                    Promoviendo...
+                  </span>
+                ) : (
+                  "Hacer admin"
+                )}
               </button>
             ) : (
               <button
                 className={`${styles.actionButton} ${styles.removeButton}`}
+                onClick={() => handleAdminToggle(false)}
+                disabled={isUpdatingAdmin}
               >
-                Quitar admin
+                {isUpdatingAdmin ? (
+                  <span className={styles.loadingContent}>
+                    <Loader2 className={styles.spinner} size={16} />
+                    Quitando...
+                  </span>
+                ) : (
+                  "Quitar admin"
+                )}
               </button>
             )}
           </div>

@@ -267,6 +267,14 @@ export const promoteAdminByCedula = (cedula) => {
 	);
 }
 
+export const removeAdminByCedula = (cedula) => {
+	return axios.post(
+		`${BASE_URL}user/users/admin/remove-by-cedula/`,
+		{ cedula },
+		{ withCredentials: true }
+	);
+}
+
 export const getUserByCedula = (cedula) => {
 	return axios.get(`${BASE_URL}user/users/lookup/by-cedula/`, {
 		params: { cedula },
