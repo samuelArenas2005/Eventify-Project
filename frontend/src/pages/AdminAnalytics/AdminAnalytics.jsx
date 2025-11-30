@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Users, Calendar, UserPlus } from "lucide-react";
+import { Users, Calendar, UserPlus, TrendingUp } from "lucide-react";
 import AnalyticsLayout from "../../components/Analytics/layout/AnalyticsLayout";
 import AdminAnalyticsHeader from "../../components/Analytics/headers/AdminAnalyticsHeader";
 import TimeSeriesChart from "../../components/Analytics/charts/TimeSeriesChart";
 import AddAdminView from "../../components/Analytics/views/AddAdminView";
+import PopularEventsView from "../../components/Analytics/views/PopularEventsView";
 import {
   getDailyEventsCreated,
   getDailyRegisteredUsers,
@@ -40,6 +41,11 @@ const AdminAnalytics = () => {
       id: "events",
       icon: <Calendar size={20} />,
       label: "Eventos Creados",
+    },
+    {
+      id: "popular-events",
+      icon: <TrendingUp size={20} />,
+      label: "Eventos Populares",
     },
     {
       id: "add-admin",
@@ -232,6 +238,9 @@ const AdminAnalytics = () => {
           onRangeChange={setEventsRange}
         />
       );
+    }
+    if (activeView === "popular-events") {
+      return <PopularEventsView />;
     }
     if (activeView === "add-admin") {
       return (

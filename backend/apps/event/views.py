@@ -323,6 +323,44 @@ class AllCreatedEventsList(generics.ListAPIView):
         return Event.objects.filter(creator=user)
 
 
+class PopularUpcomingEventsView(generics.ListAPIView):
+    """Retorna los eventos próximos con mayor número de inscritos."""
+    serializer_class = EventListSerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def get_queryset(self):
+        now = timezone.now()
+        try:
+            limit = int(self.request.query_params.get('limit', 5))
+        except (TypeError, ValueError):
+            limit = 5
+
+        limit = max(1, min(limit, 10))
+
+        return (
+            Event.objects
+            .filter(start_date__gte=now, status=Event.ACTIVE)
+            .select_related('creator', 'category')
+            .prefetch_related('images')
+            .annotate(popular_attendees=Count('attendees', distinct=True))
+            .order_by('-popular_attendees', 'start_date')[:limit]
+        )
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        results = serializer.data
+        payload = {
+            'results': results,
+            'count': len(results),
+        }
+
+        if not results:
+            payload['message'] = 'No hay eventos populares próximos disponibles.'
+
+        return Response(payload)
+
+
 class EventDailyCreatedCountView(APIView):
     """Devuelve conteos diarios de eventos creados entre dos fechas para Analytics."""
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]

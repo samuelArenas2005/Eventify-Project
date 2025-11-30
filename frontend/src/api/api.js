@@ -257,6 +257,15 @@ export const getTotalUsersCount = () => {
 	});
 }
 
+/* LLAMA A LOS 5 EVENTOS ACTIVOS MAS POPULARES */
+
+export const getPopularUpcomingEvents = (limit = 5) => {
+	return axios.get(`${BASE_URL}event/analytics/popular-upcoming/`, {
+		params: { limit },
+		withCredentials: true,
+	});
+}
+
 /* LLAMADAS RELACIONADAS CON ADMINISTRACION DE USUARIOS */
 
 export const promoteAdminByCedula = (cedula) => {
