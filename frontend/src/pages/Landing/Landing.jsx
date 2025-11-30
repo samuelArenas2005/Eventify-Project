@@ -24,6 +24,8 @@ import EventCard from "../../components/UI/EventCard/EventCard.jsx";
 import { getEvents } from "../SearchEvent/searchPage.js";
 
 const HERO_IMAGE_URL = "/hero.jpg";
+const LOGO_IMAGE_URL = "/logoEventify.png";
+
 const HERO_WORDS = [
   "Inolvidables",
   "Épicos",
@@ -37,7 +39,8 @@ function Landing() {
   const [featuredEvents, setFeaturedEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [highlightIndex, setHighlightIndex] = useState(0);
-  const [currentEventIndex, setCurrentEventIndex] = useState(1); // Start at the middle one if we have 3
+  const [currentEventIndex, setCurrentEventIndex] = useState(0);
+  const [loadingEvents, setLoadingEvents] = useState(true);
   const currentHeroWord = HERO_WORDS[highlightIndex];
 
   useEffect(() => {
@@ -47,17 +50,63 @@ function Landing() {
     return () => clearInterval(interval);
   }, []);
 
+  // Cargar eventos activos
   useEffect(() => {
-    async function loadFeaturedEvents() {
-      const events = await getEvents(() => setSelectedEvent(null));
-      // Ensure we have enough events for the carousel, or handle fewer
-      setFeaturedEvents(events.slice(0, 5)); // Get up to 5 events for better rotation
-      if (events.length > 0) {
-        setCurrentEventIndex(Math.floor(Math.min(events.length, 5) / 2));
+    const loadEvents = async () => {
+      try {
+        setLoadingEvents(true);
+        const events = await getEvents();
+        // Filtrar solo eventos activos
+        const activeEvents = events.filter(event => {
+          // Verificar si el evento tiene una fecha de inicio válida y es futura
+          if (event.date && event.date !== "Por definir") {
+            return true;
+          }
+          return true; // Por ahora mostrar todos, puedes ajustar la lógica
+        });
+        setFeaturedEvents(activeEvents);
+        setCurrentEventIndex(0);
+      } catch (error) {
+        console.error("Error al cargar eventos:", error);
+        setFeaturedEvents([]);
+      } finally {
+        setLoadingEvents(false);
       }
-    }
-    loadFeaturedEvents();
+    };
+
+    loadEvents();
   }, []);
+
+  // Navegación del carrusel
+  const handlePrevious = () => {
+    setCurrentEventIndex((prev) => 
+      prev === 0 ? featuredEvents.length - 1 : prev - 1
+    );
+  };
+
+  const handleNext = () => {
+    setCurrentEventIndex((prev) => 
+      prev === featuredEvents.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  // Obtener índices de los eventos a mostrar
+  const getEventIndex = (offset) => {
+    if (featuredEvents.length === 0) return null;
+    // Si solo hay 1 evento, solo mostrar el centro
+    if (featuredEvents.length === 1 && offset !== 0) return null;
+    // Si hay 2 eventos, solo mostrar izquierda y centro, o centro y derecha
+    if (featuredEvents.length === 2) {
+      if (offset === -1 && currentEventIndex === 0) return null;
+      if (offset === 1 && currentEventIndex === 1) return null;
+    }
+    const index = (currentEventIndex + offset + featuredEvents.length) % featuredEvents.length;
+    return index;
+  };
+
+  const leftEventIndex = getEventIndex(-1);
+  const centerEventIndex = featuredEvents.length > 0 ? currentEventIndex : null;
+  const rightEventIndex = getEventIndex(1);
 
   return (
     <div className={style.landingContainer}>
@@ -111,7 +160,7 @@ function Landing() {
                 />
               </div>
               <p>
-                Usado por <strong>+500 organizaciones estudiantiles</strong> en
+                Usado por <strong>+1 organizaciones estudiantiles</strong> en
                 Latam
               </p>
             </div>
@@ -218,72 +267,97 @@ function Landing() {
 
       {/* Sección de Eventos Destacados */}
       <section className={style.eventsShowcase}>
-        <div className={style.sectionHeader}>
-          <h2 className={style.sectionTitle}>Eventos Destacados</h2>
-          <p className={style.sectionSubtitle}>
-            Descubre los eventos más populares de la comunidad
+        <div className={style.showcaseHeader}>
+          <h2 className={style.showcaseTitle}>Eventos Destacados</h2>
+          <p className={style.showcaseSubtitle}>
+            Descubre los eventos más populares de tu campus
           </p>
         </div>
-
-
-        <div className={style.carouselContainer}>
-          <button
-            className={style.navButton}
-            onClick={() => setCurrentEventIndex(prev => (prev - 1 + featuredEvents.length) % featuredEvents.length)}
-            aria-label="Evento anterior"
-          >
-            <ChevronLeft size={24} />
-          </button>
-
-          <div className={style.carouselTrack}>
-            {featuredEvents.map((event, index) => {
-              // Calculate position relative to current index
-              let position = "hidden";
-              const total = featuredEvents.length;
-
-              // We want to show: prev, active, next
-              // But with circular logic.
-              // Simple approach for 3+ items:
-              // active is current
-              // prev is current - 1
-              // next is current + 1
-
-              const diff = (index - currentEventIndex + total) % total;
-
-              if (diff === 0) position = "active";
-              else if (diff === total - 1 || diff === -1) position = "prev";
-              else if (diff === 1) position = "next";
-              // For more than 3 items, others remain hidden or far back
-
-              return (
-                <div
-                  key={event.id}
-                  className={`${style.carouselCard} ${style[position]}`}
-                  onClick={() => {
-                    if (position === "prev") setCurrentEventIndex((currentEventIndex - 1 + total) % total);
-                    if (position === "next") setCurrentEventIndex((currentEventIndex + 1) % total);
-                  }}
-                >
-                  <EventCard {...event} />
-                </div>
-              );
-            })}
+        
+        {loadingEvents ? (
+          <div className={style.loadingContainer}>
+            <p>Cargando eventos...</p>
           </div>
-
-          <button
-            className={style.navButton}
-            onClick={() => setCurrentEventIndex(prev => (prev + 1) % featuredEvents.length)}
-            aria-label="Siguiente evento"
-          >
-            <ChevronRight size={24} />
-          </button>
-        </div>
-        <div className={style.showMoreContainer}>
-          <Link to="/searchPage" className={style.showMoreButton}>
-            Ver Todos los Eventos
-            <ArrowRight size={18} />
-          </Link>
-        </div>
+        ) : featuredEvents.length === 0 ? (
+          <div className={style.emptyContainer}>
+            <p>No hay eventos disponibles en este momento</p>
+          </div>
+        ) : (
+          <div className={style.carouselContainer}>
+            <button 
+              className={style.carouselButton} 
+              onClick={handlePrevious}
+              aria-label="Evento anterior"
+            >
+              <ChevronLeft size={32} />
+            </button>
+            
+            <div className={style.carouselContent}>
+              {/* Evento izquierda */}
+              {leftEventIndex !== null && (
+                <div className={`${style.carouselCard} ${style.carouselCardLeft}`}>
+                  <EventCard
+                    key={featuredEvents[leftEventIndex].id}
+                    {...featuredEvents[leftEventIndex]}
+                    handleImageTitleClick={() => {
+                      setSelectedEvent(featuredEvents[leftEventIndex].formattedDetailEvent);
+                    }}
+                  />
+                </div>
+              )}
+              
+              {/* Evento centro (principal) */}
+              {centerEventIndex !== null && (
+                <div className={`${style.carouselCard} ${style.carouselCardCenter}`}>
+                  <EventCard
+                    key={featuredEvents[centerEventIndex].id}
+                    {...featuredEvents[centerEventIndex]}
+                    handleImageTitleClick={() => {
+                      setSelectedEvent(featuredEvents[centerEventIndex].formattedDetailEvent);
+                    }}
+                  />
+                </div>
+              )}
+              
+              {/* Evento derecha */}
+              {rightEventIndex !== null && (
+                <div className={`${style.carouselCard} ${style.carouselCardRight}`}>
+                  <EventCard
+                    key={featuredEvents[rightEventIndex].id}
+                    {...featuredEvents[rightEventIndex]}
+                    handleImageTitleClick={() => {
+                      setSelectedEvent(featuredEvents[rightEventIndex].formattedDetailEvent);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+            
+            <button 
+              className={style.carouselButton} 
+              onClick={handleNext}
+              aria-label="Siguiente evento"
+            >
+              <ChevronRight size={32} />
+            </button>
+          </div>
+        )}
+        
+        {/* Indicadores de posición */}
+        {featuredEvents.length > 0 && (
+          <div className={style.carouselIndicators}>
+            {featuredEvents.map((_, index) => (
+              <button
+                key={index}
+                className={`${style.indicator} ${
+                  index === currentEventIndex ? style.indicatorActive : ""
+                }`}
+                onClick={() => setCurrentEventIndex(index)}
+                aria-label={`Ir al evento ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </section >
 
       {/* CTA Crear Eventos */}
@@ -323,9 +397,7 @@ function Landing() {
             </button>
           </div>
           <div className={style.ctaRight}>
-            <div className={style.ctaImagePlaceholder}>
-              <Calendar size={120} className={style.ctaPlaceholderIcon} />
-            </div>
+            <iframe src="https://lottie.host/embed/6abb92aa-9acc-4336-af9b-d5b4aa2a6df9/UYqzQ66MEd.lottie" className={style.ctaVideo}></iframe>
           </div>
         </div>
       </section >
@@ -334,9 +406,7 @@ function Landing() {
       < section className={style.aboutSection} >
         <div className={style.aboutContent}>
           <div className={style.aboutLeft}>
-            <div className={style.aboutImageContainer}>
-              <Globe size={80} className={style.aboutIcon} />
-            </div>
+            <img src={LOGO_IMAGE_URL} alt="Eventify Logo" className={style.aboutImageContainer}  />
           </div>
           <div className={style.aboutRight}>
             <h2 className={style.aboutTitle}>Sobre Eventify</h2>

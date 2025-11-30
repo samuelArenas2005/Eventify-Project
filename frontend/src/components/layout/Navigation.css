@@ -27,9 +27,10 @@ body.modo-oscuro {
 .NavBar {
   width: 100%;
   padding: 1rem 2rem; 
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
+  gap: 2rem;
   position: fixed;
   top: 0;
   left: 0;
@@ -58,10 +59,18 @@ body.modo-oscuro .NavBar.scrolled {
 .NavBarLogo {
   font-size: 1.5rem;
   font-weight: bold;
-  background: linear-gradient(90deg, #ff6ad5, #8a63f4);
+  background: var(--color-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.NavBarLogo:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #ff6ad5, #8a63f4);
+  -webkit-background-clip: text;
+  transition: all 0.3s ease-in-out;
 }
 
 /* --- BUSCADOR MINIMALISTA EN NAV --- */
@@ -139,11 +148,19 @@ body.modo-oscuro .NavBar.scrolled {
 
 /* --- NUEVA ESTRUCTURA DERECHA (LA CLAVE) --- */
 
+/* Contenedor central para botones de navegación */
+.nav-centro {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Contenedor para TODOS los elementos de la derecha */
 .nav-derecha {
   display: flex;
   align-items: center;
   gap: 1.5rem; /* Espacio entre el ícono de tema y el grupo de usuario */
+  justify-content: flex-end;
 }
 
 /* Contenedor específico para los controles del usuario (notificaciones, menú, avatar) */
@@ -198,6 +215,11 @@ body.modo-oscuro .NavBar.scrolled {
   color: var(--color-primary);
 }
 
+/* Contenedor del avatar con posición relativa para el status indicator */
+.profileImageContainer {
+  position: relative;
+  display: inline-block;
+}
 
 .profileAvatar {
   width: 50px;
@@ -209,24 +231,25 @@ body.modo-oscuro .NavBar.scrolled {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
-  gap: 5px;
 }
 
 .profileAvatar:hover {
   transform: translateY(-3px) scale(1.05);
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
 }
+
 .statusIndicator {
   position: absolute;
-  bottom: 8px;
-  right: 30px;
-  width: 20px;
-  height: 20px;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
   background-color: #10B981;
-  border: 3px solid #ffffff;
+  border: 2px solid #ffffff;
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   animation: pulse 2s infinite;
+  z-index: 10;
 }
 .profileInitials {
   width: 50px;
@@ -242,11 +265,24 @@ body.modo-oscuro .NavBar.scrolled {
   box-shadow: 0 8px 25px rgba(225, 29, 158, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  border: 4px solid #ffffff;
 }
 
 .profileInitials:hover {
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 12px 35px rgba(225, 29, 158, 0.4);
+}
+
+/* Animación de pulso para el status indicator */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
 }
 
 
@@ -325,6 +361,51 @@ body.modo-oscuro .menu-divider {
 }
 
 
+/* Contenedor para botones de navegación desktop */
+.desktop-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Botones de navegación */
+.nav-link-button {
+  font-family: 'Poppins', sans-serif;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--border-radius-md);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: inline-block;
+  position: relative;
+}
+
+.nav-link-button:hover {
+  color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.nav-link-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--color-primary);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-link-button:hover::after {
+  width: 80%;
+}
+
 /* Contenedor para botones desktop */
 .desktop-buttons {
   display: flex;
@@ -370,6 +451,14 @@ body.modo-oscuro .menu-divider {
 
 /* Ocultar botones desktop en móviles */
 @media (max-width: 768px) {
+  .NavBar {
+    grid-template-columns: auto 1fr auto;
+  }
+  
+  .nav-centro {
+    display: none;
+  }
+  
   .desktop-buttons {
     display: none;
   }

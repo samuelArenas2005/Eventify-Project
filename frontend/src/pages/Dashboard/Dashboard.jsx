@@ -510,7 +510,7 @@ const UserProfileDashboard = ({ user }) => {
       </header>
 
       {/* --- Sección de Estadísticas (Sin cambios) --- */}
-      <section className={styles.statsSection}>
+      {/* <section className={styles.statsSection}>
         <div className={styles.statCard}>
           <div className={styles.statInfo}>
             <span>Eventos Asistidos</span>
@@ -538,7 +538,7 @@ const UserProfileDashboard = ({ user }) => {
             <Star size={25} />
           </div>
         </div>
-      </section>
+      </section> */}
 
       <nav className={styles.tabsNav}>
         <button

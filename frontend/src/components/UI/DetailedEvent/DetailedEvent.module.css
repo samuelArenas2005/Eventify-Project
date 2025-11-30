@@ -342,24 +342,15 @@
 }
 
 .registerButton { 
-  background: linear-gradient(135deg, var(--color-success), #20c997);
-}
-.registerButton:hover {
-  background: linear-gradient(135deg, #20c997, var(--color-success));
+  background: var(--color-success);
 }
 
 .editButton { 
-  background: linear-gradient(135deg, var(--color-warning), #ff9800);
-}
-.editButton:hover {
-  background: linear-gradient(135deg, #ff9800, var(--color-warning));
+  background: var(--color-warning);
 }
 
 .deleteButton { 
-  background: linear-gradient(135deg, var(--color-danger), #e53935);
-}
-.deleteButton:hover {
-  background: linear-gradient(135deg, #e53935, var(--color-danger));
+  background: var(--color-danger);
 }
 
 /* --- Responsive Design --- */
