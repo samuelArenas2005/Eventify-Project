@@ -122,7 +122,7 @@ export const getCategories = async () => {
 		return [];
 	}
 }
-
+//Nuevoo
 export const getEventById = async (eventId) => {
 	try {
 		const response = await axios.get(`${BASE_URL}event/events/${eventId}/`, { withCredentials: true });
@@ -223,14 +223,14 @@ export const markNotificationAsRead = async (notificationId) => {
 }
 
 export const getEventAttendees = async (eventId) => {
-  try {
-    const response = await axios.get(
-      `${BASE_URL}event/events/${eventId}/attendees/`,
-      { withCredentials: true }
-    );
-    return response.data; // Array de EventAttendee
-  } catch (error) {
-    console.error("Error obteniendo inscritos del evento:", error);
-    throw error;
-  }
+	try {
+		const response = await axios.get(
+			`${BASE_URL}event/events/${eventId}/attendees/`,
+			{ withCredentials: true }
+		);
+		return response.data; // Array de EventAttendee
+	} catch (error) {
+		console.error("Error obteniendo inscritos del evento:", error);
+		throw error;
+	}
 };
