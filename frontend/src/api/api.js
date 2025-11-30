@@ -211,3 +211,45 @@ export const markNotificationAsRead = async (notificationId) => {
 		return false;
 	}
 }
+
+/* LLAMADAS PARA ESTADISTICAS EN ADMIN */
+
+export const getDailyEventsCreated = (startDate, endDate) => {
+	return axios.get(`${BASE_URL}event/analytics/events-per-day/`, {
+		params: { start_date: startDate, end_date: endDate },
+		withCredentials: true,
+	});
+}
+
+export const getDailyRegisteredUsers = (startDate, endDate) => {
+	return axios.get(`${BASE_URL}user/users/analytics/daily-registrations/`, {
+		params: { start_date: startDate, end_date: endDate },
+		withCredentials: true,
+	});
+}
+
+export const getTotalUsersCount = () => {
+	return axios.get(`${BASE_URL}user/users/analytics/total-users/`, {
+		withCredentials: true,
+	});
+}
+
+/* LLAMADAS RELACIONADAS CON ADMINISTRACION DE USUARIOS */
+
+export const promoteAdminByCedula = (cedula) => {
+	return axios.post(
+		`${BASE_URL}user/users/admin/promote-by-cedula/`,
+		{ cedula },
+		{ withCredentials: true }
+	);
+}
+
+export const getUserByCedula = (cedula) => {
+	return axios.get(`${BASE_URL}user/users/lookup/by-cedula/`, {
+		params: { cedula },
+		withCredentials: true,
+	});
+}
+
+
+

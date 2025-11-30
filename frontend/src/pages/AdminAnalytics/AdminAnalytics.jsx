@@ -1,13 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Users, Calendar, UserPlus } from "lucide-react";
 import AnalyticsLayout from "../../components/Analytics/layout/AnalyticsLayout";
 import AdminAnalyticsHeader from "../../components/Analytics/headers/AdminAnalyticsHeader";
 import TimeSeriesChart from "../../components/Analytics/charts/TimeSeriesChart";
 import AddAdminView from "../../components/Analytics/views/AddAdminView";
+import {
+  getDailyEventsCreated,
+  getDailyRegisteredUsers,
+  getTotalUsersCount,
+} from "../../api/api";
+
+const EVENT_RANGE_OPTIONS = [
+  { id: "7", label: "Última semana", days: 7 },
+  { id: "30", label: "Último mes", days: 30 },
+  { id: "90", label: "Últimos 3 meses", days: 90 },
+];
+
+const formatNumber = (value) =>
+  new Intl.NumberFormat("es-ES").format(Number(value || 0));
 
 const AdminAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
   const [adminSearchId, setAdminSearchId] = useState("");
+  const [usersRange, setUsersRange] = useState(EVENT_RANGE_OPTIONS[0].id);
+  const [usersChartData, setUsersChartData] = useState([]);
+  const [usersStats, setUsersStats] = useState([]);
+  const [eventsRange, setEventsRange] = useState(EVENT_RANGE_OPTIONS[0].id);
+  const [eventsChartData, setEventsChartData] = useState([]);
+  const [eventsStats, setEventsStats] = useState([]);
 
   // Opciones del menú
   const menuItems = [
@@ -28,87 +48,163 @@ const AdminAnalytics = () => {
     },
   ];
 
-  // Datos falsos para usuarios registrados
-  const usersChartData = [
-    { label: "15 Nov", value: 12 },
-    { label: "16 Nov", value: 18 },
-    { label: "17 Nov", value: 15 },
-    { label: "18 Nov", value: 22 },
-    { label: "19 Nov", value: 28 },
-    { label: "20 Nov", value: 35 },
-    { label: "21 Nov", value: 30 },
-    { label: "22 Nov", value: 42 },
-    { label: "23 Nov", value: 48 },
-    { label: "24 Nov", value: 45 },
-    { label: "25 Nov", value: 52 },
-    { label: "26 Nov", value: 58 },
-    { label: "27 Nov", value: 55 },
-    { label: "28 Nov", value: 65 },
-  ];
+  const selectedUsersRangeConfig = useMemo(() => {
+    return (
+      EVENT_RANGE_OPTIONS.find((option) => option.id === usersRange) ||
+      EVENT_RANGE_OPTIONS[0]
+    );
+  }, [usersRange]);
 
-  const usersStats = [
-    {
-      label: "Total Usuarios",
-      value: "1,248",
-      trend: { positive: true, text: "+18% este mes" },
-    },
-    {
-      label: "Nuevos Hoy",
-      value: "65",
-      trend: { positive: true, text: "+12% vs ayer" },
-    },
-    {
-      label: "Usuarios Activos",
-      value: "892",
-      trend: { positive: true, text: "71% del total" },
-    },
-    {
-      label: "Tasa de Retención",
-      value: "84%",
-      trend: { positive: true, text: "+3%" },
-    },
-  ];
+  const selectedEventsRangeConfig = useMemo(() => {
+    return (
+      EVENT_RANGE_OPTIONS.find((option) => option.id === eventsRange) ||
+      EVENT_RANGE_OPTIONS[0]
+    );
+  }, [eventsRange]);
 
-  // Datos falsos para eventos creados
-  const eventsChartData = [
-    { label: "15 Nov", value: 8 },
-    { label: "16 Nov", value: 12 },
-    { label: "17 Nov", value: 10 },
-    { label: "18 Nov", value: 15 },
-    { label: "19 Nov", value: 18 },
-    { label: "20 Nov", value: 22 },
-    { label: "21 Nov", value: 20 },
-    { label: "22 Nov", value: 25 },
-    { label: "23 Nov", value: 28 },
-    { label: "24 Nov", value: 26 },
-    { label: "25 Nov", value: 32 },
-    { label: "26 Nov", value: 35 },
-    { label: "27 Nov", value: 30 },
-    { label: "28 Nov", value: 38 },
-  ];
+  useEffect(() => {
+    const fetchUsersAnalytics = async () => {
+      const endDate = new Date();
+      const startDate = new Date();
+      const days = selectedUsersRangeConfig.days;
+      startDate.setDate(endDate.getDate() - (days - 1));
 
-  const eventsStats = [
-    {
-      label: "Total Eventos",
-      value: "436",
-      trend: { positive: true, text: "+22% este mes" },
-    },
-    {
-      label: "Creados Hoy",
-      value: "38",
-      trend: { positive: true, text: "+15% vs ayer" },
-    },
-    {
-      label: "Eventos Activos",
-      value: "284",
-      trend: { positive: true, text: "65% del total" },
-    },
-    {
-      label: "Tasa de Finalización",
-      value: "92%",
-      trend: { positive: true, text: "+5%" },
-    },
-  ];
+      const previousPeriodEnd = new Date(startDate);
+      previousPeriodEnd.setDate(previousPeriodEnd.getDate() - 1);
+      const previousPeriodStart = new Date(previousPeriodEnd);
+      previousPeriodStart.setDate(previousPeriodStart.getDate() - (days - 1));
+
+      try {
+        const [currentResponse, previousResponse, totalsResponse] =
+          await Promise.all([
+            getDailyRegisteredUsers(
+              startDate.toISOString(),
+              endDate.toISOString()
+            ),
+            getDailyRegisteredUsers(
+              previousPeriodStart.toISOString(),
+              previousPeriodEnd.toISOString()
+            ),
+            getTotalUsersCount(),
+          ]);
+
+        const dailyData = currentResponse?.data ?? {};
+        const previousData = previousResponse?.data ?? {};
+        const totalsData = totalsResponse?.data ?? {};
+
+        const normalizedSeries = (dailyData.series ?? []).map((item) => ({
+          label: item.label,
+          value: item.value,
+        }));
+
+        setUsersChartData(normalizedSeries);
+
+        const totalUsers = Number(totalsData.total_users ?? 0);
+        const periodRegistrations = Number(dailyData.total_users_period ?? 0);
+        const previousPeriodRegistrations = Number(
+          previousData.total_users_period ?? 0
+        );
+
+        const periodDiff = periodRegistrations - previousPeriodRegistrations;
+        const trendText = `${periodDiff >= 0 ? "+" : "-"}${formatNumber(
+          Math.abs(periodDiff)
+        )} vs periodo anterior`;
+
+        setUsersStats([
+          {
+            label: "Usuarios Totales",
+            value: formatNumber(totalUsers),
+            trend: {
+              positive: true,
+              text: "Histórico acumulado",
+            },
+          },
+          {
+            label: `Usuarios nuevos (${selectedUsersRangeConfig.label})`,
+            value: formatNumber(periodRegistrations),
+            trend: {
+              positive: periodDiff >= 0,
+              text: trendText,
+            },
+          },
+        ]);
+      } catch (error) {
+        console.error("Error fetching user analytics:", error);
+      }
+    };
+
+    fetchUsersAnalytics();
+  }, [selectedUsersRangeConfig]);
+
+  useEffect(() => {
+    const fetchEventsAnalytics = async () => {
+      const endDate = new Date();
+      const startDate = new Date();
+      const days = selectedEventsRangeConfig.days;
+      startDate.setDate(endDate.getDate() - (days - 1));
+
+      const previousPeriodEnd = new Date(startDate);
+      previousPeriodEnd.setDate(previousPeriodEnd.getDate() - 1);
+      const previousPeriodStart = new Date(previousPeriodEnd);
+      previousPeriodStart.setDate(previousPeriodStart.getDate() - (days - 1));
+
+      try {
+        const [currentResponse, previousResponse] = await Promise.all([
+          getDailyEventsCreated(startDate.toISOString(), endDate.toISOString()),
+          getDailyEventsCreated(
+            previousPeriodStart.toISOString(),
+            previousPeriodEnd.toISOString()
+          ),
+        ]);
+
+        const currentData = currentResponse?.data ?? {};
+        const previousData = previousResponse?.data ?? {};
+
+        const normalizedSeries = (currentData.series ?? []).map((item) => ({
+          label: item.label,
+          value: item.value,
+        }));
+
+        setEventsChartData(normalizedSeries);
+
+        const totalEvents = currentData.total_events ?? 0;
+        const finishedEvents = currentData.finished_events_count ?? 0;
+        const previousTotal = previousData.total_events ?? 0;
+        const previousFinished = previousData.finished_events_count ?? 0;
+
+        const totalDiff = totalEvents - previousTotal;
+        const finishedDiff = finishedEvents - previousFinished;
+
+        const buildTrendText = (diff) => {
+          const sign = diff >= 0 ? "+" : "-";
+          return `${sign}${Math.abs(diff)} vs periodo anterior`;
+        };
+
+        setEventsStats([
+          {
+            label: "Eventos Creados",
+            value: totalEvents.toString(),
+            trend: {
+              positive: totalDiff >= 0,
+              text: buildTrendText(totalDiff),
+            },
+          },
+          {
+            label: "Eventos Finalizados",
+            value: finishedEvents.toString(),
+            trend: {
+              positive: finishedDiff >= 0,
+              text: buildTrendText(finishedDiff),
+            },
+          },
+        ]);
+      } catch (error) {
+        console.error("Error fetching events analytics:", error);
+      }
+    };
+
+    fetchEventsAnalytics();
+  }, [selectedEventsRangeConfig]);
 
   const renderContent = () => {
     if (activeView === "users") {
@@ -116,8 +212,11 @@ const AdminAnalytics = () => {
         <TimeSeriesChart
           data={usersChartData}
           title="Usuarios Registrados por Día"
-          subtitle="Últimos 14 días"
+          subtitle={selectedUsersRangeConfig.label}
           stats={usersStats}
+          rangeOptions={EVENT_RANGE_OPTIONS}
+          selectedRange={usersRange}
+          onRangeChange={setUsersRange}
         />
       );
     }
@@ -126,8 +225,11 @@ const AdminAnalytics = () => {
         <TimeSeriesChart
           data={eventsChartData}
           title="Eventos Creados por Día"
-          subtitle="Últimos 14 días"
+          subtitle={selectedEventsRangeConfig.label}
           stats={eventsStats}
+          rangeOptions={EVENT_RANGE_OPTIONS}
+          selectedRange={eventsRange}
+          onRangeChange={setEventsRange}
         />
       );
     }

@@ -1,13 +1,17 @@
 # views.py
 from django.db.models import Count, Prefetch
+from django.db.models.functions import TruncDate
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, JsonResponse
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 import json
 import base64
 from openai import OpenAI
@@ -303,6 +307,98 @@ class AllCreatedEventsList(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Event.objects.filter(creator=user)
+
+
+class EventDailyCreatedCountView(APIView):
+    """Devuelve conteos diarios de eventos creados entre dos fechas para Analytics."""
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def get(self, request):
+        start_param = request.query_params.get('start_date')
+        end_param = request.query_params.get('end_date')
+
+        if not start_param or not end_param:
+            raise ValidationError({'detail': 'start_date y end_date son obligatorios (ISO 8601).'})
+
+        start_dt = parse_datetime(start_param)
+        end_dt = parse_datetime(end_param)
+        if not start_dt or not end_dt:
+            raise ValidationError({'detail': 'Formato de fecha inválido. Usa ISO 8601, ej: 2024-11-01T00:00:00Z.'})
+
+        tz = timezone.get_current_timezone()
+        if timezone.is_naive(start_dt):
+            start_dt = timezone.make_aware(start_dt, tz)
+        if timezone.is_naive(end_dt):
+            end_dt = timezone.make_aware(end_dt, tz)
+
+        if end_dt < start_dt:
+            raise ValidationError({'detail': 'end_date debe ser mayor o igual a start_date.'})
+
+        daily_counts = (
+            Event.objects
+            .filter(created_at__range=(start_dt, end_dt))
+            .annotate(day=TruncDate('created_at'))
+            .values('day')
+            .order_by('day')
+            .annotate(count=Count('id'))
+        )
+
+        counts_map = {entry['day']: entry['count'] for entry in daily_counts}
+
+        current_day = start_dt.date()
+        end_day = end_dt.date()
+        data = []
+        total = 0
+        while current_day <= end_day:
+            count = counts_map.get(current_day, 0)
+            total += count
+            data.append({
+                'label': current_day.strftime('%d %b'),
+                'date': current_day.isoformat(),
+                'value': count,
+            })
+            current_day += timedelta(days=1)
+
+        now = timezone.now()
+
+        finished_period_end = end_dt if end_dt <= now else now
+
+        finished_events_qs = (
+            Event.objects
+            .filter(
+                end_date__gte=start_dt,
+                end_date__lte=finished_period_end
+            )
+            .select_related('category', 'creator')
+        )
+
+        finished_events = [
+            {
+                'id': event.id,
+                'title': event.title,
+                'start_date': event.start_date.isoformat(),
+                'end_date': event.end_date.isoformat(),
+                'category': event.category.name if event.category else None,
+                'creator_id': event.creator_id,
+            }
+            for event in finished_events_qs
+        ]
+
+        ongoing_events_total = (
+            Event.objects
+            .exclude(status=Event.CANCELLED)
+            .filter(end_date__gte=now)
+            .count()
+        )
+
+        return Response({
+            'start_date': start_dt.isoformat(),
+            'end_date': end_dt.isoformat(),
+            'total_events': total,
+            'series': data,
+            'finished_events_count': len(finished_events),
+            'ongoing_events_total': ongoing_events_total,
+        })
 
 class ConfirmEventRegistrationView(APIView):
     permission_classes = [permissions.IsAuthenticated]
