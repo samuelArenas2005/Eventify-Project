@@ -198,6 +198,20 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def attendees(self, request, pk=None):
+        """
+        GET /api/event/events/{pk}/attendees/ -> lista de usuarios inscritos al evento {pk}, osea a la id
+        """
+        event = self.get_object()
+        qs = (
+            EventAttendee.objects
+            .select_related('user')
+            .filter(event=event)
+        )
+        serializer = EventAttendeeSerializer(qs, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
     """

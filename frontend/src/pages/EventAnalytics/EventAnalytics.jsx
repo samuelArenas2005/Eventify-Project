@@ -1,13 +1,20 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import { Users, TrendingUp, MessageCircle } from "lucide-react";
 import AnalyticsLayout from "../../components/Analytics/layout/AnalyticsLayout";
 import EventAnalyticsHeader from "../../components/Analytics/headers/EventAnalyticsHeader";
 import UserListView from "../../components/Analytics/views/UserListView";
 import TimeSeriesChart from "../../components/Analytics/charts/TimeSeriesChart";
 import CommentsPlaceholder from "../../components/Analytics/views/CommentsPlaceholder";
+import { Edit } from 'lucide-react';
+import { Pencil } from 'lucide-react';
+import ModifyEventView from "../../components/Analytics/views/modifyEventView";
 
 const EventAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
+
+  // Imprimir el eventId en consola
+
 
   // Datos del evento
   const eventData = {
@@ -19,6 +26,11 @@ const EventAnalytics = () => {
 
   // Opciones del menú
   const menuItems = [
+    {
+      id: "Modificar_evento",
+      icon: <Pencil size={20} />,
+      label: "Modificar evento",
+    },
     {
       id: "users",
       icon: <Users size={20} />,
@@ -33,7 +45,8 @@ const EventAnalytics = () => {
       id: "comments",
       icon: <MessageCircle size={20} />,
       label: "Comentarios",
-    },
+    }
+
   ];
 
   // Datos falsos para la lista de usuarios
@@ -153,6 +166,9 @@ const EventAnalytics = () => {
     }
     if (activeView === "comments") {
       return <CommentsPlaceholder />;
+    }
+    if (activeView === "Modificar_evento") {
+      return <ModifyEventView />
     }
     return null;
   };

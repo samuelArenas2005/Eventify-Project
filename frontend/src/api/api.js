@@ -123,6 +123,16 @@ export const getCategories = async () => {
 	}
 }
 
+export const getEventById = async (eventId) => {
+	try {
+		const response = await axios.get(`${BASE_URL}event/events/${eventId}/`, { withCredentials: true });
+		return response.data;
+	} catch (error) {
+		console.error("Error en getEventById:", error);
+		return null;
+	}
+}
+
 export const getAllEvents = async () => {
 	try {
 		const response = await axios.get(`${BASE_URL}event/active/`, { withCredentials: true });
@@ -158,18 +168,18 @@ export const confirmAttendance = async (eventId, status = 'CONFIRMED') => {
 }
 
 export const confirmEventRegistration = async (eventId) => {
-  try {
-    // Enviar cuerpo vacío y configuración aparte
-    const response = await axios.post(
-      `${BASE_URL}event/register/confirm/${eventId}/`,
-      {},                       // cuerpo (vacío)
-      { withCredentials: true } // configuración (cookies)
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error confirmando registro:", error);
-    throw error.response?.data ?? error;
-  }
+	try {
+		// Enviar cuerpo vacío y configuración aparte
+		const response = await axios.post(
+			`${BASE_URL}event/register/confirm/${eventId}/`,
+			{},                       // cuerpo (vacío)
+			{ withCredentials: true } // configuración (cookies)
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error confirmando registro:", error);
+		throw error.response?.data ?? error;
+	}
 };
 
 export const getUserNotifications = async () => {
@@ -211,6 +221,19 @@ export const markNotificationAsRead = async (notificationId) => {
 		return false;
 	}
 }
+
+export const getEventAttendees = async (eventId) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}event/events/${eventId}/attendees/`,
+      { withCredentials: true }
+    );
+    return response.data; // Array de EventAttendee
+  } catch (error) {
+    console.error("Error obteniendo inscritos del evento:", error);
+    throw error;
+  }
+};
 
 /* LLAMADAS PARA ESTADISTICAS EN ADMIN */
 
