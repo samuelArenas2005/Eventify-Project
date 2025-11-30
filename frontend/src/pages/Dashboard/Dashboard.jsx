@@ -498,6 +498,7 @@ const UserProfileDashboard = ({ user }) => {
                 {...event}
                 handleQRCodeClick={() => handleQRCodeClick(event)}
                 handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                handleImageTitleClick={() => console.log(`putas`)}
               />
             ))}
           </div>
