@@ -64,13 +64,18 @@ const EventDashboard = ({
       address: "",
       venueInfo: "",
       capacity: "",
-      category: initialData?.category,
+      category: "",
     },
   });
 
   // Efecto para cargar datos iniciales en modo edición
   useEffect(() => {
-    if (isEditMode && initialData) {
+    if (initialData && categories.length > 0) {
+      // Convertir category a string para que coincida con los valores de las opciones
+      const categoryValue = initialData.category 
+        ? String(initialData.category) 
+        : "";
+      
       reset({
         title: initialData.title || "",
         description: initialData.description || "",
@@ -81,7 +86,7 @@ const EventDashboard = ({
         address: initialData.address || "",
         venueInfo: initialData.venueInfo || "",
         capacity: initialData.capacity || "",
-        category: initialData.category,
+        category: categoryValue,
       });
 
       // Cargar imágenes si existen en initialData
@@ -93,7 +98,7 @@ const EventDashboard = ({
         }
       }
     }
-  }, [isEditMode, initialData, reset]);
+  }, [initialData, categories, reset]);
 
   // 👇💡 Aquí agregas el useEffect
   const formValues = watch();
@@ -622,11 +627,10 @@ const EventDashboard = ({
                     {...register("category", {
                       required: "Debes elegir una categoría",
                     })}
-                    defaultValue={initialData?.category ?? ""}
                   >
                     <option value="">Selecciona una...</option>
                     {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id} >
+                      <option key={cat.id} value={String(cat.id)} >
                         {cat.name}
                       </option>
                     ))}
