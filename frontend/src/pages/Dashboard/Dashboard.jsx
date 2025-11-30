@@ -1,25 +1,48 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import styles from './Dashboard.module.css';
-import EventCard from '../../components/UI/EventCard/EventCard';
-import { Edit, ChartColumnBig, Calendar, User, Star, Filter, CirclePlus, Plus, CalendarCheck2, X, ChevronDown, CheckCircle2, FileText, XCircle, Archive } from 'lucide-react';
-import { getRegisteredEvents, getPendingEvents, getCreatedEvent } from './GetEventsData';
-import { getAllRegisteredEventsCount, getAllCreatedEventsCount } from '../../api/api';
-import EventDashboard from '../../components/UI/EventCreate/EventForm'
-import Loanding from '../../components/UI/Loanding/Loanding';
-import ModalQr from '../../components/UI/modalQR/ModalQr';
-import ScanQr from '../../components/UI/ScanQr/ScanQr';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import styles from "./Dashboard.module.css";
+import EventCard from "../../components/UI/EventCard/EventCard";
+import {
+  Edit,
+  ChartColumnBig,
+  Calendar,
+  User,
+  Star,
+  Filter,
+  CirclePlus,
+  Plus,
+  CalendarCheck2,
+  X,
+  ChevronDown,
+  CheckCircle2,
+  FileText,
+  XCircle,
+  Archive,
+} from "lucide-react";
+import {
+  getRegisteredEvents,
+  getPendingEvents,
+  getCreatedEvent,
+} from "./GetEventsData";
+import {
+  getAllRegisteredEventsCount,
+  getAllCreatedEventsCount,
+} from "../../api/api";
+import EventDashboard from "../../components/UI/EventCreate/EventForm";
+import Loanding from "../../components/UI/Loanding/Loanding";
+import ModalQr from "../../components/UI/modalQR/ModalQr";
+import ScanQr from "../../components/UI/ScanQr/ScanQr";
 
 const historyData = [];
 
 // --- Componente Principal ---
 const UserProfileDashboard = ({ user }) => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('registrados');
+  const [activeTab, setActiveTab] = useState("registrados");
   const [loading, setLoading] = useState(true);
-  const [registeredEventsData, setregisteredEventsData] = useState([])
-  const [pendingEventData, setpendingEventData] = useState([])
-  const [myEventsData, setMyEventsData] = useState([])
+  const [registeredEventsData, setregisteredEventsData] = useState([]);
+  const [pendingEventData, setpendingEventData] = useState([]);
+  const [myEventsData, setMyEventsData] = useState([]);
   const [totalRegisteredCount, setTotalRegisteredCount] = useState(0);
   const [totalCreatedCount, setTotalCreatedCount] = useState(0);
   const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
@@ -28,14 +51,18 @@ const UserProfileDashboard = ({ user }) => {
   const [selectedEventForQR, setSelectedEventForQR] = useState(null);
   const [isScanQRModalOpen, setIsScanQRModalOpen] = useState(false);
   const [selectedEventForScan, setSelectedEventForScan] = useState(null);
-  
+
   // Estados para filtros de "Mis Eventos"
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedStatusFilter, setSelectedStatusFilter] = useState("");
 
-  const FullName = user ? `${user.name} ${user.last_name}` : 'Usuario';
-  const initials = user ? `${user.name.charAt(0)}${user.last_name.charAt(0)}` : 'UU';
-  const dateRegister = user ? `${user.date_joined.substring(0, 4)}` : 'fecha no disponible';
+  const FullName = user ? `${user.name} ${user.last_name}` : "Usuario";
+  const initials = user
+    ? `${user.name.charAt(0)}${user.last_name.charAt(0)}`
+    : "UU";
+  const dateRegister = user
+    ? `${user.date_joined.substring(0, 4)}`
+    : "fecha no disponible";
 
   const hardRefresh = () => {
     window.location.reload(true);
@@ -59,7 +86,6 @@ const UserProfileDashboard = ({ user }) => {
     setIsCreatePanelOpen(true);
   };
 
-
   // Iniciar cierre: quitar estado 'open' y marcar 'closing' para permitir la animación
   const closeCreatePanel = () => {
     // marcar como no abierto y como cerrándose
@@ -68,7 +94,7 @@ const UserProfileDashboard = ({ user }) => {
 
     setTimeout(() => {
       setIsCreatePanelClosing(false);
-      setActiveTab('misEventos');
+      setActiveTab("misEventos");
     }, 220);
   };
 
@@ -76,7 +102,7 @@ const UserProfileDashboard = ({ user }) => {
   const handleQRCodeClick = (event) => {
     setSelectedEventForQR({
       id: event.id,
-      title: event.title
+      title: event.title,
     });
     setIsQRModalOpen(true);
   };
@@ -91,7 +117,7 @@ const UserProfileDashboard = ({ user }) => {
   const handleReadQrCodeClick = (event) => {
     setSelectedEventForScan({
       id: event.id,
-      title: event.title
+      title: event.title,
     });
     setIsScanQRModalOpen(true);
   };
@@ -103,7 +129,6 @@ const UserProfileDashboard = ({ user }) => {
   };
 
   console.log(user);
-
 
   useEffect(() => {
     async function loadEvents() {
@@ -117,17 +142,17 @@ const UserProfileDashboard = ({ user }) => {
       const allCreated = await getAllCreatedEventsCount();
 
       setLoading(false);
-      setregisteredEventsData(Registerdata)
-      setpendingEventData(PendingData)
-      setMyEventsData(CreatedData)
+      setregisteredEventsData(Registerdata);
+      setpendingEventData(PendingData);
+      setMyEventsData(CreatedData);
       setTotalRegisteredCount(allRegistered.data.length);
-      
+
       // Contar solo eventos ACTIVE y FINISHED (no DRAFT ni CANCELLED)
       const activeAndFinishedCount = allCreated.data.filter(
-        event => event.status === 'ACTIVE' || event.status === 'FINISHED'
+        (event) => event.status === "ACTIVE" || event.status === "FINISHED"
       ).length;
       setTotalCreatedCount(activeAndFinishedCount);
-      console.log(user)
+      console.log(user);
     }
 
     loadEvents();
@@ -137,16 +162,16 @@ const UserProfileDashboard = ({ user }) => {
 
   // Función para obtener eventos filtrados por status
   const getEventsByStatus = (status) => {
-    return myEventsData.filter(event => event.status === status);
+    return myEventsData.filter((event) => event.status === status);
   };
 
   // Función para obtener el nombre traducido del status
   const getStatusLabel = (status) => {
     const statusMap = {
-      'ACTIVE': 'Activos',
-      'DRAFT': 'Borradores',
-      'CANCELLED': 'Cancelados',
-      'FINISHED': 'Finalizados'
+      ACTIVE: "Activos",
+      DRAFT: "Borradores",
+      CANCELLED: "Cancelados",
+      FINISHED: "Finalizados",
     };
     return statusMap[status] || status;
   };
@@ -154,13 +179,13 @@ const UserProfileDashboard = ({ user }) => {
   // Función para obtener el icono del status
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'ACTIVE':
+      case "ACTIVE":
         return CheckCircle2;
-      case 'DRAFT':
+      case "DRAFT":
         return FileText;
-      case 'CANCELLED':
+      case "CANCELLED":
         return XCircle;
-      case 'FINISHED':
+      case "FINISHED":
         return Archive;
       default:
         return Calendar;
@@ -185,57 +210,63 @@ const UserProfileDashboard = ({ user }) => {
     if (!selectedStatusFilter) {
       return myEventsData;
     }
-    return myEventsData.filter(event => event.status === selectedStatusFilter);
+    return myEventsData.filter(
+      (event) => event.status === selectedStatusFilter
+    );
   };
 
   const renderContent = () => {
-    let title = '';
+    let title = "";
     let data = [];
-    let emptyMessage = '';
-    let type = ''
+    let emptyMessage = "";
+    let type = "";
 
     switch (activeTab) {
-      case 'registrados':
+      case "registrados":
         title = `Eventos Registrados (${registeredEventsData.length})`;
         data = registeredEventsData;
-        emptyMessage = 'No estás registrado en ningún evento.';
+        emptyMessage = "No estás registrado en ningún evento.";
         break;
-      case 'megustas':
+      case "megustas":
         title = `Eventos que te interesan (${pendingEventData.length})`;
         data = pendingEventData;
-        emptyMessage = 'No te gusta ningún evento.';
+        emptyMessage = "No te gusta ningún evento.";
         break;
-      case 'misEventos':
+      case "misEventos":
         title = `Mis Eventos (${myEventsData.length})`;
         data = myEventsData;
-        emptyMessage = 'No has creado ningún evento.';
-        type = 'myevent'
+        emptyMessage = "No has creado ningún evento.";
+        type = "myevent";
         break;
-      case 'historial':
+      case "historial":
         title = `Historial (${historyData.length})`;
         data = historyData;
-        emptyMessage = 'No tienes eventos en tu historial.';
+        emptyMessage = "No tienes eventos en tu historial.";
         break;
       default:
         return null;
     }
 
     // Render especial para "Mis Eventos" con secciones por status
-    if (type === 'myevent') {
-      const activeEvents = getEventsByStatus('ACTIVE');
-      const draftEvents = getEventsByStatus('DRAFT');
-      const cancelledEvents = getEventsByStatus('CANCELLED');
-      const finishedEvents = getEventsByStatus('FINISHED');
-      
+    if (type === "myevent") {
+      const activeEvents = getEventsByStatus("ACTIVE");
+      const draftEvents = getEventsByStatus("DRAFT");
+      const cancelledEvents = getEventsByStatus("CANCELLED");
+      const finishedEvents = getEventsByStatus("FINISHED");
+
       const filteredEvents = getFilteredEvents();
-      const shouldShowFiltered = selectedStatusFilter && filteredEvents.length > 0;
+      const shouldShowFiltered =
+        selectedStatusFilter && filteredEvents.length > 0;
 
       return (
         <>
           <div className={styles.contentHeader}>
             <h2 className={styles.contentTitle}>{title}</h2>
             <div className={styles.viewOptions}>
-              <button onClick={openCreatePanel} className={`${styles.actionButton} ${styles.createButton}`}>
+              <button
+                onClick={openCreatePanel}
+                className={`${styles.actionButton} ${styles.createButton}`}
+              >
                 <Plus size={16} />
               </button>
               <div className={styles.filterContainer}>
@@ -256,7 +287,10 @@ const UserProfileDashboard = ({ user }) => {
                   >
                     <div className={styles.filterHeader}>
                       <h3>Filtrar por estado</h3>
-                      <button className={styles.clearButton} onClick={clearFilters}>
+                      <button
+                        className={styles.clearButton}
+                        onClick={clearFilters}
+                      >
                         Limpiar
                       </button>
                     </div>
@@ -298,8 +332,12 @@ const UserProfileDashboard = ({ user }) => {
                 return (
                   <div key={index} className={styles.activeFilterTag}>
                     <IconComponent size={14} className={styles.filterTagIcon} />
-                    <span className={styles.filterTagLabel}>{filter.label}:</span>
-                    <span className={styles.filterTagValue}>{filter.value}</span>
+                    <span className={styles.filterTagLabel}>
+                      {filter.label}:
+                    </span>
+                    <span className={styles.filterTagValue}>
+                      {filter.value}
+                    </span>
                     <button
                       className={styles.filterTagRemove}
                       onClick={filter.onRemove}
@@ -317,8 +355,8 @@ const UserProfileDashboard = ({ user }) => {
           {shouldShowFiltered ? (
             <div className={`${styles.eventList} ${styles.grid}`}>
               {filteredEvents.map((event) => (
-                <EventCard 
-                  key={event.id} 
+                <EventCard
+                  key={event.id}
                   {...event}
                   handleQRCodeClick={() => handleQRCodeClick(event)}
                   handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
@@ -331,18 +369,23 @@ const UserProfileDashboard = ({ user }) => {
               {activeEvents.length > 0 && (
                 <div className={styles.statusSection}>
                   <div className={styles.statusSectionHeader}>
-                    <CheckCircle2 size={24} className={styles.statusIconActive} />
+                    <CheckCircle2
+                      size={24}
+                      className={styles.statusIconActive}
+                    />
                     <h3 className={styles.statusSectionTitle}>
                       Eventos Activos ({activeEvents.length})
                     </h3>
                   </div>
                   <div className={`${styles.eventList} ${styles.grid}`}>
                     {activeEvents.map((event) => (
-                      <EventCard 
-                        key={event.id} 
+                      <EventCard
+                        key={event.id}
                         {...event}
                         handleQRCodeClick={() => handleQRCodeClick(event)}
-                        handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                        handleReadQrCodeClick={() =>
+                          handleReadQrCodeClick(event)
+                        }
                       />
                     ))}
                   </div>
@@ -360,11 +403,13 @@ const UserProfileDashboard = ({ user }) => {
                   </div>
                   <div className={`${styles.eventList} ${styles.grid}`}>
                     {draftEvents.map((event) => (
-                      <EventCard 
-                        key={event.id} 
+                      <EventCard
+                        key={event.id}
                         {...event}
                         handleQRCodeClick={() => handleQRCodeClick(event)}
-                        handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                        handleReadQrCodeClick={() =>
+                          handleReadQrCodeClick(event)
+                        }
                       />
                     ))}
                   </div>
@@ -382,11 +427,13 @@ const UserProfileDashboard = ({ user }) => {
                   </div>
                   <div className={`${styles.eventList} ${styles.grid}`}>
                     {cancelledEvents.map((event) => (
-                      <EventCard 
-                        key={event.id} 
+                      <EventCard
+                        key={event.id}
                         {...event}
                         handleQRCodeClick={() => handleQRCodeClick(event)}
-                        handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                        handleReadQrCodeClick={() =>
+                          handleReadQrCodeClick(event)
+                        }
                       />
                     ))}
                   </div>
@@ -404,11 +451,13 @@ const UserProfileDashboard = ({ user }) => {
                   </div>
                   <div className={`${styles.eventList} ${styles.grid}`}>
                     {finishedEvents.map((event) => (
-                      <EventCard 
-                        key={event.id} 
+                      <EventCard
+                        key={event.id}
                         {...event}
                         handleQRCodeClick={() => handleQRCodeClick(event)}
-                        handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                        handleReadQrCodeClick={() =>
+                          handleReadQrCodeClick(event)
+                        }
                       />
                     ))}
                   </div>
@@ -416,10 +465,12 @@ const UserProfileDashboard = ({ user }) => {
               )}
 
               {/* Mensaje cuando no hay eventos */}
-              {activeEvents.length === 0 && draftEvents.length === 0 && 
-               cancelledEvents.length === 0 && finishedEvents.length === 0 && (
-                <p className={styles.emptyMessage}>{emptyMessage}</p>
-              )}
+              {activeEvents.length === 0 &&
+                draftEvents.length === 0 &&
+                cancelledEvents.length === 0 &&
+                finishedEvents.length === 0 && (
+                  <p className={styles.emptyMessage}>{emptyMessage}</p>
+                )}
             </>
           )}
         </>
@@ -442,11 +493,12 @@ const UserProfileDashboard = ({ user }) => {
         {data.length > 0 ? (
           <div className={`${styles.eventList} ${styles.grid}`}>
             {data.map((event) => (
-              <EventCard 
-                key={event.id} 
+              <EventCard
+                key={event.id}
                 {...event}
                 handleQRCodeClick={() => handleQRCodeClick(event)}
                 handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
+                handleImageTitleClick={() => console.log(`putas`)}
               />
             ))}
           </div>
@@ -463,9 +515,15 @@ const UserProfileDashboard = ({ user }) => {
       <header className={styles.profileHeader}>
         <div className={styles.profileMain}>
           <div className={styles.profileImageContainer}>
-            {(user.avatar ?
-              <img src={user.avatar} alt="Avatar" className={styles.profileAvatar} /> :
-              <div className={styles.profileInitials}>{initials}</div>)}
+            {user.avatar ? (
+              <img
+                src={user.avatar}
+                alt="Avatar"
+                className={styles.profileAvatar}
+              />
+            ) : (
+              <div className={styles.profileInitials}>{initials}</div>
+            )}
             <div className={styles.statusIndicator}></div>
           </div>
           <div className={styles.profileInfo}>
@@ -473,7 +531,9 @@ const UserProfileDashboard = ({ user }) => {
               <h1>{FullName}</h1>
               <div className={styles.profileTags}>
                 <span className={styles.roleTag}>{user.rol}</span>
-                <span className={styles.codeTag}>{user.codigo || user.cedula}</span>
+                <span className={styles.codeTag}>
+                  {user.codigo || user.cedula}
+                </span>
               </div>
             </div>
             <div className={styles.profileDetails}>
@@ -485,27 +545,33 @@ const UserProfileDashboard = ({ user }) => {
                 </span>
                 <span className={styles.statItem}>
                   <Star size={14} />
-                  <span>
-                    {(user.is_active) ? 'Activo' : 'Inactivo'}
-                  </span>
+                  <span>{user.is_active ? "Activo" : "Inactivo"}</span>
                 </span>
               </div>
             </div>
           </div>
         </div>
         <div className={styles.profileActions}>
-          <Link to="/createEvent" className={`${styles.actionButton} ${styles.createButton}`}>
+          <Link
+            to="/createEvent"
+            className={`${styles.actionButton} ${styles.createButton}`}
+          >
             <CirclePlus size={18} /> Crear Evento
           </Link>
-          <button 
+          <button
             className={styles.actionButton}
-            onClick={() => navigate('/editProfile')}
+            onClick={() => navigate("/editProfile")}
           >
             <Edit size={18} /> Editar Perfil
           </button>
-          <button className={styles.actionButton}>
-            <ChartColumnBig size={18} /> Analytics
-          </button>
+          {user.is_admin && (
+            <button
+              className={styles.actionButton}
+              onClick={() => navigate("/admin")}
+            >
+              <ChartColumnBig size={18} /> Admin
+            </button>
+          )}
         </div>
       </header>
 
@@ -514,7 +580,7 @@ const UserProfileDashboard = ({ user }) => {
         <div className={styles.statCard}>
           <div className={styles.statInfo}>
             <span>Eventos Asistidos</span>
-            <b>{totalRegisteredCount || '0'}</b>
+            <b>{totalRegisteredCount || "0"}</b>
           </div>
           <div className={`${styles.statIcon} ${styles.iconEvents}`}>
             <CalendarCheck2 size={25} />
@@ -523,7 +589,7 @@ const UserProfileDashboard = ({ user }) => {
         <div className={styles.statCard}>
           <div className={styles.statInfo}>
             <span>Eventos Creados</span>
-            <b>{totalCreatedCount || '0'}</b>
+            <b>{totalCreatedCount || "0"}</b>
           </div>
           <div className={`${styles.statIcon} ${styles.iconCreated}`}>
             <User size={25} />
@@ -542,43 +608,54 @@ const UserProfileDashboard = ({ user }) => {
 
       <nav className={styles.tabsNav}>
         <button
-          className={`${styles.tabButton} ${activeTab === 'registrados' ? styles.active : ''}`}
-          onClick={() => setActiveTab('registrados')}
+          className={`${styles.tabButton} ${
+            activeTab === "registrados" ? styles.active : ""
+          }`}
+          onClick={() => setActiveTab("registrados")}
         >
           Eventos Registrados
         </button>
         <button
-          className={`${styles.tabButton} ${activeTab === 'megustas' ? styles.active : ''}`}
-          onClick={() => setActiveTab('megustas')}
+          className={`${styles.tabButton} ${
+            activeTab === "megustas" ? styles.active : ""
+          }`}
+          onClick={() => setActiveTab("megustas")}
         >
           Eventos Favoritos
         </button>
         <button
-          className={`${styles.tabButton} ${activeTab === 'misEventos' ? styles.active : ''}`}
-          onClick={() => setActiveTab('misEventos')}
+          className={`${styles.tabButton} ${
+            activeTab === "misEventos" ? styles.active : ""
+          }`}
+          onClick={() => setActiveTab("misEventos")}
         >
           Mis Eventos
         </button>
         <button
-          className={`${styles.tabButton} ${activeTab === 'historial' ? styles.active : ''}`}
-          onClick={() => setActiveTab('historial')}
+          className={`${styles.tabButton} ${
+            activeTab === "historial" ? styles.active : ""
+          }`}
+          onClick={() => setActiveTab("historial")}
         >
           Historial
         </button>
       </nav>
 
       {/* --- Sección de Contenido (Renderizado dinámico) --- */}
-      <main className={styles.contentSection}>
-        {renderContent()}
-      </main>
-      {(isCreatePanelOpen || isCreatePanelClosing) ?
-        <div className={`${styles.modalOverlay} ${isCreatePanelOpen ? styles.show : ""} ${isCreatePanelClosing ? styles.closing : ""}`}>
+      <main className={styles.contentSection}>{renderContent()}</main>
+      {isCreatePanelOpen || isCreatePanelClosing ? (
+        <div
+          className={`${styles.modalOverlay} ${
+            isCreatePanelOpen ? styles.show : ""
+          } ${isCreatePanelClosing ? styles.closing : ""}`}
+        >
           <div className={`${styles.quickCreatePanel} ${styles.modalPanel}`}>
             <div className={styles.modalContent}>
               <EventDashboard onClose={closeCreatePanel} />
             </div>
           </div>
-        </div> : null}
+        </div>
+      ) : null}
 
       {/* Modal QR */}
       <ModalQr
@@ -595,7 +672,6 @@ const UserProfileDashboard = ({ user }) => {
         eventId={selectedEventForScan?.id}
         redirection={hardRefresh}
       />
-
     </div>
   );
 };

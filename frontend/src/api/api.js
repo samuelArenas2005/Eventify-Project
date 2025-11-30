@@ -122,6 +122,16 @@ export const getCategories = async () => {
 		return [];
 	}
 }
+//Nuevoo
+export const getEventById = async (eventId) => {
+	try {
+		const response = await axios.get(`${BASE_URL}event/events/${eventId}/`, { withCredentials: true });
+		return response.data;
+	} catch (error) {
+		console.error("Error en getEventById:", error);
+		return null;
+	}
+}
 
 export const getAllEvents = async () => {
 	try {
@@ -158,18 +168,18 @@ export const confirmAttendance = async (eventId, status = 'CONFIRMED') => {
 }
 
 export const confirmEventRegistration = async (eventId) => {
-  try {
-    // Enviar cuerpo vacío y configuración aparte
-    const response = await axios.post(
-      `${BASE_URL}event/register/confirm/${eventId}/`,
-      {},                       // cuerpo (vacío)
-      { withCredentials: true } // configuración (cookies)
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error confirmando registro:", error);
-    throw error.response?.data ?? error;
-  }
+	try {
+		// Enviar cuerpo vacío y configuración aparte
+		const response = await axios.post(
+			`${BASE_URL}event/register/confirm/${eventId}/`,
+			{},                       // cuerpo (vacío)
+			{ withCredentials: true } // configuración (cookies)
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error confirmando registro:", error);
+		throw error.response?.data ?? error;
+	}
 };
 
 export const getUserNotifications = async () => {
@@ -211,3 +221,75 @@ export const markNotificationAsRead = async (notificationId) => {
 		return false;
 	}
 }
+
+export const getEventAttendees = async (eventId) => {
+	try {
+		const response = await axios.get(
+			`${BASE_URL}event/events/${eventId}/attendees/`,
+			{ withCredentials: true }
+		);
+		return response.data; // Array de EventAttendee
+	} catch (error) {
+		console.error("Error obteniendo inscritos del evento:", error);
+		throw error;
+	}
+};
+
+/* LLAMADAS PARA ESTADISTICAS EN ADMIN */
+
+export const getDailyEventsCreated = (startDate, endDate) => {
+	return axios.get(`${BASE_URL}event/analytics/events-per-day/`, {
+		params: { start_date: startDate, end_date: endDate },
+		withCredentials: true,
+	});
+}
+
+export const getDailyRegisteredUsers = (startDate, endDate) => {
+	return axios.get(`${BASE_URL}user/users/analytics/daily-registrations/`, {
+		params: { start_date: startDate, end_date: endDate },
+		withCredentials: true,
+	});
+}
+
+export const getTotalUsersCount = () => {
+	return axios.get(`${BASE_URL}user/users/analytics/total-users/`, {
+		withCredentials: true,
+	});
+}
+
+/* LLAMA A LOS 5 EVENTOS ACTIVOS MAS POPULARES */
+
+export const getPopularUpcomingEvents = (limit = 5) => {
+	return axios.get(`${BASE_URL}event/analytics/popular-upcoming/`, {
+		params: { limit },
+		withCredentials: true,
+	});
+}
+
+/* LLAMADAS RELACIONADAS CON ADMINISTRACION DE USUARIOS */
+
+export const promoteAdminByCedula = (cedula) => {
+	return axios.post(
+		`${BASE_URL}user/users/admin/promote-by-cedula/`,
+		{ cedula },
+		{ withCredentials: true }
+	);
+}
+
+export const removeAdminByCedula = (cedula) => {
+	return axios.post(
+		`${BASE_URL}user/users/admin/remove-by-cedula/`,
+		{ cedula },
+		{ withCredentials: true }
+	);
+}
+
+export const getUserByCedula = (cedula) => {
+	return axios.get(`${BASE_URL}user/users/lookup/by-cedula/`, {
+		params: { cedula },
+		withCredentials: true,
+	});
+}
+
+
+
