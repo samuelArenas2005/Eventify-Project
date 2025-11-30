@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import EventCard from "../../components/UI/EventCard/EventCard";
+import EventModal from "../../components/UI/DetailedEvent/DetailedEvent.jsx";
 import {
   Edit,
   ChartColumnBig,
@@ -52,6 +53,8 @@ const UserProfileDashboard = ({ user }) => {
   const [isScanQRModalOpen, setIsScanQRModalOpen] = useState(false);
   const [selectedEventForScan, setSelectedEventForScan] = useState(null);
 
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
   // Estados para filtros de "Mis Eventos"
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedStatusFilter, setSelectedStatusFilter] = useState("");
@@ -74,6 +77,10 @@ const UserProfileDashboard = ({ user }) => {
 
   const clearFilters = () => {
     setSelectedStatusFilter("");
+  };
+
+  const handleCloseModal = () => {
+    setSelectedEvent(null);
   };
 
   const removeStatusFilter = () => {
@@ -134,7 +141,7 @@ const UserProfileDashboard = ({ user }) => {
     async function loadEvents() {
       setLoading(true);
       const Registerdata = await getRegisteredEvents();
-      const PendingData = await getPendingEvents();
+      const PendingData = await getPendingEvents(handleCloseModal);
       const CreatedData = await getCreatedEvent();
 
       // Nuevas llamadas para contar todos los eventos (activos + finalizados)
@@ -498,7 +505,10 @@ const UserProfileDashboard = ({ user }) => {
                 {...event}
                 handleQRCodeClick={() => handleQRCodeClick(event)}
                 handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
-                handleImageTitleClick={() => console.log(`putas`)}
+                handleImageTitleClick={() => setSelectedEvent({
+                  ...event.formattedDetailEvent,
+                  onClose: handleCloseModal
+                })}
               />
             ))}
           </div>
@@ -575,66 +585,31 @@ const UserProfileDashboard = ({ user }) => {
         </div>
       </header>
 
-      {/* --- Sección de Estadísticas (Sin cambios) --- */}
-      {/* <section className={styles.statsSection}>
-        <div className={styles.statCard}>
-          <div className={styles.statInfo}>
-            <span>Eventos Asistidos</span>
-            <b>{totalRegisteredCount || "0"}</b>
-          </div>
-          <div className={`${styles.statIcon} ${styles.iconEvents}`}>
-            <CalendarCheck2 size={25} />
-          </div>
-        </div>
-        <div className={styles.statCard}>
-          <div className={styles.statInfo}>
-            <span>Eventos Creados</span>
-            <b>{totalCreatedCount || "0"}</b>
-          </div>
-          <div className={`${styles.statIcon} ${styles.iconCreated}`}>
-            <User size={25} />
-          </div>
-        </div>
-        <div className={styles.statCard}>
-          <div className={styles.statInfo}>
-            <span>Calificación Promedio</span>
-            <b>0</b>
-          </div>
-          <div className={`${styles.statIcon} ${styles.iconRating}`}>
-            <Star size={25} />
-          </div>
-        </div>
-      </section> */}
-
       <nav className={styles.tabsNav}>
         <button
-          className={`${styles.tabButton} ${
-            activeTab === "registrados" ? styles.active : ""
-          }`}
+          className={`${styles.tabButton} ${activeTab === "registrados" ? styles.active : ""
+            }`}
           onClick={() => setActiveTab("registrados")}
         >
           Eventos Registrados
         </button>
         <button
-          className={`${styles.tabButton} ${
-            activeTab === "megustas" ? styles.active : ""
-          }`}
+          className={`${styles.tabButton} ${activeTab === "megustas" ? styles.active : ""
+            }`}
           onClick={() => setActiveTab("megustas")}
         >
           Eventos Favoritos
         </button>
         <button
-          className={`${styles.tabButton} ${
-            activeTab === "misEventos" ? styles.active : ""
-          }`}
+          className={`${styles.tabButton} ${activeTab === "misEventos" ? styles.active : ""
+            }`}
           onClick={() => setActiveTab("misEventos")}
         >
           Mis Eventos
         </button>
         <button
-          className={`${styles.tabButton} ${
-            activeTab === "historial" ? styles.active : ""
-          }`}
+          className={`${styles.tabButton} ${activeTab === "historial" ? styles.active : ""
+            }`}
           onClick={() => setActiveTab("historial")}
         >
           Historial
@@ -645,9 +620,8 @@ const UserProfileDashboard = ({ user }) => {
       <main className={styles.contentSection}>{renderContent()}</main>
       {isCreatePanelOpen || isCreatePanelClosing ? (
         <div
-          className={`${styles.modalOverlay} ${
-            isCreatePanelOpen ? styles.show : ""
-          } ${isCreatePanelClosing ? styles.closing : ""}`}
+          className={`${styles.modalOverlay} ${isCreatePanelOpen ? styles.show : ""
+            } ${isCreatePanelClosing ? styles.closing : ""}`}
         >
           <div className={`${styles.quickCreatePanel} ${styles.modalPanel}`}>
             <div className={styles.modalContent}>
@@ -672,6 +646,9 @@ const UserProfileDashboard = ({ user }) => {
         eventId={selectedEventForScan?.id}
         redirection={hardRefresh}
       />
+
+      {/* Modal Detail Event */}
+      {selectedEvent && <EventModal {...selectedEvent} />}
     </div>
   );
 };

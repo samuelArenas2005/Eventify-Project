@@ -170,7 +170,29 @@ function hora12Colombia(iso) {
   }).toLowerCase();
 }
 
-export const getRegisteredEvents = async () => {
+const formattedDetailEvent = (event, onCloseHandler) => {
+  return {
+
+    titulo: event.title || "Sin título",
+    descripcion: event.description || "Sin descripción",
+    imag: event.images || [event.main_image || "https://via.placeholder.com/300x200"],
+    fechaInicio: event.start_date || null,
+    fechaFin: event.end_date || null,
+    direccion: event.location_info || "Por definir",
+    capacidad: event.capacity || 100,
+    asistentes: event.attendees_count || 0,
+    organizador: event.creator?.username || "Desconocido",
+    categoria: event.category?.name|| "Sin categoría",
+    estado: event.status || "Activo",
+    local_info: event.location_info || "Por definir",   // detalle del local
+    fechaCreacion:event.created_at || null,     // string ISO o similar
+
+    onClose: onCloseHandler,
+    showBorrar: true,
+  };
+};
+
+export const getRegisteredEvents = async (closeModalHandler) => {
   try {
     // Llamada al backend
     const events = await getEventRegisteredUser();
@@ -192,6 +214,7 @@ export const getRegisteredEvents = async () => {
       showRegisterButton: false,
       showHeartButton: false,
       readQRCode: true,
+      formattedDetailEvent: formattedDetailEvent(events.event, closeModalHandler) 
     }));
 
 
@@ -231,6 +254,7 @@ export const getPendingEvents = async () => {
       showRegisterButton: true,
       showHeartButton: true,
       activeHeart: true,
+      
     }));
 
 
