@@ -13,7 +13,22 @@ import styles from "./TimeSeriesChart.module.css";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const TimeSeriesChart = ({ data, title, subtitle, stats }) => {
+const TimeSeriesChart = ({
+  data,
+  title,
+  subtitle,
+  stats,
+  rangeOptions,
+  selectedRange,
+  onRangeChange,
+}) => {
+  const dataPoints = data?.length ?? 0;
+  const computedBarThickness = (() => {
+    if (dataPoints <= 0) return 24;
+    const base = Math.floor(220 / dataPoints);
+    return Math.max(6, Math.min(base, 28));
+  })();
+
   const chartData = {
     labels: data?.map((point) => point.label) ?? [],
     datasets: [
@@ -22,7 +37,7 @@ const TimeSeriesChart = ({ data, title, subtitle, stats }) => {
         data: data?.map((point) => point.value) ?? [],
         backgroundColor: "rgba(11, 114, 185, 0.8)",
         borderRadius: 6,
-        barThickness: 24,
+        barThickness: computedBarThickness,
         borderSkipped: false,
       },
     ],
@@ -87,8 +102,26 @@ const TimeSeriesChart = ({ data, title, subtitle, stats }) => {
 
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
-          <h3 className={styles.chartTitle}>{title}</h3>
-          {subtitle && <p className={styles.chartSubtitle}>{subtitle}</p>}
+          <div>
+            <h3 className={styles.chartTitle}>{title}</h3>
+            {subtitle && <p className={styles.chartSubtitle}>{subtitle}</p>}
+          </div>
+          {Array.isArray(rangeOptions) && rangeOptions.length > 0 && (
+            <div className={styles.rangeControls}>
+              {rangeOptions.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`${styles.rangeButton} ${
+                    option.id === selectedRange ? styles.rangeButtonActive : ""
+                  }`}
+                  onClick={() => onRangeChange && onRangeChange(option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className={styles.chartContainer}>
           <Bar data={chartData} options={options} />
