@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+
+
 import { Users, TrendingUp, MessageCircle } from "lucide-react";
 import AnalyticsLayout from "../../components/Analytics/layout/AnalyticsLayout";
 import EventAnalyticsHeader from "../../components/Analytics/headers/EventAnalyticsHeader";
@@ -9,19 +9,97 @@ import CommentsPlaceholder from "../../components/Analytics/views/CommentsPlaceh
 import { Edit } from 'lucide-react';
 import { Pencil } from 'lucide-react';
 import ModifyEventView from "../../components/Analytics/views/modifyEventView";
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
+import { useParams } from 'react-router-dom';
+import { getEventById } from '../../api/api';
+import { Loader2 } from 'lucide-react';
 
 const EventAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
+  const { eventId } = useParams();
+  const [formattedEventData, setFormattedEventData] = useState(null);
+
+
+  useEffect(() => {
+    const fetchEventData = async () => {
+      if (!eventId) return;
+
+      try {
+        const data = await getEventById(eventId);
+        if (data) {
+          // Mapear los datos de la API al formato del formulario
+          const startDateObj = new Date(data.start_date);
+          const endDateObj = new Date(data.end_date);
+
+          const formattedData = {
+            title: data.title,
+            description: data.description,
+            startDate: startDateObj.toISOString().split('T')[0],
+            startTime: startDateObj.toTimeString().slice(0, 5),
+            endDate: endDateObj.toISOString().split('T')[0],
+            endTime: endDateObj.toTimeString().slice(0, 5),
+            address: data.address,
+            venueInfo: data.location_info,
+            capacity: data.capacity,
+            category: data.category.id.toString(),
+            images: []
+          };
+          console.log("📌 Tu puto Event es 1:", data);
+          console.log("📌 Tu puto Event en analytics:", formattedData);
+
+          // Manejar imágenes existentes
+          if (data.images && Array.isArray(data.images)) {
+            const imagePromises = data.images.map(async (imgUrl) => {
+              try {
+                const url = typeof imgUrl === 'string' ? imgUrl : imgUrl.image;
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const filename = url.split('/').pop() || 'image.jpg';
+                const file = new File([blob], filename, { type: blob.type });
+
+                return { url: URL.createObjectURL(file), file: file };
+              } catch (err) {
+                console.error("Error cargando imagen existente:", err);
+                return null;
+              }
+            });
+
+            const processedImages = await Promise.all(imagePromises);
+            formattedData.images = processedImages.filter(img => img !== null);
+          } else if (data.main_image) {
+            try {
+              const response = await fetch(data.main_image);
+              const blob = await response.blob();
+              const file = new File([blob], 'main_image.jpg', { type: blob.type });
+              formattedData.images = [{ url: URL.createObjectURL(file), file: file }];
+            } catch (err) {
+              console.error("Error cargando main_image:", err);
+            }
+          }
+
+          setFormattedEventData(formattedData);
+        }
+      } catch (error) {
+        console.error("Error al obtener el evento:", error);
+        toast.error("No se pudo cargar la información del evento");
+      }
+    };
+
+    fetchEventData();
+  }, [eventId]);
+
+
 
   // Imprimir el eventId en consola
 
 
   // Datos del evento
   const eventData = {
-    title: "Conferencia Tech Summit 2025",
-    date: "15 Dic 2025",
-    attendees: 55,
-    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400",
+    title: formattedEventData?.title,
+    date: formattedEventData?.startDate,
+    attendees: "Dos perras",
+    image: formattedEventData?.images[0]?.url,
   };
 
   // Opciones del menú
@@ -168,7 +246,7 @@ const EventAnalytics = () => {
       return <CommentsPlaceholder />;
     }
     if (activeView === "Modificar_evento") {
-      return <ModifyEventView />
+      return <ModifyEventView event={formattedEventData} />
     }
     return null;
   };
@@ -183,6 +261,8 @@ const EventAnalytics = () => {
       {renderContent()}
     </AnalyticsLayout>
   );
+
+
 };
 
 export default EventAnalytics;

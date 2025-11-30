@@ -43,6 +43,9 @@ const EventDashboard = ({
   const navigate = useNavigate();
 
   console.log("hola soy onClose", onClose);
+  console.log("hola soy initialData", initialData);
+  console.log("hola soy initialData category", initialData?.category.toString());
+
   // --- React Hook Form ---
   const {
     register,
@@ -61,7 +64,7 @@ const EventDashboard = ({
       address: "",
       venueInfo: "",
       capacity: "",
-      category: "",
+      category: initialData?.category,
     },
   });
 
@@ -78,7 +81,7 @@ const EventDashboard = ({
         address: initialData.address || "",
         venueInfo: initialData.venueInfo || "",
         capacity: initialData.capacity || "",
-        category: initialData.category || "",
+        category: initialData.category,
       });
 
       // Cargar imágenes si existen en initialData
@@ -619,10 +622,11 @@ const EventDashboard = ({
                     {...register("category", {
                       required: "Debes elegir una categoría",
                     })}
+                    defaultValue={initialData?.category ?? ""}
                   >
                     <option value="">Selecciona una...</option>
                     {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
+                      <option key={cat.id} value={cat.id} >
                         {cat.name}
                       </option>
                     ))}
