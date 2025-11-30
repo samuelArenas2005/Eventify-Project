@@ -17,23 +17,44 @@ import {
   Award,
   Target,
   Globe,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import EventCard from "../../components/UI/EventCard/EventCard.jsx";
 import { getEvents } from "../SearchEvent/searchPage.js";
 
-const HERO_IMAGE_URL =
-  "https://images.pexels.com/photos/8197544/pexels-photo-8197544.jpeg";
+const HERO_IMAGE_URL = "/hero.jpg";
+const HERO_WORDS = [
+  "Inolvidables",
+  "Épicos",
+  "Memorables",
+  "Vibrantes",
+  "Impactantes",
+];
 
 function Landing() {
   const navigate = useNavigate();
   const [featuredEvents, setFeaturedEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [highlightIndex, setHighlightIndex] = useState(0);
+  const [currentEventIndex, setCurrentEventIndex] = useState(1); // Start at the middle one if we have 3
+  const currentHeroWord = HERO_WORDS[highlightIndex];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHighlightIndex((prev) => (prev + 1) % HERO_WORDS.length);
+    }, 3200);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     async function loadFeaturedEvents() {
       const events = await getEvents(() => setSelectedEvent(null));
-      // Tomar solo los primeros 3 eventos
-      setFeaturedEvents(events.slice(0, 3));
+      // Ensure we have enough events for the carousel, or handle fewer
+      setFeaturedEvents(events.slice(0, 5)); // Get up to 5 events for better rotation
+      if (events.length > 0) {
+        setCurrentEventIndex(Math.floor(Math.min(events.length, 5) / 2));
+      }
     }
     loadFeaturedEvents();
   }, []);
@@ -41,35 +62,85 @@ function Landing() {
   return (
     <div className={style.landingContainer}>
       {/* Hero Section con forma triangular */}
-      <section
-        className={style.heroContainer}
-        style={{ "--hero-bg-image": `url(${HERO_IMAGE_URL})` }}
-      >
-        <div className={style.heroContent}>
-          <h1 className={style.logoText}>Eventify</h1>
-          <p className={style.sloganText}>
-            Tu plataforma definitiva para crear y descubrir eventos
-            universitarios
-          </p>
-          <div className={style.buttonContainer}>
-            <Link
-              to="/createEvent"
-              className={`${style.button} ${style.buttonPrimary}`}
-            >
-              <Plus size={18} />
-              Crea Eventos
-            </Link>
-            <Link
-              to="/searchPage"
-              className={`${style.button} ${style.buttonSecondary}`}
-            >
-              Explora eventos
-              <ArrowRight size={16} />
-            </Link>
+      <section className={style.heroContainer}>
+        <div className={style.heroInner}>
+          <div className={style.heroCopy}>
+            <div className={style.heroBadge}>
+              <span role="img" aria-label="cohete">
+                🚀
+              </span>
+              La plataforma #1 para la vida en el campus
+            </div>
+            <h1 className={style.heroTitle}>
+              Transforma la Vida Universitaria: Crea Eventos{" "}
+              <span
+                className={`${style.heroHighlight} ${style.heroHighlightAnimated}`}
+              >
+                {currentHeroWord}
+              </span>{" "}
+              en Minutos.
+            </h1>
+            <p className={style.heroDescription}>
+              Desde reuniones de clubes y talleres académicos hasta grandes
+              festivales. Centraliza registros, tickets y la promoción en una sola
+              plataforma diseñada para tu campus.
+            </p>
+            <div className={style.heroActions}>
+              <Link to="/createEvent" className={style.heroPrimaryButton}>
+                <Plus size={18} />
+                Crear mi primer evento
+              </Link>
+              <Link to="/searchPage" className={style.heroSecondaryButton}>
+                Explorar Eventos
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+            <div className={style.heroTrust}>
+              <div className={style.trustAvatars}>
+                <img
+                  src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=120&q=80"
+                  alt="Estudiante 1"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
+                  alt="Estudiante 2"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=120&q=80"
+                  alt="Estudiante 3"
+                />
+              </div>
+              <p>
+                Usado por <strong>+500 organizaciones estudiantiles</strong> en
+                Latam
+              </p>
+            </div>
+          </div>
+          <div className={style.heroVisual}>
+            <div className={style.visualBackdrop}></div>
+            <img
+              src={HERO_IMAGE_URL}
+              alt="Estudiantes disfrutando un evento universitario"
+              className={style.heroImage}
+            />
+            <div className={`${style.heroCard} ${style.heroCardNotification}`}>
+              <span role="img" aria-label="confeti">
+                🎉
+              </span>
+              <div>
+                <p>Nuevo registro</p>
+                <small>Club de Robótica acaba de publicar “TechNight 2024”</small>
+              </div>
+            </div>
+            <div className={`${style.heroCard} ${style.heroCardStats}`}>
+              <p>Dashboard del Evento</p>
+              <div className={style.cardMetric}>
+                <span>Asistentes: 450/500</span>
+                <strong>90% Lleno</strong>
+              </div>
+            </div>
           </div>
         </div>
-        {/* Forma triangular */}
-        <div className={style.triangleShape}></div>
       </section>
 
 
@@ -153,12 +224,59 @@ function Landing() {
             Descubre los eventos más populares de la comunidad
           </p>
         </div>
-        <div className={style.eventsGrid}>
-          {featuredEvents.map((event, index) => (
-            <div key={event.id} className={style.eventCardWrapper}>
-              <EventCard {...event} />
-            </div>
-          ))}
+
+
+        <div className={style.carouselContainer}>
+          <button
+            className={style.navButton}
+            onClick={() => setCurrentEventIndex(prev => (prev - 1 + featuredEvents.length) % featuredEvents.length)}
+            aria-label="Evento anterior"
+          >
+            <ChevronLeft size={24} />
+          </button>
+
+          <div className={style.carouselTrack}>
+            {featuredEvents.map((event, index) => {
+              // Calculate position relative to current index
+              let position = "hidden";
+              const total = featuredEvents.length;
+
+              // We want to show: prev, active, next
+              // But with circular logic.
+              // Simple approach for 3+ items:
+              // active is current
+              // prev is current - 1
+              // next is current + 1
+
+              const diff = (index - currentEventIndex + total) % total;
+
+              if (diff === 0) position = "active";
+              else if (diff === total - 1 || diff === -1) position = "prev";
+              else if (diff === 1) position = "next";
+              // For more than 3 items, others remain hidden or far back
+
+              return (
+                <div
+                  key={event.id}
+                  className={`${style.carouselCard} ${style[position]}`}
+                  onClick={() => {
+                    if (position === "prev") setCurrentEventIndex((currentEventIndex - 1 + total) % total);
+                    if (position === "next") setCurrentEventIndex((currentEventIndex + 1) % total);
+                  }}
+                >
+                  <EventCard {...event} />
+                </div>
+              );
+            })}
+          </div>
+
+          <button
+            className={style.navButton}
+            onClick={() => setCurrentEventIndex(prev => (prev + 1) % featuredEvents.length)}
+            aria-label="Siguiente evento"
+          >
+            <ChevronRight size={24} />
+          </button>
         </div>
         <div className={style.showMoreContainer}>
           <Link to="/searchPage" className={style.showMoreButton}>
@@ -166,10 +284,10 @@ function Landing() {
             <ArrowRight size={18} />
           </Link>
         </div>
-      </section>
+      </section >
 
       {/* CTA Crear Eventos */}
-      <section className={style.createEventCTA}>
+      < section className={style.createEventCTA} >
         <div className={style.ctaContent}>
           <div className={style.ctaLeft}>
             <Sparkles className={style.ctaSparkle} size={48} />
@@ -210,10 +328,10 @@ function Landing() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Sección Sobre Nosotros */}
-      <section className={style.aboutSection}>
+      < section className={style.aboutSection} >
         <div className={style.aboutContent}>
           <div className={style.aboutLeft}>
             <div className={style.aboutImageContainer}>
@@ -255,10 +373,10 @@ function Landing() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* CTA Final */}
-      <section className={style.finalCTA}>
+      < section className={style.finalCTA} >
         <h2 className={style.finalCTATitle}>¿Listo para comenzar?</h2>
         <p className={style.finalCTASubtitle}>
           Únete a miles de estudiantes que ya están creando y descubriendo
@@ -272,8 +390,8 @@ function Landing() {
             Explorar Eventos
           </Link>
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   );
 }
 

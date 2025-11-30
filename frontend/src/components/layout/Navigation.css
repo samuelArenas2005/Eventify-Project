@@ -336,8 +336,8 @@ body.modo-oscuro .menu-divider {
 .NavBarLoginButton {
   font-family: 'Poppins', sans-serif;
   padding: 0.5rem 0.6rem;
-  background: var(--color-primary);
-  color: white;
+  background: whitesmoke;
+  color: var(--color-primary);
   border: none;
   border-radius: var(--border-radius-md);
   text-decoration: none;
@@ -351,7 +351,7 @@ body.modo-oscuro .menu-divider {
 .NavBarRegisterButton {
   font-family: 'Poppins', sans-serif;
   padding: 0.5rem 0.6rem;
-  background: var(--color-secondary);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: var(--border-radius-md);
