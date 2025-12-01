@@ -10,8 +10,20 @@ const USER_URL = `${BASE_URL}user/users/me/`
 // Forzando actualización de git
 
 export const login = async (email, password) => {
-	const response = await axios.post(LOGIN_URL, { email: email, password: password }, { withCredentials: true });
-	return response.data.success;
+	try {
+		const response = await axios.post(
+			LOGIN_URL,
+			{ email, password },
+			{ withCredentials: true }
+		);
+		return { success: response.data.success === true };
+	} catch (error) {
+		const detail =
+			error?.response?.data?.detail ||
+			error?.message ||
+			"No pudimos contactar al servidor. Inténtalo más tarde.";
+		throw new Error(detail);
+	}
 }
 
 export const refresh_token = async () => {

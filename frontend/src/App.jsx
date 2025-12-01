@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import {
-  login as apilogin,
-  logout as apilogout,
-  getUser
-} from "./api/api";
+import { login as apilogin, logout as apilogout, getUser } from "./api/api";
 
 import Navigation from "./components/layout/Navigation";
 import Footer from "./components/layout/Footer";
@@ -29,16 +25,22 @@ function App() {
 
   const handleLogin = async (email, password) => {
     try {
-      const success = await apilogin(email, password);
+      const { success } = await apilogin(email, password);
       if (success) {
-        const userData = await getUser(); // ← Añade await aquí
+        const userData = await getUser();
         setUser(userData);
+        return { success: true };
       }
-      console.log("success:", success);
-      return success;
+      return {
+        success: false,
+        message: "Credenciales inválidas. Por favor, verifica tus datos.",
+      };
     } catch (error) {
       console.error("Login failed:", error);
-      return false;
+      return {
+        success: false,
+        message: error.message || "No pudimos iniciar sesión.",
+      };
     }
   };
 
@@ -101,7 +103,7 @@ function App() {
           path="/searchPage"
           element={
             <>
-              <SearchPage  user={user} />
+              <SearchPage user={user} />
             </>
           }
         />
@@ -114,7 +116,7 @@ function App() {
             path="/dashboard"
             element={
               <>
-                <Dashboard user = {user}/>
+                <Dashboard user={user} />
               </>
             }
           />
