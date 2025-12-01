@@ -16,6 +16,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -27,6 +28,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -34,16 +36,19 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
 }
 
 
-.quickCreatePanel{
+.quickCreatePanel {
   z-index: 100;
   position: relative;
   top: auto;
@@ -86,6 +91,7 @@
   gap: 2rem;
   flex: 1;
 }
+
 .profileImageContainer {
   position: relative;
   flex-shrink: 0;
@@ -104,7 +110,7 @@
   font-weight: 700;
   box-shadow: 0 8px 25px rgba(225, 29, 158, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .profileInitials:hover {
@@ -124,6 +130,7 @@
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   animation: pulse 2s infinite;
 }
+
 .profileInfo {
   flex: 1;
   min-width: 0;
@@ -194,6 +201,7 @@
   font-weight: 600;
   border: 1px solid #E5E7EB;
 }
+
 .profileActions {
   display: flex;
   gap: 1rem;
@@ -242,9 +250,9 @@
   border-color: #D1D5DB;
 }
 
-.createButton{
+.createButton {
   text-decoration: none;
-  border:none;
+  border: none;
   color: var(--color-white);
   background-color: var(--color-primary);
 }
@@ -261,6 +269,7 @@
   gap: 1.5rem;
   margin-bottom: 2.5rem;
 }
+
 .statCard {
   background-color: #FFFFFF;
   border-radius: 12px;
@@ -271,6 +280,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   border: 1px solid #E5E7EB;
 }
+
 .statInfo {
   display: flex;
   flex-direction: column;
@@ -294,22 +304,16 @@
   -webkit-text-fill-color: transparent;
   animation: fadeIn 0.6s ease-out;
 }
+
 .statIcon {
   padding: 0.9rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.iconEvents {
   color: var(--color-primary);
 }
-.iconCreated {
-  color: var(--color-secondary);
-}
-.iconRating {
-  color: var(--color-tertiary);
-}
+
 
 /* --- Tabs (Sin cambios) --- */
 .tabsNav {
@@ -318,6 +322,7 @@
   border-bottom: 2px solid #E5E7EB;
   margin-bottom: 2rem;
 }
+
 .tabButton {
   background: none;
   border: none;
@@ -330,13 +335,16 @@
   position: relative;
   transition: color 0.2s;
 }
+
 .tabButton:hover {
   color: #0B72B9
 }
+
 .tabButton.active {
   color: #0B72B9;
   font-weight: 600;
 }
+
 .tabButton.active::after {
   content: '';
   position: absolute;
@@ -352,8 +360,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem; /* Aumentado para más espacio */
-  flex-wrap: wrap; /* Para pantallas pequeñas */
+  margin-bottom: 2rem;
+  /* Aumentado para más espacio */
+  flex-wrap: wrap;
+  /* Para pantallas pequeñas */
   gap: 1rem;
 }
 
@@ -361,7 +371,8 @@
   font-size: 1.5rem;
   font-weight: 600;
   color: #111827;
-  margin: 0; /* Quitamos margen para alinear bien */
+  margin: 0;
+  /* Quitamos margen para alinear bien */
 }
 
 .viewOptions {
@@ -394,12 +405,14 @@
 .layoutButton {
   background: none;
   border: none;
-  border-radius: 6px; /* Bordes internos */
+  border-radius: 6px;
+  /* Bordes internos */
   padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6B7280; /* Color de icono inactivo */
+  color: #6B7280;
+  /* Color de icono inactivo */
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
 }
@@ -409,8 +422,10 @@
 }
 
 .layoutButton.active {
-  background-color: #FFFFFF; /* Fondo blanco activo */
-  color: #4F46E5; /* Color primario */
+  background-color: #FFFFFF;
+  /* Fondo blanco activo */
+  color: #4F46E5;
+  /* Color primario */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -434,15 +449,15 @@
   .dashboardContainer {
     padding: 1.5rem 2rem;
   }
-  
+
   .profileHeader {
     padding: 2rem;
   }
-  
+
   .profileMain {
     gap: 1.5rem;
   }
-  
+
   .eventList.grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.2rem;
@@ -453,60 +468,60 @@
   .dashboardContainer {
     padding: 1rem;
   }
-  
+
   .profileHeader {
     flex-direction: column;
     align-items: stretch;
     padding: 1.5rem;
     gap: 1.5rem;
   }
-  
+
   .profileMain {
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 1rem;
   }
-  
+
   .profileActions {
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .actionButton {
     flex: 1;
     min-width: 120px;
     justify-content: center;
   }
-  
+
   .profileInfo h1 {
     font-size: 1.75rem;
   }
-  
+
   .profileStats {
     justify-content: center;
   }
-  
+
   .statsSection {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .tabsNav {
     flex-wrap: wrap;
     gap: 1rem;
   }
-  
+
   .contentHeader {
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
   }
-  
+
   .viewOptions {
     justify-content: center;
   }
-  
+
   .eventList.grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -514,26 +529,27 @@
 }
 
 @media (max-width: 480px) {
+
   .profileInitials,
   .profileAvatar {
     width: 72px;
     height: 72px;
     font-size: 1.8rem;
   }
-  
+
   .profileInfo h1 {
     font-size: 1.5rem;
   }
-  
+
   .actionButton {
     padding: 0.6rem 1rem;
     font-size: 0.85rem;
   }
-  
+
   .profileTags {
     justify-content: center;
   }
-  
+
   .profileStats {
     flex-direction: column;
     gap: 0.5rem;
@@ -802,6 +818,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -817,7 +834,8 @@
   align-items: center;
   background-color: rgba(0, 0, 0, 0.55);
   z-index: 9999;
-  padding: 20px; /* espacio para que el modal no toque los bordes */
+  padding: 20px;
+  /* espacio para que el modal no toque los bordes */
 }
 
 .modalOverlay {
@@ -835,14 +853,31 @@
 }
 
 @keyframes popIn {
-  0% { transform: scale(0.8); opacity: 0; }
-  60% { transform: scale(1.05); opacity: 1; }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes popOut {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(0.8); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
 }
 
 .modalPanel {
@@ -860,7 +895,7 @@
   max-width: 1100px;
   max-height: calc(100vh - 70px);
   box-sizing: border-box;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -872,5 +907,3 @@
   overflow-x: hidden;
   scrollbar-gutter: stable;
 }
-
-

@@ -187,6 +187,23 @@ export default function Navigation({ user, logout }) {
             <div className="NavBarLogo">Eventify</div>
           </Link>
 
+          {/* Contenedor central para botones de navegación (solo cuando no hay usuario) */}
+          {!user && (
+            <div className="nav-centro">
+              <div className="desktop-nav-links">
+                <Link to="/" className="nav-link-button">
+                  Inicio
+                </Link>
+                <Link to="/searchPage" className="nav-link-button">
+                  Eventos
+                </Link>
+                <Link to="/calendario" className="nav-link-button">
+                  Calendario
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* Contenedor principal de todos los elementos de la derecha */}
           <div className="nav-derecha">
             {/* <div className="IconoTema" >
