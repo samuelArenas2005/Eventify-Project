@@ -1,5 +1,3 @@
-
-
 import { Users, TrendingUp, MessageCircle } from "lucide-react";
 import AnalyticsLayout from "../../components/Analytics/layout/AnalyticsLayout";
 import EventAnalyticsHeader from "../../components/Analytics/headers/EventAnalyticsHeader";
@@ -12,14 +10,14 @@ import ModifyEventView from "../../components/Analytics/views/modifyEventView";
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
-import { getEventById } from '../../api/api';
+import { getEventById, getEventAttendees } from '../../api/api';
 import { Loader2 } from 'lucide-react';
 
 const EventAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
   const { eventId } = useParams();
   const [formattedEventData, setFormattedEventData] = useState(null);
-
+  const [attendees, setAttendees] = useState([]); 
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -89,7 +87,39 @@ const EventAnalytics = () => {
     fetchEventData();
   }, [eventId]);
 
+  
+  useEffect(() => {
+    const fetchAttendees = async () => {
+      if (!eventId) return;
 
+      try {
+        const data = await getEventAttendees(eventId);
+        
+        // datos para UserListView
+        const formattedAttendees = data.map(attendee => ({
+          id: attendee.user?.id || attendee.id,
+          name: attendee.user?.name 
+            ? `${attendee.user.name} ${attendee.user.last_name || ''}`.trim()
+            : attendee.user?.username || 'Usuario',
+          email: attendee.user?.email || 'No disponible',
+          status: attendee.status || 'CONFIRMED', // Si no hay status se asigna CONFIRMED
+          registrationDate: attendee.created_at 
+            ? new Date(attendee.created_at).toISOString().split('T')[0]
+            : new Date().toISOString().split('T')[0]
+        }));
+
+        setAttendees(formattedAttendees);
+      } catch (error) {
+        console.error("Error al obtener inscritos:", error);
+        toast.error("No se pudo cargar la lista de inscritos");
+        setAttendees([]); // por si llegara a fallar que espero que no, lista vacia de usuarios
+      }
+    };
+
+    if (activeView === "users") {
+      fetchAttendees();
+    }
+  }, [eventId, activeView]);
 
   // Imprimir el eventId en consola
 
@@ -230,7 +260,7 @@ const EventAnalytics = () => {
 
   const renderContent = () => {
     if (activeView === "users") {
-      return <UserListView users={fakeUsers} />;
+      return <UserListView users={attendees} />; // Usar attendees reales en lugar de fakeUsers
     }
     if (activeView === "registrations") {
       return (
@@ -261,8 +291,7 @@ const EventAnalytics = () => {
       {renderContent()}
     </AnalyticsLayout>
   );
-
-
 };
 
 export default EventAnalytics;
+
