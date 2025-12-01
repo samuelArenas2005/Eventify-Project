@@ -20,6 +20,7 @@ import os
 
 from datetime import timedelta
 from apps.notification.models import Notification, UserNotification
+from apps.common.permissions import IsAdminAttributeUser
 from .models import Event, Category, EventAttendee, EventImage
 from .serializers import (
     CategorySerializer,
@@ -326,7 +327,7 @@ class AllCreatedEventsList(generics.ListAPIView):
 class PopularUpcomingEventsView(generics.ListAPIView):
     """Retorna los eventos próximos con mayor número de inscritos."""
     serializer_class = EventListSerializer
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated, IsAdminAttributeUser]
 
     def get_queryset(self):
         now = timezone.now()
@@ -363,7 +364,7 @@ class PopularUpcomingEventsView(generics.ListAPIView):
 
 class EventDailyCreatedCountView(APIView):
     """Devuelve conteos diarios de eventos creados entre dos fechas para Analytics."""
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated, IsAdminAttributeUser]
 
     def get(self, request):
         start_param = request.query_params.get('start_date')
@@ -388,7 +389,10 @@ class EventDailyCreatedCountView(APIView):
 
         daily_counts = (
             Event.objects
-            .filter(created_at__range=(start_dt, end_dt))
+            .filter(
+                created_at__range=(start_dt, end_dt),
+                status=Event.ACTIVE,
+            )
             .annotate(day=TruncDate('created_at'))
             .values('day')
             .order_by('day')

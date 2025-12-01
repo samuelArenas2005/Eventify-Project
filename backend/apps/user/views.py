@@ -9,6 +9,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from apps.common.permissions import IsAdminAttributeUser
 from .models import User
 from .serializers import (
     UserSerializer,
@@ -62,7 +63,7 @@ class UserViewSet(viewsets.ModelViewSet):
         detail=False,
         methods=['get'],
         url_path='analytics/daily-registrations',
-        permission_classes=[permissions.IsAuthenticated, permissions.IsAdminUser],
+        permission_classes=[permissions.IsAuthenticated, IsAdminAttributeUser],
     )
     def daily_registrations(self, request):
         """Devuelve conteos diarios de usuarios registrados en un rango de fechas."""
@@ -131,7 +132,7 @@ class UserViewSet(viewsets.ModelViewSet):
         detail=False,
         methods=['get'],
         url_path='analytics/total-users',
-        permission_classes=[permissions.IsAuthenticated, permissions.IsAdminUser],
+        permission_classes=[permissions.IsAuthenticated, IsAdminAttributeUser],
     )
     def total_users(self, request):
         """Devuelve el conteo total de usuarios y usuarios activos."""
