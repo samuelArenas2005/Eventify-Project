@@ -207,3 +207,7 @@ WARP.md
 backend/apps/event/migrations/0003_alter_eventattendee_status.py
 .gitignore
 backend/apps/notification/migrations/0003_notification_visible_at_and_more.py
+
+# VS Code settings
+.vscode/
+.vs/
