@@ -72,7 +72,7 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
     )
     category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),
-        required=True
+        required=False
     )
 
     class Meta:
@@ -91,7 +91,8 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "end_date": "End date must be after start date"
                 })
-        if not data.get('category'):
+        # Solo validar category en creación (no en actualización parcial)
+        if not self.instance and not data.get('category'):
             raise serializers.ValidationError({
                 "category": "A category must be specified"
             })

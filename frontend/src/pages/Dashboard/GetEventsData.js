@@ -178,7 +178,7 @@ const formattedDetailEvent = (event, onCloseHandler) => {
     imag: event.images || [event.main_image || "https://via.placeholder.com/300x200"],
     fechaInicio: event.start_date || null,
     fechaFin: event.end_date || null,
-    direccion: event.location_info || "Por definir",
+    direccion: event.address || "Por definir",
     capacidad: event.capacity || 100,
     asistentes: event.attendees_count || 0,
     organizador: event.creator?.username || "Desconocido",

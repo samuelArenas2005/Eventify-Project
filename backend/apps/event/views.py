@@ -20,7 +20,7 @@ import os
 
 from datetime import timedelta
 from apps.notification.models import Notification, UserNotification
-from apps.common.permissions import IsAdminAttributeUser
+from apps.common.permissions import IsAdminAttributeUser, IsEventCreatorOrReadOnly
 from .models import Event, Category, EventAttendee, EventImage
 from .serializers import (
     CategorySerializer,
@@ -50,7 +50,7 @@ class EventViewSet(viewsets.ModelViewSet):
     - create/update -> EventCreateUpdateSerializer
     - acciones custom: POST /events/{pk}/attend/ y POST /events/{pk}/unattend/
     """
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsEventCreatorOrReadOnly]
 
     def get_queryset(self):
         return (
@@ -79,22 +79,149 @@ class EventViewSet(viewsets.ModelViewSet):
         event = serializer.save(creator=self.request.user)
 
         # --- Lógica de Notificación ---
-        # Crear recordatorio programado para 1 día antes
-        reminder_date = event.start_date - timedelta(days=1)
-        
-        notification = Notification.objects.create(
-            event=event,
-            type=Notification.NotificationType.REMINDER,
-            message=f"¡Recordatorio! Tu evento '{event.title}' es mañana a las {event.start_date.strftime('%H:%M')}.",
-            visible_at=reminder_date
-        )
+        # Solo crear notificaciones si el evento NO es un borrador
+        if event.status != Event.DRAFT:
+            # Crear recordatorio programado para 1 día antes
+            reminder_date = event.start_date - timedelta(days=1)
+            
+            notification = Notification.objects.create(
+                event=event,
+                type=Notification.NotificationType.REMINDER,
+                message=f"¡Recordatorio! Tu evento '{event.title}' es mañana a las {event.start_date.strftime('%H:%M')}.",
+                visible_at=reminder_date
+            )
 
-        # Suscribir al creador al recordatorio
-        UserNotification.objects.create(
-            user=event.creator,
-            notification=notification,
-            state=UserNotification.State.DELIVERED
-        )
+            # Suscribir al creador al recordatorio
+            UserNotification.objects.create(
+                user=event.creator,
+                notification=notification,
+                state=UserNotification.State.DELIVERED
+            )
+
+    def perform_update(self, serializer):
+        # Obtener el evento antes de actualizarlo
+        old_event = self.get_object()
+        old_status = old_event.status
+        
+        # Diccionario para almacenar valores antiguos
+        old_values = {
+            'title': old_event.title,
+            'description': old_event.description,
+            'start_date': old_event.start_date,
+            'end_date': old_event.end_date,
+            'address': old_event.address,
+            'capacity': old_event.capacity,
+        }
+        
+        # Guardar el evento actualizado
+        event = serializer.save()
+        
+        # Si el evento cambió de DRAFT a ACTIVE, crear la notificación de recordatorio
+        if old_status == Event.DRAFT and event.status == Event.ACTIVE:
+            reminder_date = event.start_date - timedelta(days=1)
+            reminder = Notification.objects.create(
+                event=event,
+                type=Notification.NotificationType.REMINDER,
+                message=f"¡Recordatorio! Tu evento '{event.title}' es mañana a las {event.start_date.strftime('%H:%M')}.",
+                visible_at=reminder_date
+            )
+            
+            # Suscribir al creador
+            UserNotification.objects.create(
+                user=event.creator,
+                notification=reminder,
+                state=UserNotification.State.DELIVERED
+            )
+            
+            # Suscribir a todos los usuarios inscritos (si ya hay alguno)
+            attendees = EventAttendee.objects.filter(event=event).select_related('user')
+            for attendee in attendees:
+                UserNotification.objects.create(
+                    user=attendee.user,
+                    notification=reminder,
+                    state=UserNotification.State.DELIVERED
+                )
+        
+        # Solo procesar cambios y crear notificaciones si el evento NO es DRAFT
+        if event.status != Event.DRAFT:
+            # Mapeo de nombres de campos a textos legibles
+            field_labels = {
+                'title': 'título',
+                'description': 'descripción',
+                'start_date': 'fecha de inicio',
+                'end_date': 'fecha de finalización',
+                'address': 'ubicación',
+                'location_info': 'información de ubicación',
+                'capacity': 'capacidad',
+            }
+            
+            # Detectar cambios y crear notificaciones
+            for field, old_value in old_values.items():
+                new_value = getattr(event, field)
+                
+                if old_value != new_value:
+                    # Si cambió la fecha de inicio, eliminar y recrear el recordatorio
+                    if field == 'start_date':
+                        # Buscar y eliminar la notificación de recordatorio existente
+                        old_reminder = Notification.objects.filter(
+                            event=event,
+                            type=Notification.NotificationType.REMINDER
+                        ).first()
+                        
+                        if old_reminder:
+                            # Eliminar la notificación (esto también elimina las UserNotifications asociadas en cascada)
+                            old_reminder.delete()
+                        
+                        # Crear nuevo recordatorio con la nueva fecha
+                        new_reminder_date = new_value - timedelta(days=1)
+                        new_reminder = Notification.objects.create(
+                            event=event,
+                            type=Notification.NotificationType.REMINDER,
+                            message=f"¡Recordatorio! Tu evento '{event.title}' es mañana a las {new_value.strftime('%H:%M')}.",
+                            visible_at=new_reminder_date
+                        )
+                        
+                        # Suscribir a todos los usuarios inscritos al nuevo recordatorio
+                        attendees = EventAttendee.objects.filter(event=event).select_related('user')
+                        for attendee in attendees:
+                            UserNotification.objects.create(
+                                user=attendee.user,
+                                notification=new_reminder,
+                                state=UserNotification.State.DELIVERED
+                            )
+                    
+                    # Formatear valores para el mensaje
+                    if isinstance(old_value, timezone.datetime):
+                        old_str = old_value.strftime('%d/%m/%Y %H:%M')
+                        new_str = new_value.strftime('%d/%m/%Y %H:%M')
+                    else:
+                        old_str = str(old_value)
+                        new_str = str(new_value)
+                    
+                    # Determinar el tipo de notificación según el campo
+                    if field in ['start_date', 'address']:
+                        notification_type = Notification.NotificationType.ALERT
+                    else:
+                        notification_type = Notification.NotificationType.INFO
+                    
+                    pronoun = 'El' if field == 'title' else 'La'
+                    
+                    # Crear notificación para este cambio
+                    notification = Notification.objects.create(
+                        event=event,
+                        type=notification_type,
+                        message=f"{pronoun} {field_labels[field]} del evento '{event.title}' ha cambiado de '{old_str}' a '{new_str}'.",
+                        visible_at=timezone.now()
+                    )
+                    
+                    # Suscribir a todos los usuarios inscritos al evento
+                    attendees = EventAttendee.objects.filter(event=event).select_related('user')
+                    for attendee in attendees:
+                        UserNotification.objects.create(
+                            user=attendee.user,
+                            notification=notification,
+                            state=UserNotification.State.DELIVERED
+                        )
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def attend(self, request, pk=None):
