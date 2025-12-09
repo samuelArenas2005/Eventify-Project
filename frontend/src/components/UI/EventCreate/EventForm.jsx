@@ -609,6 +609,10 @@ const EventDashboard = ({
                         value: 1,
                         message: "La capacidad debe ser al menos 1",
                       },
+                      max: {
+                        value: 100000,
+                        message: "La capacidad máxima es de 100000",
+                      },
                     })}
                   />
                   {errors.capacity && (

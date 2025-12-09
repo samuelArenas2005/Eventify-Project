@@ -397,15 +397,21 @@ class  ActiveEventsList(generics.ListAPIView):
     """
     /api/event/active/ -> eventos con status ACTIVE, permisos AllowAny,
     y si el usuario está autenticado excluye los eventos cuyo creador sea el mismo usuario.
+    También excluye eventos donde el usuario tiene status REGISTERED o FAVORITE,
+    y solo muestra eventos futuros (start_date > fecha actual).
     """
     serializer_class = EventListSerializer
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         user = self.request.user
+        now = timezone.now()
         qs = (
             Event.objects
-                 .filter(status=Event.ACTIVE)
+                 .filter(
+                     status=Event.ACTIVE,
+                     start_date__gt=now  # Solo eventos futuros
+                 )
                  .select_related('creator', 'category')
                  .prefetch_related(
                      'images',
@@ -418,9 +424,15 @@ class  ActiveEventsList(generics.ListAPIView):
                  .order_by('-start_date')
         )
 
-        # Si el usuario está autenticado, excluimos los eventos que él creó
+        # Si el usuario está autenticado, excluimos:
+        # 1. Los eventos que él creó
+        # 2. Los eventos donde tiene status REGISTERED o FAVORITE
         if user and user.is_authenticated:
             qs = qs.exclude(creator=user)
+            qs = qs.exclude(
+                eventattendee__user=user,
+                eventattendee__status__in=['REGISTERED', 'FAVORITE']
+            )
 
         return qs
 
