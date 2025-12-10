@@ -2,16 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./EventCard.module.css";
 import {
-  Calendar,
-  Clock,
-  MapPin,
-  Users,
-  Heart,
-  UserPlus,
-  QrCode,
-  Scan,
+  Calendar, Clock, MapPin, Users, Heart, QrCode, Scan
 } from "lucide-react";
 import { getCategories } from "../../../api/api";
+import StarRating from "../StarRating/StarRating";
 
 const EventCard = ({
   id,
@@ -35,6 +29,9 @@ const EventCard = ({
   handleQRCodeClick,
   readQRCode = false,
   handleReadQrCodeClick,
+  // NUEVAS PROPS
+  status,
+  myRating, // Objeto { score, comment } o null
 }) => {
   const navigate = useNavigate();
   const [isHeartActive, setIsHeartActive] = useState(activeHeart);
@@ -48,23 +45,19 @@ const EventCard = ({
     }
   };
 
-  // Cargar categorías y sus colores al montar el componente
   useEffect(() => {
     const loadCategories = async () => {
       try {
         const categories = await getCategories();
-        // Crear un objeto con el mapeo de nombre -> color
         const colorMap = {};
         categories.forEach((cat) => {
           colorMap[cat.name] = cat.color;
         });
         setCategoryColors(colorMap);
-        console.log("🎨 Colores de categorías cargados:", colorMap);
       } catch (error) {
-        console.error("Error al cargar colores de categorías:", error);
+        console.error("Error al cargar colores:", error);
       }
     };
-
     loadCategories();
   }, []);
 
@@ -74,12 +67,8 @@ const EventCard = ({
   };
 
   const getCategoryStyle = (categoryName) => {
-    // Si tenemos el color de la categoría, lo usamos, sino un color por defecto
     const color = categoryColors[categoryName] || "#6B7280";
-    // Convertir el color hex a rgba con transparencia
-    return {
-      backgroundColor: color + "99", // Añade transparencia (60%)
-    };
+    return { backgroundColor: color + "99" };
   };
 
   return (
@@ -95,48 +84,50 @@ const EventCard = ({
           <h3 className={styles.eventTitle} onClick={handleTitleClick}>
             {title}
           </h3>
-          {showHeartButton ? (
-            <div className={`${styles.heartIcon}`} onClick={handleHeartClick}>
-              {/* Icono de corazón más grande */}
-              <Heart
-                size={28}
-                className={`${isHeartActive ? styles.heartActive : ""}`}
-              />
-            </div>
-          ) : null}
-          {generateQRCode ? (
-            <div className={styles.qrCodeContainer} onClick={handleQRCodeClick}>
-              <QrCode size={28} className={styles.qrCodeIcon} />
-            </div>
-          ) : null}
-          {readQRCode ? (
-            <div
-              className={styles.qrCodeContainer}
-              onClick={handleReadQrCodeClick}
-            >
-              <Scan size={28} className={styles.qrCodeIcon} />
-            </div>
-          ) : null}
+
+          {/* BOTONES DE ACCIÓN (Corazón, QR) */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {showHeartButton && (
+              <div className={`${styles.heartIcon}`} onClick={handleHeartClick}>
+                <Heart size={28} className={`${isHeartActive ? styles.heartActive : ""}`} />
+              </div>
+            )}
+            {generateQRCode && (
+              <div className={styles.qrCodeContainer} onClick={handleQRCodeClick}>
+                <QrCode size={28} className={styles.qrCodeIcon} />
+              </div>
+            )}
+            {readQRCode && (
+              <div className={styles.qrCodeContainer} onClick={handleReadQrCodeClick}>
+                <Scan size={28} className={styles.qrCodeIcon} />
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* --- NUEVO: MOSTRAR RATING SI EL EVENTO FINALIZÓ --- */}
+        {status === 'FINISHED' && myRating && (
+          <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <span style={{ fontSize: '12px', color: '#6B7280', fontWeight: '500' }}>Tu calificación:</span>
+            <StarRating score={myRating.score} size={18} readOnly={true} />
+          </div>
+        )}
+
         <p className={styles.eventDescription}>{description}</p>
 
         <div className={styles.detailItem}>
-          {/* Iconos más grandes */}
           <Calendar size={20} className={styles.detailIcon} />
           <span className={styles.detailText}>{date}</span>
         </div>
         <div className={styles.detailItem}>
-          {/* Iconos más grandes */}
           <Clock size={20} className={styles.detailIcon} />
           <span className={styles.detailText}>{time}</span>
         </div>
         <div className={styles.detailItem}>
-          {/* Iconos más grandes */}
           <MapPin size={20} className={styles.detailIcon} />
           <span className={styles.detailText}>{location}</span>
         </div>
         <div className={styles.detailItem}>
-          {/* Iconos más grandes */}
           <Users size={20} className={styles.detailIcon} />
           <span className={styles.detailText}>
             {currentParticipants}/{totalParticipants} Participantes

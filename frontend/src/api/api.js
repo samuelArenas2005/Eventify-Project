@@ -303,5 +303,15 @@ export const getUserByCedula = (cedula) => {
 	});
 }
 
+export const createRating = async (eventId, score, comment) => {
+
+	const response = await api.post("/events/ratings/", {
+		event: eventId,
+		score: score,
+		comment: comment
+	});
+	return response.data;
+};
+
 
 

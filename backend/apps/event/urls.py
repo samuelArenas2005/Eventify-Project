@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from apps.rating.views import RatingViewSet
 from .views import (
     CategoryViewSet,
     EventViewSet,
@@ -24,7 +25,7 @@ router = DefaultRouter()
 router.register(r'categories', CategoryViewSet)
 router.register(r'events', EventViewSet, basename='event')
 router.register(r'attendees', EventAttendeeViewSet, basename='eventattendee')
-
+router.register(r'ratings', RatingViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('confirmed/', ConfirmedAttendeesList.as_view(), name='confirmed-attendees'),
