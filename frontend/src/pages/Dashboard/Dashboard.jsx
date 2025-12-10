@@ -24,6 +24,7 @@ import {
   getRegisteredEvents,
   getPendingEvents,
   getCreatedEvent,
+  getConfirmedEvents,
 } from "./GetEventsData";
 import {
   getAllRegisteredEventsCount,
@@ -34,8 +35,6 @@ import Loanding from "../../components/UI/Loanding/Loanding";
 import ModalQr from "../../components/UI/modalQR/ModalQr";
 import ScanQr from "../../components/UI/ScanQr/ScanQr";
 
-const historyData = [];
-
 // --- Componente Principal ---
 const UserProfileDashboard = ({ user }) => {
   const navigate = useNavigate();
@@ -44,6 +43,7 @@ const UserProfileDashboard = ({ user }) => {
   const [registeredEventsData, setregisteredEventsData] = useState([]);
   const [pendingEventData, setpendingEventData] = useState([]);
   const [myEventsData, setMyEventsData] = useState([]);
+  const [historyEventsData, setHistoryEventsData] = useState([]);
   const [totalRegisteredCount, setTotalRegisteredCount] = useState(0);
   const [totalCreatedCount, setTotalCreatedCount] = useState(0);
   const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
@@ -143,6 +143,7 @@ const UserProfileDashboard = ({ user }) => {
       const Registerdata = await getRegisteredEvents();
       const PendingData = await getPendingEvents(handleCloseModal);
       const CreatedData = await getCreatedEvent();
+      const HistoryData = await getConfirmedEvents(handleCloseModal);
 
       // Nuevas llamadas para contar todos los eventos (activos + finalizados)
       const allRegistered = await getAllRegisteredEventsCount();
@@ -152,6 +153,7 @@ const UserProfileDashboard = ({ user }) => {
       setregisteredEventsData(Registerdata);
       setpendingEventData(PendingData);
       setMyEventsData(CreatedData);
+      setHistoryEventsData(HistoryData);
       setTotalRegisteredCount(allRegistered.data.length);
 
       // Contar solo eventos ACTIVE y FINISHED (no DRAFT ni CANCELLED)
@@ -245,10 +247,10 @@ const UserProfileDashboard = ({ user }) => {
         emptyMessage = "No has creado ningún evento.";
         type = "myevent";
         break;
-      case "historial":
-        title = `Historial (${historyData.length})`;
-        data = historyData;
-        emptyMessage = "No tienes eventos en tu historial.";
+      case "Confirmados":
+        title = `Eventos Confirmados (${historyEventsData.length})`;
+        data = historyEventsData;
+        emptyMessage = "No tienes eventos confirmados.";
         break;
       default:
         return null;
@@ -608,11 +610,11 @@ const UserProfileDashboard = ({ user }) => {
           Mis Eventos
         </button>
         <button
-          className={`${styles.tabButton} ${activeTab === "historial" ? styles.active : ""
+          className={`${styles.tabButton} ${activeTab === "Confirmados" ? styles.active : ""
             }`}
-          onClick={() => setActiveTab("historial")}
+          onClick={() => setActiveTab("Confirmados")}
         >
-          Historial
+          Confirmados
         </button>
       </nav>
 

@@ -349,6 +349,22 @@ class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EventAttendeeSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+class RegisteredAttendeesList(generics.ListAPIView):
+    """
+    /api/event/confirmed/  -> devuelve solo los EventAttendee registrados del usuario autenticado
+    """
+    serializer_class = EventAttendeeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # Ajusta el valor 'CONFIRMED' si en tu modelo usas constantes (e.g. EventAttendee.Status.CONFIRMED)
+        return (
+            EventAttendee.objects
+            .select_related('user', 'event')
+            .filter(user=user, status='REGISTERED', event__status=Event.ACTIVE)
+        )
+
 class ConfirmedAttendeesList(generics.ListAPIView):
     """
     /api/event/confirmed/  -> devuelve solo los EventAttendee confirmados del usuario autenticado
@@ -362,7 +378,7 @@ class ConfirmedAttendeesList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user, status='REGISTERED', event__status=Event.ACTIVE)
+            .filter(user=user, status='CONFIRMED', event__status=Event.ACTIVE)
         )
 
 class PendingAttendeesList(generics.ListAPIView):

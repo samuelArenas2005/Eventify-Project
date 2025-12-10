@@ -110,6 +110,10 @@ export const updateUser = async (userData) => {
 }
 
 export const getEventRegisteredUser = () => {
+	return axios.get(`${BASE_URL}event/registered/`, { withCredentials: true });
+}
+
+export const getEventConfirmedUser = () => {
 	return axios.get(`${BASE_URL}event/confirmed/`, { withCredentials: true });
 }
 

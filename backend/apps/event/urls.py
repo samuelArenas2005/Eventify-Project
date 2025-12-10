@@ -7,6 +7,7 @@ from .views import (
     CategoryViewSet,
     EventViewSet,
     EventAttendeeViewSet,
+    RegisteredAttendeesList,
     ConfirmedAttendeesList,
     PendingAttendeesList,
     EventsByCreatorList,
@@ -27,6 +28,7 @@ router.register(r'attendees', EventAttendeeViewSet, basename='eventattendee')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('registered/', RegisteredAttendeesList.as_view(), name='confirmed-attendees'),
     path('confirmed/', ConfirmedAttendeesList.as_view(), name='confirmed-attendees'),
     path('pending/', PendingAttendeesList.as_view(), name='pending-attendees'),
     path('created/', EventsByCreatorList.as_view(), name='events-by-creator'),   
