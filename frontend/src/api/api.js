@@ -198,6 +198,20 @@ export const confirmEventRegistration = async (eventId) => {
 	}
 };
 
+export const finishEvent = async (eventId) => {
+	try {
+		const response = await axios.post(
+			`${BASE_URL}event/events/${eventId}/finish/`,
+			{},
+			{ withCredentials: true }
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error finalizando evento:", error);
+		throw error.response?.data ?? error;
+	}
+};
+
 export const getUserNotifications = async () => {
 	try {
 		const response = await axios.get(`${BASE_URL}notification/user-notifications/`, { withCredentials: true });

@@ -19,12 +19,14 @@ import {
   FileText,
   XCircle,
   Archive,
+  RefreshCw,
 } from "lucide-react";
 import {
   getRegisteredEvents,
   getPendingEvents,
   getCreatedEvent,
   getConfirmedEvents,
+  finishExpiredEvents,
 } from "./GetEventsData";
 import {
   getAllRegisteredEventsCount,
@@ -85,6 +87,22 @@ const UserProfileDashboard = ({ user }) => {
 
   const removeStatusFilter = () => {
     setSelectedStatusFilter("");
+  };
+
+  // Función para finalizar eventos activos que ya pasaron su fecha de finalización
+  const handleFinishExpiredEvents = async () => {
+    try {
+      const finishedCount = await finishExpiredEvents(myEventsData);
+      
+      if (finishedCount === 0) {
+        return;
+      }
+      // Refrescar la página para ver los cambios
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al finalizar eventos:", error);
+      alert("Error al finalizar eventos. Por favor, intenta de nuevo.");
+    }
   };
 
   // Abrir panel de creación: limpiar estado de cierre
@@ -277,6 +295,13 @@ const UserProfileDashboard = ({ user }) => {
                 className={`${styles.actionButton} ${styles.createButton}`}
               >
                 <Plus size={16} />
+              </button>
+              <button
+                onClick={handleFinishExpiredEvents}
+                className={`${styles.actionButton} ${styles.refreshButton}`}
+                title="Finalizar eventos expirados"
+              >
+                <RefreshCw size={16} />
               </button>
               <div className={styles.filterContainer}>
                 <button

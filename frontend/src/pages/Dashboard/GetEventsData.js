@@ -1,4 +1,4 @@
-import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser,getEventConfirmedUser} from '../../api/api'
+import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser,getEventConfirmedUser, finishEvent} from '../../api/api'
  
 
 function diaMes(iso) {
@@ -131,6 +131,7 @@ export const getCreatedEvent = async () => {
       totalParticipants: event.capacity || 100,
       organizer: event.creator.username || "Desconocido",
       status: event.status || "DRAFT", // Incluir el status del evento
+      end_date: event.end_date || null, // Añadir fecha de finalización
       onRegisterClick: () => alert(`Ver detalle de registro ${event.id}`),
       onHeartClick: () => console.log(`Heart ${hora12Colombia(event.start_date)}`),
       showRegisterButton: false,
@@ -182,4 +183,43 @@ export const getConfirmedEvents = async (closeModalHandler) => {
   }
 };
 
+/**
+ * Finaliza eventos activos cuya fecha de finalización ya pasó.
+ * @param {Array} myEventsData - Array de eventos del usuario
+ * @returns {Promise<number>} - Número de eventos finalizados
+ */
+export const finishExpiredEvents = async (myEventsData) => {
+  try {
+    const now = new Date();
+    const activeEvents = myEventsData.filter(
+      (event) => event.status === "ACTIVE"
+    );
+
+    // Filtrar eventos cuya fecha de finalización ya pasó
+    const eventsToFinish = activeEvents.filter((event) => {
+      if (!event.end_date) return false;
+      const endDate = new Date(event.end_date);
+      return endDate < now;
+    });
+
+    if (eventsToFinish.length === 0) {
+      return 0;
+    }
+
+    // Finalizar todos los eventos que cumplen la condición
+    const finishPromises = eventsToFinish.map((event) =>
+      finishEvent(event.id).catch((error) => {
+        console.error(`Error finalizando evento ${event.id}:`, error);
+        return null;
+      })
+    );
+
+    await Promise.all(finishPromises);
+
+    return eventsToFinish.length;
+  } catch (error) {
+    console.error("Error al finalizar eventos:", error);
+    throw error;
+  }
+};
 

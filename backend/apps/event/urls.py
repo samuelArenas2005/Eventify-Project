@@ -18,6 +18,7 @@ from .views import (
     PopularUpcomingEventsView,
     generate_image,
     ConfirmEventRegistrationView,
+    FinishEventView,
 )
 
 
@@ -39,4 +40,5 @@ urlpatterns = [
     path('analytics/popular-upcoming/', PopularUpcomingEventsView.as_view(), name='analytics-popular-upcoming'),
     path('generate-image/', generate_image),
     path('register/confirm/<int:event_id>/', ConfirmEventRegistrationView.as_view(), name='confirm-event-registration'),
+    path('events/<int:event_id>/finish/', FinishEventView.as_view(), name='finish-event'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
