@@ -19,11 +19,14 @@ import {
   FileText,
   XCircle,
   Archive,
+  RefreshCw,
 } from "lucide-react";
 import {
   getRegisteredEvents,
   getPendingEvents,
   getCreatedEvent,
+  getConfirmedEvents,
+  finishExpiredEvents,
 } from "./GetEventsData";
 import {
   getAllRegisteredEventsCount,
@@ -34,6 +37,7 @@ import Loanding from "../../components/UI/Loanding/Loanding";
 import ModalQr from "../../components/UI/modalQR/ModalQr";
 import ScanQr from "../../components/UI/ScanQr/ScanQr";
 
+const historyData = [];
 
 // --- Componente Principal ---
 const UserProfileDashboard = ({ user }) => {
@@ -43,6 +47,7 @@ const UserProfileDashboard = ({ user }) => {
   const [registeredEventsData, setregisteredEventsData] = useState([]);
   const [pendingEventData, setpendingEventData] = useState([]);
   const [myEventsData, setMyEventsData] = useState([]);
+  const [historyEventsData, setHistoryEventsData] = useState([]);
   const [totalRegisteredCount, setTotalRegisteredCount] = useState(0);
   const [totalCreatedCount, setTotalCreatedCount] = useState(0);
   const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
@@ -85,6 +90,22 @@ const UserProfileDashboard = ({ user }) => {
 
   const removeStatusFilter = () => {
     setSelectedStatusFilter("");
+  };
+
+  // Función para finalizar eventos activos que ya pasaron su fecha de finalización
+  const handleFinishExpiredEvents = async () => {
+    try {
+      const finishedCount = await finishExpiredEvents(myEventsData);
+
+      if (finishedCount === 0) {
+        return;
+      }
+      // Refrescar la página para ver los cambios
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al finalizar eventos:", error);
+      alert("Error al finalizar eventos. Por favor, intenta de nuevo.");
+    }
   };
 
   // Abrir panel de creación: limpiar estado de cierre
@@ -180,6 +201,7 @@ const UserProfileDashboard = ({ user }) => {
       const Registerdata = await getRegisteredEvents();
       const PendingData = await getPendingEvents(handleCloseModal);
       const CreatedData = await getCreatedEvent();
+      const HistoryData = await getConfirmedEvents(handleCloseModal);
 
       // Nuevas llamadas para contar todos los eventos (activos + finalizados)
       const allRegistered = await getAllRegisteredEventsCount();
@@ -189,6 +211,7 @@ const UserProfileDashboard = ({ user }) => {
       setregisteredEventsData(Registerdata);
       setpendingEventData(PendingData);
       setMyEventsData(CreatedData);
+      setHistoryEventsData(HistoryData);
       setTotalRegisteredCount(allRegistered.data.length);
 
       // Contar solo eventos ACTIVE y FINISHED (no DRAFT ni CANCELLED)
@@ -287,10 +310,10 @@ const UserProfileDashboard = ({ user }) => {
         emptyMessage = "No has creado ningún evento.";
         type = "myevent";
         break;
-      case "historial":
-        title = `Historial (${historyData.length})`;
-        data = historyData;
-        emptyMessage = "No tienes eventos en tu historial.";
+      case "Confirmados":
+        title = `Eventos Confirmados (${historyEventsData.length})`;
+        data = historyEventsData;
+        emptyMessage = "No tienes eventos confirmados.";
         break;
       default:
         return null;
@@ -317,6 +340,13 @@ const UserProfileDashboard = ({ user }) => {
                 className={`${styles.actionButton} ${styles.createButton}`}
               >
                 <Plus size={16} />
+              </button>
+              <button
+                onClick={handleFinishExpiredEvents}
+                className={`${styles.actionButton} ${styles.refreshButton}`}
+                title="Finalizar eventos expirados"
+              >
+                <RefreshCw size={16} />
               </button>
               <div className={styles.filterContainer}>
                 <button
@@ -652,11 +682,11 @@ const UserProfileDashboard = ({ user }) => {
           Mis Eventos
         </button>
         <button
-          className={`${styles.tabButton} ${activeTab === "historial" ? styles.active : ""
+          className={`${styles.tabButton} ${activeTab === "Confirmados" ? styles.active : ""
             }`}
-          onClick={() => setActiveTab("historial")}
+          onClick={() => setActiveTab("Confirmados")}
         >
-          Historial
+          Confirmados
         </button>
       </nav>
 

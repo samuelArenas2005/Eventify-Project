@@ -8,6 +8,7 @@ from .views import (
     CategoryViewSet,
     EventViewSet,
     EventAttendeeViewSet,
+    RegisteredAttendeesList,
     ConfirmedAttendeesList,
     PendingAttendeesList,
     EventsByCreatorList,
@@ -18,6 +19,7 @@ from .views import (
     PopularUpcomingEventsView,
     generate_image,
     ConfirmEventRegistrationView,
+    FinishEventView,
 )
 
 
@@ -28,6 +30,7 @@ router.register(r'attendees', EventAttendeeViewSet, basename='eventattendee')
 router.register(r'ratings', RatingViewSet)
 urlpatterns = [
     path('', include(router.urls)),
+    path('registered/', RegisteredAttendeesList.as_view(), name='confirmed-attendees'),
     path('confirmed/', ConfirmedAttendeesList.as_view(), name='confirmed-attendees'),
     path('pending/', PendingAttendeesList.as_view(), name='pending-attendees'),
     path('created/', EventsByCreatorList.as_view(), name='events-by-creator'),   
@@ -38,4 +41,5 @@ urlpatterns = [
     path('analytics/popular-upcoming/', PopularUpcomingEventsView.as_view(), name='analytics-popular-upcoming'),
     path('generate-image/', generate_image),
     path('register/confirm/<int:event_id>/', ConfirmEventRegistrationView.as_view(), name='confirm-event-registration'),
+    path('events/<int:event_id>/finish/', FinishEventView.as_view(), name='finish-event'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

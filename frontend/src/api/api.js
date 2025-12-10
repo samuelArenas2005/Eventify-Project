@@ -110,6 +110,10 @@ export const updateUser = async (userData) => {
 }
 
 export const getEventRegisteredUser = () => {
+	return axios.get(`${BASE_URL}event/registered/`, { withCredentials: true });
+}
+
+export const getEventConfirmedUser = () => {
 	return axios.get(`${BASE_URL}event/confirmed/`, { withCredentials: true });
 }
 
@@ -190,6 +194,20 @@ export const confirmEventRegistration = async (eventId) => {
 		return response.data;
 	} catch (error) {
 		console.error("Error confirmando registro:", error);
+		throw error.response?.data ?? error;
+	}
+};
+
+export const finishEvent = async (eventId) => {
+	try {
+		const response = await axios.post(
+			`${BASE_URL}event/events/${eventId}/finish/`,
+			{},
+			{ withCredentials: true }
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error finalizando evento:", error);
 		throw error.response?.data ?? error;
 	}
 };

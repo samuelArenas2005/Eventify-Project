@@ -349,6 +349,28 @@ class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EventAttendeeSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+class RegisteredAttendeesList(generics.ListAPIView):
+    """
+    /api/event/registered/  -> devuelve solo los EventAttendee registrados del usuario autenticado
+    Solo incluye eventos activos cuya fecha de finalización sea mayor a la fecha actual.
+    """
+    serializer_class = EventAttendeeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        now = timezone.now()
+        return (
+            EventAttendee.objects
+            .select_related('user', 'event')
+            .filter(
+                user=user,
+                status='REGISTERED',
+                event__status=Event.ACTIVE,
+                event__end_date__gt=now  # Solo eventos cuya fecha de finalización sea mayor a la fecha actual
+            )
+        )
+
 class ConfirmedAttendeesList(generics.ListAPIView):
     """
     /api/event/confirmed/  -> devuelve solo los EventAttendee confirmados del usuario autenticado
@@ -358,11 +380,10 @@ class ConfirmedAttendeesList(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        # Ajusta el valor 'CONFIRMED' si en tu modelo usas constantes (e.g. EventAttendee.Status.CONFIRMED)
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user, status='REGISTERED', event__status=Event.ACTIVE)
+            .filter(user=user, status='CONFIRMED', event__status=Event.ACTIVE)
         )
 
 class PendingAttendeesList(generics.ListAPIView):
@@ -397,15 +418,21 @@ class  ActiveEventsList(generics.ListAPIView):
     """
     /api/event/active/ -> eventos con status ACTIVE, permisos AllowAny,
     y si el usuario está autenticado excluye los eventos cuyo creador sea el mismo usuario.
+    También excluye eventos donde el usuario tiene status REGISTERED o FAVORITE,
+    y solo muestra eventos futuros (start_date > fecha actual).
     """
     serializer_class = EventListSerializer
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         user = self.request.user
+        now = timezone.now()
         qs = (
             Event.objects
-                 .filter(status=Event.ACTIVE)
+                 .filter(
+                     status=Event.ACTIVE,
+                     start_date__gt=now  # Solo eventos futuros
+                 )
                  .select_related('creator', 'category')
                  .prefetch_related(
                      'images',
@@ -418,9 +445,15 @@ class  ActiveEventsList(generics.ListAPIView):
                  .order_by('-start_date')
         )
 
-        # Si el usuario está autenticado, excluimos los eventos que él creó
+        # Si el usuario está autenticado, excluimos:
+        # 1. Los eventos que él creó
+        # 2. Los eventos donde tiene status REGISTERED o FAVORITE
         if user and user.is_authenticated:
             qs = qs.exclude(creator=user)
+            qs = qs.exclude(
+                eventattendee__user=user,
+                eventattendee__status__in=['REGISTERED', 'FAVORITE']
+            )
 
         return qs
 
@@ -623,6 +656,31 @@ class ConfirmEventRegistrationView(APIView):
         
         serializer = EventAttendeeSerializer(attendee, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class FinishEventView(APIView):
+    """
+    Cambia el estado de un evento a FINISHED.
+    Solo el creador del evento puede realizar esta acción.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, event_id):
+        event = get_object_or_404(Event, pk=event_id)
+        
+        # Verificar que el usuario sea el creador del evento
+        if event.creator != request.user:
+            return Response(
+                {"detail": "No tienes permiso para finalizar este evento."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Cambiar el estado a FINISHED
+        event.status = Event.FINISHED
+        event.save()
+        
+        serializer = EventListSerializer(event, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 load_dotenv()
