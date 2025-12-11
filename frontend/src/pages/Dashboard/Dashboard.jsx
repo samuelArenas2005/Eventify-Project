@@ -464,10 +464,9 @@ const UserProfileDashboard = ({ user }) => {
                       <EventCard
                         key={event.id}
                         {...event}
-                        handleQRCodeClick={() => handleQRCodeClick(event)}
-                        handleReadQrCodeClick={() =>
-                          handleReadQrCodeClick(event)
-                        }
+                        handleImageTitleClick={() => { }}  // Función vacía para eventos cancelados
+                        handleQRCodeClick={() => { }}      // No permite generar QR
+                        handleReadQrCodeClick={() => { }}  // No permite leer QR
                       />
                     ))}
                   </div>

@@ -22,7 +22,7 @@ function hora12Colombia(iso) {
   }).toLowerCase();
 }
 
-const formattedDetailEvent = (event, onCloseHandler, showCancelar, showRegister, onBorrarHandler, onRegisterHandler) => {
+const formattedDetailEvent = (event, onCloseHandler, showCancelar, showRegistrar, onBorrarHandler, onRegisterHandler) => {
   return {
 
     titulo: event.title || "Sin título",
@@ -42,7 +42,7 @@ const formattedDetailEvent = (event, onCloseHandler, showCancelar, showRegister,
     onClose: onCloseHandler,
     showBorrar: false,
     showCancelar: showCancelar,
-    showRegister: showRegister,
+    showRegistrar: showRegistrar,
     onCancelar: onBorrarHandler,  // Asignar la función al botón de cancelar
     onRegister: onRegisterHandler,
 
