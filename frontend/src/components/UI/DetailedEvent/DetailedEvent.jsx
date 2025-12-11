@@ -50,11 +50,13 @@ const EventDetailModal = ({
   showBorrar = false,
   showEditar = false,
   showRegistrar = false,
+  showCancelar = false,
 
   // Funciones de botones
   onBorrar,
   onEditar,
   onRegistrar,
+  onCancelar,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -142,9 +144,8 @@ const EventDetailModal = ({
                       key={index}
                       src={imgUrl}
                       alt={`Miniatura ${index + 1}`}
-                      className={`${styles.thumbnail} ${
-                        index === activeIndex ? styles.activeThumbnail : ""
-                      }`}
+                      className={`${styles.thumbnail} ${index === activeIndex ? styles.activeThumbnail : ""
+                        }`}
                       onClick={() => handleThumbnailClick(index)}
                     />
                   ))}
@@ -231,7 +232,7 @@ const EventDetailModal = ({
           </div>
 
           {/* --- Pie de Página (Acciones) --- */}
-          {(showBorrar || showEditar || showRegistrar) && (
+          {(showBorrar || showEditar || showRegistrar || showCancelar) && (
             <div className={styles.modalFooter}>
               {showRegistrar && (
                 <button
@@ -255,6 +256,14 @@ const EventDetailModal = ({
                   onClick={onBorrar}
                 >
                   <Trash2 size={18} /> Borrar
+                </button>
+              )}
+              {showCancelar && (
+                <button
+                  className={`${styles.button} ${styles.deleteButton}`}
+                  onClick={onCancelar}
+                >
+                  <X size={18} /> Cancelar
                 </button>
               )}
             </div>

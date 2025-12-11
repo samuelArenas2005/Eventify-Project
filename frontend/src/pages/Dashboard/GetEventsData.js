@@ -1,5 +1,11 @@
-import {getEventRegisteredUser,getEventPendingUser,getEventCreatedUser,getEventConfirmedUser, finishEvent} from '../../api/api'
- 
+import { getEventRegisteredUser, getEventPendingUser, getEventCreatedUser, getEventConfirmedUser, finishEvent } from '../../api/api'
+import { cancelAttendee } from '../../api/api'
+import { getUser } from '../../api/api';
+import toast from 'react-hot-toast';
+
+
+const currentUser = await getUser();
+const userId = currentUser.id;
 
 function diaMes(iso) {
   const d = new Date(iso);
@@ -16,7 +22,7 @@ function hora12Colombia(iso) {
   }).toLowerCase();
 }
 
-const formattedDetailEvent = (event, onCloseHandler) => {
+const formattedDetailEvent = (event, onCloseHandler, showCancelar, showRegister, onBorrarHandler, onRegisterHandler) => {
   return {
 
     titulo: event.title || "Sin título",
@@ -28,13 +34,18 @@ const formattedDetailEvent = (event, onCloseHandler) => {
     capacidad: event.capacity || 100,
     asistentes: event.attendees_count || 0,
     organizador: event.creator?.username || "Desconocido",
-    categoria: event.category?.name|| "Sin categoría",
+    categoria: event.category?.name || "Sin categoría",
     estado: event.status || "Activo",
     local_info: event.location_info || "Por definir",   // detalle del local
-    fechaCreacion:event.created_at || null,     // string ISO o similar
+    fechaCreacion: event.created_at || null,     // string ISO o similar
 
     onClose: onCloseHandler,
-    showBorrar: true,
+    showBorrar: false,
+    showCancelar: showCancelar,
+    showRegister: showRegister,
+    onCancelar: onBorrarHandler,  // Asignar la función al botón de cancelar
+    onRegister: onRegisterHandler,
+
   };
 };
 
@@ -43,6 +54,38 @@ export const getRegisteredEvents = async (closeModalHandler) => {
     // Llamada al backend
     const events = await getEventRegisteredUser();
 
+    // Función para cancelar el registro del usuario en un evento
+    const handleBorrarRegistro = async (userId, eventId) => {
+      try {
+        console.log("🚀 Cancelando registro - User ID:", userId, "Event ID:", eventId);
+        const response = await cancelAttendee(eventId, userId);
+        console.log("✅ Registro cancelado exitosamente:", response);
+
+        // Mostrar toast de éxito
+        toast.success("Registro cancelado exitosamente", {
+          duration: 3000,
+          style: {
+            background: "var(--color-success)",
+            color: "white",
+          },
+        });
+
+        // Recargar la página después de un breve delay para que el usuario vea el toast
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } catch (error) {
+        console.error("❌ Error al cancelar registro:", error);
+        toast.error("Error al cancelar el registro", {
+          duration: 4000,
+          style: {
+            background: "#ef4444",
+            color: "white",
+          },
+        });
+      }
+    };
+
     const formattedFromApi = events.data.map((events, index) => ({
       id: events.event.id || index,
       imageUrl: events.event.main_image || "https://via.placeholder.com/300x200",
@@ -50,7 +93,7 @@ export const getRegisteredEvents = async (closeModalHandler) => {
       title: events.event.title,
       description: events.event.description,
       date: diaMes(events.event.start_date) || "Por definir",
-      time: hora12Colombia(events.event.start_date)  || "Por definir",
+      time: hora12Colombia(events.event.start_date) || "Por definir",
       location: events.event.address || "Por definir",
       currentParticipants: events.event.attendees_count || 0,
       totalParticipants: events.event.capacity || 100,
@@ -60,7 +103,14 @@ export const getRegisteredEvents = async (closeModalHandler) => {
       showRegisterButton: false,
       showHeartButton: false,
       readQRCode: true,
-      formattedDetailEvent: formattedDetailEvent(events.event, closeModalHandler) 
+      formattedDetailEvent: formattedDetailEvent(
+        events.event,
+        closeModalHandler,
+        true,
+        false,
+        () => handleBorrarRegistro(userId, events.event.id),
+        null
+      )
     }));
 
 
@@ -77,7 +127,7 @@ export const getRegisteredEvents = async (closeModalHandler) => {
   }
 };
 
-export const getPendingEvents = async () => {
+export const getPendingEvents = async (closeModalHandler) => {
   try {
     // Llamada al backend
     const events = await getEventPendingUser();
@@ -90,7 +140,7 @@ export const getPendingEvents = async () => {
       title: events.event.title,
       description: events.event.description,
       date: diaMes(events.event.start_date) || "Por definir",
-      time: hora12Colombia(events.event.start_date)  || "Por definir",
+      time: hora12Colombia(events.event.start_date) || "Por definir",
       location: events.event.address || "Por definir",
       currentParticipants: events.event.attendees_count || 0,
       totalParticipants: events.event.capacity || 100,
@@ -100,7 +150,8 @@ export const getPendingEvents = async () => {
       showRegisterButton: true,
       showHeartButton: true,
       activeHeart: true,
-      
+      formattedDetailEvent: formattedDetailEvent(events.event, closeModalHandler, false, true, null, null)
+
     }));
 
 
@@ -125,7 +176,7 @@ export const getCreatedEvent = async () => {
       title: event.title,
       description: event.description,
       date: diaMes(event.start_date) || "Por definir",
-      time: hora12Colombia(event.start_date)  || "Por definir",
+      time: hora12Colombia(event.start_date) || "Por definir",
       location: event.address || "Por definir",
       currentParticipants: event.attendees_count || 0,
       totalParticipants: event.capacity || 100,
@@ -172,7 +223,7 @@ export const getConfirmedEvents = async (closeModalHandler) => {
       showHeartButton: false,
       readQRCode: false,
       generateQRCode: false,
-      formattedDetailEvent: formattedDetailEvent(attendee.event, closeModalHandler)
+      formattedDetailEvent: formattedDetailEvent(attendee.event, closeModalHandler, false, true)
     }));
 
     return formattedFromApi;

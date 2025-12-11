@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { updateEvent } from '../../../api/api';
 import { cancelEvent } from '../../../api/api';
 
-const ModifyEventView = ({ event, id, onNavigateBack }) => {
+const ModifyEventView = ({ event, id }) => {
     console.log("📌 Evento recibido en ModifyEventView:", event);
     //aaa
     const handleUpdate = async (data) => {
@@ -75,11 +75,6 @@ const ModifyEventView = ({ event, id, onNavigateBack }) => {
                 const response = await cancelEvent(id);
                 console.log("✅ Respuesta del servidor:", response);
                 toast.success("¡Evento cancelado exitosamente!");
-
-                // Navegar de vuelta al dashboard después de cancelar
-                if (onNavigateBack) {
-                    onNavigateBack();
-                }
             } catch (error) {
                 console.error("❌ Error al cancelar evento:", error);
                 const errorMessage = error?.response?.data?.detail

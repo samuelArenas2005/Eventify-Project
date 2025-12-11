@@ -93,7 +93,7 @@ const UserProfileDashboard = ({ user }) => {
   const handleFinishExpiredEvents = async () => {
     try {
       const finishedCount = await finishExpiredEvents(myEventsData);
-      
+
       if (finishedCount === 0) {
         return;
       }

@@ -149,6 +149,24 @@ export const cancelEvent = async (eventId) => {
 	}
 }
 
+export const cancelAttendee = async (eventId, userId) => {
+	console.log("🚀 cancelAttendee called with eventId:", eventId, "and userId:", userId);
+	try {
+		const response = await axios.put(
+			`${BASE_URL}event/events/${eventId}/confirm_attendance/`,
+			{ status: "CANCELLED" },
+			{
+				withCredentials: true
+			}
+		);
+
+		return response.data;
+	} catch (error) {
+		console.error("Error canceling attendee:", error);
+		throw error;
+	}
+}
+
 export const getEventRegisteredUser = () => {
 	return axios.get(`${BASE_URL}event/registered/`, { withCredentials: true });
 }
