@@ -17,7 +17,7 @@ const EventAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
   const { eventId } = useParams();
   const [formattedEventData, setFormattedEventData] = useState(null);
-  const [attendees, setAttendees] = useState([]); 
+  const [attendees, setAttendees] = useState([]);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -87,23 +87,23 @@ const EventAnalytics = () => {
     fetchEventData();
   }, [eventId]);
 
-  
+
   useEffect(() => {
     const fetchAttendees = async () => {
       if (!eventId) return;
 
       try {
         const data = await getEventAttendees(eventId);
-        
+
         // datos para UserListView
         const formattedAttendees = data.map(attendee => ({
           id: attendee.user?.id || attendee.id,
-          name: attendee.user?.name 
+          name: attendee.user?.name
             ? `${attendee.user.name} ${attendee.user.last_name || ''}`.trim()
             : attendee.user?.username || 'Usuario',
           email: attendee.user?.email || 'No disponible',
           status: attendee.status || 'CONFIRMED', // Si no hay status se asigna CONFIRMED
-          registrationDate: attendee.created_at 
+          registrationDate: attendee.created_at
             ? new Date(attendee.created_at).toISOString().split('T')[0]
             : new Date().toISOString().split('T')[0]
         }));
@@ -276,7 +276,7 @@ const EventAnalytics = () => {
       return <CommentsPlaceholder />;
     }
     if (activeView === "Modificar_evento") {
-      return <ModifyEventView event={formattedEventData} />
+      return <ModifyEventView event={formattedEventData} id={eventId} />
     }
     return null;
   };

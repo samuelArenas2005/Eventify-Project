@@ -72,10 +72,10 @@ const EventDashboard = ({
   useEffect(() => {
     if (initialData && categories.length > 0) {
       // Convertir category a string para que coincida con los valores de las opciones
-      const categoryValue = initialData.category 
-        ? String(initialData.category) 
+      const categoryValue = initialData.category
+        ? String(initialData.category)
         : "";
-      
+
       reset({
         title: initialData.title || "",
         description: initialData.description || "",
@@ -361,6 +361,18 @@ const EventDashboard = ({
   const handleCreateEvent = (data) => {
     onSubmit(data, "ACTIVE");
   }
+
+  // Nueva función para manejar la actualización en modo edición
+  const handleUpdateEvent = (data) => {
+    // Agregar las imágenes y el índice de la imagen principal a los datos
+    const dataWithImages = {
+      ...data,
+      images: images,
+      mainImageIndex: mainImageIndex
+    };
+    console.log("📸 Datos con imágenes para actualizar:", dataWithImages);
+    onUpdate(dataWithImages);
+  };
 
   const onError = (formErrors) => {
     console.log("Errores de validación:", formErrors);
@@ -662,7 +674,7 @@ const EventDashboard = ({
                     </button>
                     <button
                       type="button" // Cambiado a button para manejar onUpdate manualmente o submit si prefieres
-                      onClick={handleSubmit(onUpdate, onError)}
+                      onClick={handleSubmit(handleUpdateEvent, onError)}
                       className={styles.submitButton}
                       disabled={isSubmitting}
                     >

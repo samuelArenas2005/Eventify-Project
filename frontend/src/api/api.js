@@ -109,6 +109,46 @@ export const updateUser = async (userData) => {
 	}
 }
 
+export const updateEvent = async (eventId, eventData) => {
+	console.log("🚀 updateEvent called with eventId:", eventId, "and eventData:", eventData);
+	try {
+		// Determine if eventData is FormData or regular object
+		const isFormData = eventData instanceof FormData;
+
+		const response = await axios.put(
+			`${BASE_URL}event/events/${eventId}/`,
+			eventData,
+			{
+				withCredentials: true,
+				headers: isFormData ? {
+					'Content-Type': 'multipart/form-data',
+				} : undefined
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error updating event:", error);
+		throw error;
+	}
+}
+
+export const cancelEvent = async (eventId) => {
+	try {
+		const response = await axios.patch(
+			`${BASE_URL}event/events/${eventId}/`,
+			{ status: "CANCELLED" },
+			{
+				withCredentials: true
+			}
+		);
+
+		return response.data;
+	} catch (error) {
+		console.error("Error canceling event:", error);
+		throw error;
+	}
+}
+
 export const getEventRegisteredUser = () => {
 	return axios.get(`${BASE_URL}event/registered/`, { withCredentials: true });
 }

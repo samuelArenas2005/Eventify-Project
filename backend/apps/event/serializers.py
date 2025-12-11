@@ -114,7 +114,11 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
         images_data = validated_data.pop('images', [])
         event = super().update(instance, validated_data)
         
-        # Add new images
+        # Always delete all existing images and replace with new ones
+        # The frontend sends all images (old + new), so we replace everything
+        EventImage.objects.filter(event=event).delete()
+        
+        # Add all images sent from frontend
         for image in images_data:
             EventImage.objects.create(event=event, image=image)
             

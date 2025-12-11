@@ -142,8 +142,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
   "http://192.168.18.16:5173",
+  "http://192.168.18.16:5174",
   "https://eventify-project-eight.vercel.app",
 ]
 
