@@ -351,29 +351,33 @@ class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RegisteredAttendeesList(generics.ListAPIView):
     """
-    /api/event/registered/  -> devuelve solo los EventAttendee registrados del usuario autenticado
-    Solo incluye eventos activos cuya fecha de finalización sea mayor a la fecha actual.
+    /api/event/registered/
+    Devuelve los eventos donde el usuario está registrado (REGISTERED).
+    CORRECCIÓN: Ahora incluye eventos ACTIVOS y FINALIZADOS para poder calificarlos.
     """
     serializer_class = EventAttendeeSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        now = timezone.now()
+        # Eliminamos 'now = timezone.now()' porque ya no filtraremos por fecha futura estricta
         return (
             EventAttendee.objects
             .select_related('user', 'event')
             .filter(
                 user=user,
                 status='REGISTERED',
-                event__status=Event.ACTIVE,
-                event__end_date__gt=now  # Solo eventos cuya fecha de finalización sea mayor a la fecha actual
+                # AQUÍ ESTABA EL ERROR:
+                # Antes: event__status=Event.ACTIVE, event__end_date__gt=now
+                # Ahora usamos __in para permitir ambos estados:
+                event__status__in=[Event.ACTIVE, Event.FINISHED]
             )
         )
 
 class ConfirmedAttendeesList(generics.ListAPIView):
     """
-    /api/event/confirmed/  -> devuelve solo los EventAttendee confirmados del usuario autenticado
+    /api/event/confirmed/
+    Devuelve los eventos confirmados, incluyendo los finalizados.
     """
     serializer_class = EventAttendeeSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -383,7 +387,12 @@ class ConfirmedAttendeesList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user, status='CONFIRMED', event__status=Event.ACTIVE)
+            .filter(
+                user=user, 
+                status='CONFIRMED', 
+                # Permitimos Active y Finished
+                event__status__in=[Event.ACTIVE, Event.FINISHED]
+            )
         )
 
 class PendingAttendeesList(generics.ListAPIView):
@@ -459,7 +468,7 @@ class  ActiveEventsList(generics.ListAPIView):
 
 class AllRegisteredEventsList(generics.ListAPIView):
     """
-    /api/event/registered/all/ -> devuelve todos los EventAttendee del usuario (activos y finalizados)
+    /api/event/registered/all/
     """
     serializer_class = EventAttendeeSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -469,7 +478,12 @@ class AllRegisteredEventsList(generics.ListAPIView):
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user, status='CONFIRMED', event__status=Event.ACTIVE or Event.FINISHED)
+            .filter(
+                user=user, 
+                status='CONFIRMED', 
+                # CORRECCIÓN: Usar lista con __in
+                event__status__in=[Event.ACTIVE, Event.FINISHED]
+            )
         )
 
 class AllCreatedEventsList(generics.ListAPIView):

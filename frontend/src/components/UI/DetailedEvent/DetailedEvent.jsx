@@ -5,15 +5,15 @@ import {
   ChevronLeft, ChevronRight, Trash2, Edit, CheckSquare, Info, MessageSquare
 } from "lucide-react";
 
-// Asegúrate de que estas rutas sean correctas en tu proyecto
 import StarRating from "../StarRating/StarRating";
-import { createRating } from "../../../api/api";
+// Importamos la nueva función getEventRatings
+import { createRating, getEventRatings } from "../../../api/api";
 
 const estadoColors = {
   Próximo: "var(--color-info)",
   "En Curso": "var(--color-success)",
   Finalizado: "var(--color-warning)",
-  FINISHED: "var(--color-warning)", // Agregado por si llega en inglés
+  FINISHED: "var(--color-warning)",
   Cancelado: "var(--color-danger)",
 };
 
@@ -29,12 +29,10 @@ const EventDetailModal = ({
   asistentes,
   organizador,
   categoria,
-  estado, // "Próximo", "En Curso", "Finalizado" o "FINISHED"
-  mainImage,
+  estado,
   local_info,
   fechaCreacion,
-  myRating, // {score, comment} o null
-
+  myRating,
   onClose,
   showBorrar = false,
   showEditar = false,
@@ -54,6 +52,10 @@ const EventDetailModal = ({
   const [ratingError, setRatingError] = useState(null);
   const [existingRating, setExistingRating] = useState(myRating);
 
+  // --- ESTADOS PARA LA LISTA DE COMENTARIOS ---
+  const [commentsList, setCommentsList] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+
   // Sincronizar estado local si cambia la prop myRating
   useEffect(() => {
     if (myRating) {
@@ -62,6 +64,25 @@ const EventDetailModal = ({
       setRatingComment(myRating.comment || "");
     }
   }, [myRating]);
+
+  // Validamos si el evento está finalizado
+  const isFinished = estado === 'Finalizado' || estado === 'FINISHED';
+
+  // --- LÓGICA: Cargar Comentarios ---
+  // Solo cargamos si el evento está finalizado y tenemos un ID
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (isFinished && id) {
+        setLoadingComments(true);
+        const data = await getEventRatings(id);
+        // Opcional: Filtramos para no mostrar mi propio comentario en la lista general 
+        // (ya que se muestra arriba en "Tu Reseña"), o lo dejamos. Aquí mostramos todos.
+        setCommentsList(data);
+        setLoadingComments(false);
+      }
+    };
+    fetchComments();
+  }, [id, isFinished, existingRating]); // Recargar si yo envío una calificación nueva
 
   // --- Lógica Galería ---
   const handlePrevImage = () => setActiveIndex((prev) => (prev === 0 ? imagenes.length - 1 : prev - 1));
@@ -79,9 +100,8 @@ const EventDetailModal = ({
 
     try {
       const data = await createRating(id, ratingScore, ratingComment);
-
       setExistingRating(data);
-      if (onRatingUpdate) onRatingUpdate(); // Avisar al padre para recargar
+      if (onRatingUpdate) onRatingUpdate();
     } catch (error) {
       console.error(error);
       const msg = error.response?.data?.detail || "Error al enviar calificación";
@@ -91,22 +111,14 @@ const EventDetailModal = ({
     }
   };
 
-  // --- Helpers ---
   const formatDate = (dateString) => {
     if (!dateString) return "No especificada";
     return new Date(dateString).toLocaleString("es-ES", { dateStyle: "long", timeStyle: "short" });
   };
 
   const formatCreationDate = (isoString) => isoString ? isoString.slice(0, 10) : "No especificada";
-
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) onClose();
-  };
-
+  const handleOverlayClick = (e) => { if (e.target === e.currentTarget) onClose(); };
   const estadoColor = estadoColors[estado] || "var(--text-secundary)";
-
-  // Validamos si el evento está finalizado (soportando español e inglés)
-  const isFinished = estado === 'Finalizado' || estado === 'FINISHED';
 
   return (
     <div className={styles.modalOverlay} onClick={handleOverlayClick}>
@@ -173,16 +185,17 @@ const EventDetailModal = ({
               <p className={styles.descriptionText}>{descripcion}</p>
             </div>
 
-            {/* --- SECCIÓN DE RATINGS --- */}
+            {/* --- SECCIÓN DE RATINGS Y COMENTARIOS --- */}
             {isFinished && (
               <div className={styles.ratingSection}>
+
+                {/* 1. Mi Calificación (Formulario o Vista Previa) */}
                 <h3 className={styles.sectionTitle}>
                   <MessageSquare size={20} style={{ marginRight: 8 }} />
                   {existingRating ? "Tu Reseña" : "Califica tu experiencia"}
                 </h3>
 
                 <div className={styles.ratingContainer}>
-                  {/* Estrellas */}
                   <div style={{ marginBottom: '1rem' }}>
                     <StarRating
                       score={ratingScore}
@@ -194,7 +207,6 @@ const EventDetailModal = ({
                   </div>
 
                   {existingRating ? (
-                    // --- MODO LECTURA: Ya calificó ---
                     <div className={styles.ratingCommentBox}>
                       <strong>Tu comentario:</strong>
                       <p style={{ marginTop: '5px', fontStyle: 'italic' }}>
@@ -202,12 +214,8 @@ const EventDetailModal = ({
                       </p>
                     </div>
                   ) : (
-                    // --- MODO ESCRITURA: Aún no califica ---
                     <div className={styles.ratingForm}>
-                      <label
-                        htmlFor="ratingComment"
-                        style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#666' }}
-                      >
+                      <label htmlFor="ratingComment" style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#666' }}>
                         ¿Qué fue lo que más te gustó? (Opcional)
                       </label>
                       <textarea
@@ -229,9 +237,41 @@ const EventDetailModal = ({
                     </div>
                   )}
                 </div>
+
+                {/* 2. Lista de Comentarios de Otros Usuarios (SCROLLBAR AQUÍ) */}
+                {commentsList.length > 0 && (
+                  <div className={styles.commentsContainer}>
+                    <h4 className={styles.commentsTitle}>Opiniones de la comunidad ({commentsList.length})</h4>
+
+                    <div className={styles.commentsScrollArea}>
+                      {loadingComments ? (
+                        <p>Cargando comentarios...</p>
+                      ) : (
+                        commentsList.map((comment) => (
+                          <div key={comment.id} className={styles.commentCard}>
+                            <div className={styles.commentHeader}>
+                              <span className={styles.commentUser}>
+                                <User size={16} /> {comment.username || "Usuario"}
+                              </span>
+                              <span className={styles.commentDate}>
+                                {new Date(comment.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                            {/* Estrellas pequeñas para el comentario */}
+                            <div style={{ pointerEvents: 'none', marginBottom: '0.5rem' }}>
+                              <StarRating score={comment.score} max={5} size={16} readOnly={true} />
+                            </div>
+                            <p className={styles.commentText}>
+                              {comment.comment || "Sin comentario escrito."}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-            {/* ---------------------------------- */}
           </div>
 
           {/* Botones de Acción (Footer) */}
@@ -260,7 +300,6 @@ const EventDetailModal = ({
   );
 };
 
-// Componente auxiliar interno
 const InfoItem = ({ icon, label, value }) => (
   <div className={styles.infoItem}>
     <span className={styles.infoIcon}>{icon}</span>

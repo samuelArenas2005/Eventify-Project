@@ -471,3 +471,100 @@
     justify-content: center;
   }
 }
+
+/* --- AGREGAR AL FINAL DE DetailedEvent.module.css --- */
+
+.commentsContainer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.commentsTitle {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+/* Área con SCROLLBAR */
+.commentsScrollArea {
+  max-height: 350px;
+  /* Altura fija para forzar scroll si hay muchos */
+  overflow-y: auto;
+  /* Scroll vertical */
+  padding-right: 8px;
+  /* Espacio para el scrollbar */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Estilo del Scrollbar (Navegadores WebKit: Chrome, Edge, Safari) */
+.commentsScrollArea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.commentsScrollArea::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.commentsScrollArea::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  /* Color gris suave */
+  border-radius: 4px;
+}
+
+.commentsScrollArea::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+/* Tarjeta individual de comentario */
+.commentCard {
+  background-color: #fff;
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.commentCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.commentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.commentUser {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.commentDate {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.commentText {
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.errorMessage {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
