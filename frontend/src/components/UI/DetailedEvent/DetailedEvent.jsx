@@ -275,14 +275,17 @@ const EventDetailModal = ({
 };
 
 // Pequeño componente auxiliar para los items de información
-const InfoItem = ({ icon, label, value }) => (
-  <div className={styles.infoItem}>
-    <span className={styles.infoIcon}>{icon}</span>
-    <div className={styles.infoContent}>
-      <span className={styles.infoLabel}>{label}</span>
-      <span className={styles.infoValue}>{value}</span>
+const InfoItem = ({ icon, label, value }) => {
+  const isLocation = label === "Ubicación" || label === "Información del Lugar";
+  return (
+    <div className={styles.infoItem}>
+      <span className={styles.infoIcon}>{icon}</span>
+      <div className={styles.infoContent}>
+        <span className={styles.infoLabel}>{label}</span>
+        <span className={`${styles.infoValue} ${isLocation ? styles.locationValue : ""}`}>{value}</span>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default EventDetailModal;

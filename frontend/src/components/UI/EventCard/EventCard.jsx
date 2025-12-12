@@ -11,7 +11,8 @@ import {
   QrCode,
   Scan,
 } from "lucide-react";
-import { getCategories } from "../../../api/api";
+import { getCategories, setEventFavorite, unsetEventFavorite } from "../../../api/api"; 
+import { toast } from "react-hot-toast";
 
 const EventCard = ({
   id,
@@ -68,8 +69,33 @@ const EventCard = ({
     loadCategories();
   }, []);
 
-  const handleHeartClick = () => {
-    setIsHeartActive(!isHeartActive);
+  const handleHeartClick = async () => {
+    const next = !isHeartActive;
+    setIsHeartActive(next);
+
+    try {
+      if (!id) return;
+      if (next) {
+        await setEventFavorite(id);
+        toast.success("Añadido a favoritos");
+                window.location.reload();
+
+      } else {
+        await unsetEventFavorite(id);
+        toast.success("Eliminado de favoritos");
+                window.location.reload();
+
+      }
+    } catch (error) {
+      // Revertir si falla
+      setIsHeartActive((prev) => !prev);
+      const detail =
+        error?.response?.data?.detail ||
+        error?.message ||
+        "Acción de favorito fallida";
+      toast.error(detail);
+    }
+
     onHeartClick && onHeartClick();
   };
 
@@ -133,7 +159,7 @@ const EventCard = ({
         <div className={styles.detailItem}>
           {/* Iconos más grandes */}
           <MapPin size={20} className={styles.detailIcon} />
-          <span className={styles.detailText}>{location}</span>
+          <span className={`${styles.detailText} ${styles.locationText}`}>{location}</span>
         </div>
         <div className={styles.detailItem}>
           {/* Iconos más grandes */}

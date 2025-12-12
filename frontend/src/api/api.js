@@ -378,5 +378,33 @@ export const getUserByCedula = (cedula) => {
 	});
 }
 
+export const setEventFavorite = async (eventId) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}event/events/${eventId}/favorite/`,
+      {},
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error marcando favorito:", error);
+    throw error;
+  }
+};
+
+export const unsetEventFavorite = async (eventId) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}event/events/${eventId}/unfavorite/`,
+      {},
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error quitando favorito:", error);
+    throw error;
+  }
+};
+
 
 
