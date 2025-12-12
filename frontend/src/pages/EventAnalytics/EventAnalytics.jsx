@@ -4,14 +4,18 @@ import EventAnalyticsHeader from "../../components/Analytics/headers/EventAnalyt
 import UserListView from "../../components/Analytics/views/UserListView";
 import TimeSeriesChart from "../../components/Analytics/charts/TimeSeriesChart";
 import CommentsListView from "../../components/Analytics/views/CommentsListView";
-import { Pencil } from 'lucide-react';
+import { Pencil } from "lucide-react";
 import ModifyEventView from "../../components/Analytics/views/modifyEventView";
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
-import { useParams } from 'react-router-dom';
-import { getEventById, getEventAttendees, getEventRatings } from '../../api/api';
-import { Loader2 } from 'lucide-react';
-import styles from './EventAnalytics.module.css';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
+import { useParams } from "react-router-dom";
+import {
+  getEventById,
+  getEventAttendees,
+  getEventRatings,
+} from "../../api/api";
+import { Loader2 } from "lucide-react";
+import styles from "./EventAnalytics.module.css";
 
 const EventAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
@@ -36,39 +40,43 @@ const EventAnalytics = () => {
             title: data.title,
             description: data.description,
             status: data.status,
-            startDate: startDateObj.toISOString().split('T')[0],
+            startDate: startDateObj.toISOString().split("T")[0],
             startTime: startDateObj.toTimeString().slice(0, 5),
-            endDate: endDateObj.toISOString().split('T')[0],
+            endDate: endDateObj.toISOString().split("T")[0],
             endTime: endDateObj.toTimeString().slice(0, 5),
             address: data.address,
             venueInfo: data.location_info,
             capacity: data.capacity,
             category: data.category?.id?.toString(),
-            images: []
+            images: [],
           };
           console.log("📌 Tu  Event es :", data);
           console.log("📌 Tu  Event en analytics:", formattedData);
           console.log("📌 Tu  Event status:", formattedData.status);
 
           // Lógica de imágenes - Cargar como File objects para que EventForm las muestre
-          const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+          const BASE_URL =
+            import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
           // Remover /api/ del final si existe para obtener la URL base
-          const API_BASE = BASE_URL.replace(/\/api\/?$/, '');
+          const API_BASE = BASE_URL.replace(/\/api\/?$/, "");
           const imagesArray = [];
 
           // Función helper para convertir URL relativa a absoluta
           const getFullImageUrl = (url) => {
             if (!url) return null;
             // Si ya es una URL completa (http/https), retornarla tal cual
-            if (url.startsWith('http://') || url.startsWith('https://')) {
+            if (url.startsWith("http://") || url.startsWith("https://")) {
               return url;
             }
             // Si es una URL de Cloudinary, retornarla tal cual
-            if (url.includes('cloudinary.com') || url.includes('res.cloudinary.com')) {
+            if (
+              url.includes("cloudinary.com") ||
+              url.includes("res.cloudinary.com")
+            ) {
               return url;
             }
             // Si es relativa, agregar la URL base del backend
-            return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+            return `${API_BASE}${url.startsWith("/") ? "" : "/"}${url}`;
           };
 
           // Función para cargar imagen como File object
@@ -84,12 +92,26 @@ const EventAnalytics = () => {
               }
 
               const blob = await response.blob();
-              const fileName = imageUrl.split('/').pop() || 'image.jpg';
-              const file = new File([blob], fileName, { type: blob.type });
-              
-              return { 
-                url: URL.createObjectURL(file), 
-                file: file 
+              const rawName =
+                (imageUrl && imageUrl.split("/").pop()) ||
+                (fullUrl && fullUrl.split("/").pop()) ||
+                "image";
+              const sanitizedName =
+                decodeURIComponent(rawName || "image")
+                  .split("?")[0]
+                  .trim() || "image";
+              const extension = blob.type?.split("/")[1] || "jpg";
+              const resolvedName = sanitizedName.includes(".")
+                ? sanitizedName
+                : `${sanitizedName}.${extension}`;
+
+              const file = new File([blob], resolvedName, {
+                type: blob.type || `image/${extension}`,
+              });
+
+              return {
+                url: URL.createObjectURL(file),
+                file: file,
               };
             } catch (error) {
               console.error("Error al cargar imagen:", error);
@@ -100,15 +122,19 @@ const EventAnalytics = () => {
           };
 
           // Cargar imágenes existentes
-          if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+          if (
+            data.images &&
+            Array.isArray(data.images) &&
+            data.images.length > 0
+          ) {
             // Si hay imágenes en el array, procesarlas
             const imagePromises = data.images.map(async (img) => {
               const imageUrl = img.image || img;
               return await loadImageAsFile(imageUrl);
             });
-            
+
             const loadedImages = await Promise.all(imagePromises);
-            formattedData.images = loadedImages.filter(img => img !== null);
+            formattedData.images = loadedImages.filter((img) => img !== null);
           } else if (data.main_image) {
             // Si solo hay main_image, procesarla
             const loadedImage = await loadImageAsFile(data.main_image);
@@ -138,16 +164,16 @@ const EventAnalytics = () => {
         setLoadingAttendees(true);
         try {
           const data = await getEventAttendees(eventId);
-          const formattedAttendees = data.map(attendee => ({
+          const formattedAttendees = data.map((attendee) => ({
             id: attendee.user?.id || attendee.id,
             name: attendee.user?.name
-              ? `${attendee.user.name} ${attendee.user.last_name || ''}`.trim()
-              : attendee.user?.username || 'Usuario',
-            email: attendee.user?.email || 'No disponible',
-            status: attendee.status || 'CONFIRMED',
+              ? `${attendee.user.name} ${attendee.user.last_name || ""}`.trim()
+              : attendee.user?.username || "Usuario",
+            email: attendee.user?.email || "No disponible",
+            status: attendee.status || "CONFIRMED",
             registrationDate: attendee.created_at
-              ? new Date(attendee.created_at).toISOString().split('T')[0]
-              : new Date().toISOString().split('T')[0]
+              ? new Date(attendee.created_at).toISOString().split("T")[0]
+              : new Date().toISOString().split("T")[0],
           }));
           console.log("formattedAttendees", formattedAttendees);
           setAttendees(formattedAttendees);
@@ -182,15 +208,25 @@ const EventAnalytics = () => {
   const eventData = {
     title: formattedEventData?.title,
     date: formattedEventData?.startDate,
-    attendees: loadingAttendees ? "Cargando..." : `${attendees.length} inscritos`,
+    attendees: loadingAttendees
+      ? "Cargando..."
+      : `${attendees.length} inscritos`,
     image: formattedEventData?.images?.[0]?.url,
   };
 
   const menuItems = [
-    { id: "Modificar_evento", icon: <Pencil size={20} />, label: "Modificar evento" },
+    {
+      id: "Modificar_evento",
+      icon: <Pencil size={20} />,
+      label: "Modificar evento",
+    },
     { id: "users", icon: <Users size={20} />, label: "Lista de Inscritos" },
-    { id: "registrations", icon: <TrendingUp size={20} />, label: "Inscripciones por Día" },
-    { id: "comments", icon: <MessageCircle size={20} />, label: "Comentarios" }
+    {
+      id: "registrations",
+      icon: <TrendingUp size={20} />,
+      label: "Inscripciones por Día",
+    },
+    { id: "comments", icon: <MessageCircle size={20} />, label: "Comentarios" },
   ];
 
   // Generar datos de la gráfica a partir de attendees reales
@@ -202,7 +238,7 @@ const EventAnalytics = () => {
     // Agrupar attendees por fecha de registro
     const registrationsByDate = {};
 
-    attendees.forEach(attendee => {
+    attendees.forEach((attendee) => {
       const date = attendee.registrationDate;
       if (date) {
         if (!registrationsByDate[date]) {
@@ -217,18 +253,20 @@ const EventAnalytics = () => {
 
     // Crear datos acumulativos para la gráfica
     let cumulativeCount = 0;
-    const chartData = sortedDates.map(date => {
+    const chartData = sortedDates.map((date) => {
       cumulativeCount += registrationsByDate[date];
 
       // Formatear la fecha para mostrar (ej: "15 Nov")
-      const dateObj = new Date(date + 'T00:00:00');
+      const dateObj = new Date(date + "T00:00:00");
       const day = dateObj.getDate();
-      const month = dateObj.toLocaleDateString('es-ES', { month: 'short' });
-      const formattedLabel = `${day} ${month.charAt(0).toUpperCase() + month.slice(1)}`;
+      const month = dateObj.toLocaleDateString("es-ES", { month: "short" });
+      const formattedLabel = `${day} ${
+        month.charAt(0).toUpperCase() + month.slice(1)
+      }`;
 
       return {
         label: formattedLabel,
-        value: cumulativeCount
+        value: cumulativeCount,
       };
     });
 
@@ -243,15 +281,27 @@ const EventAnalytics = () => {
 
     if (totalInscritos === 0) {
       return [
-        { label: "Total Inscritos", value: "0", trend: { positive: true, text: "Sin datos" } },
-        { label: "Promedio Diario", value: "0", trend: { positive: true, text: "Sin datos" } },
-        { label: "Pico Máximo", value: "0", trend: { positive: false, text: "Sin datos" } },
+        {
+          label: "Total Inscritos",
+          value: "0",
+          trend: { positive: true, text: "Sin datos" },
+        },
+        {
+          label: "Promedio Diario",
+          value: "0",
+          trend: { positive: true, text: "Sin datos" },
+        },
+        {
+          label: "Pico Máximo",
+          value: "0",
+          trend: { positive: false, text: "Sin datos" },
+        },
       ];
     }
 
     // Calcular promedio diario
     const registrationsByDate = {};
-    attendees.forEach(attendee => {
+    attendees.forEach((attendee) => {
       const date = attendee.registrationDate;
       if (date) {
         registrationsByDate[date] = (registrationsByDate[date] || 0) + 1;
@@ -259,7 +309,8 @@ const EventAnalytics = () => {
     });
 
     const uniqueDays = Object.keys(registrationsByDate).length;
-    const averagePerDay = uniqueDays > 0 ? (totalInscritos / uniqueDays).toFixed(1) : "0";
+    const averagePerDay =
+      uniqueDays > 0 ? (totalInscritos / uniqueDays).toFixed(1) : "0";
 
     // Encontrar el día con más inscripciones
     let maxDate = "";
@@ -271,11 +322,13 @@ const EventAnalytics = () => {
       }
     });
 
-    const maxDateFormatted = maxDate ? new Date(maxDate + 'T00:00:00').toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    }) : "Sin datos";
+    const maxDateFormatted = maxDate
+      ? new Date(maxDate + "T00:00:00").toLocaleDateString("es-ES", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : "Sin datos";
 
     return [
       {
@@ -322,7 +375,7 @@ const EventAnalytics = () => {
       );
     }
     if (activeView === "Modificar_evento") {
-      return <ModifyEventView event={formattedEventData} id={eventId} />
+      return <ModifyEventView event={formattedEventData} id={eventId} />;
     }
     return null;
   };
