@@ -4,8 +4,6 @@ import { getUser } from '../../api/api';
 import toast from 'react-hot-toast';
 
 
-const currentUser = await getUser();
-const userId = currentUser.id;
 
 function diaMes(iso) {
   const d = new Date(iso);
@@ -53,7 +51,15 @@ export const getRegisteredEvents = async (closeModalHandler) => {
   try {
     // Llamada al backend
     const events = await getEventRegisteredUser();
+    let userIdObtenido = null;
 
+    try {
+      const currentUser = await getUser();
+      userIdObtenido = currentUser.id;
+      console.log("ID del usuario actual:", userIdObtenido);
+    } catch (error) {
+      console.error("Error al obtener usuario:", error);
+    }
     // Función para cancelar el registro del usuario en un evento
     const handleBorrarRegistro = async (userId, eventId) => {
       try {
@@ -108,7 +114,7 @@ export const getRegisteredEvents = async (closeModalHandler) => {
         closeModalHandler,
         true,
         false,
-        () => handleBorrarRegistro(userId, events.event.id),
+        () => handleBorrarRegistro(userIdObtenido, events.event.id),
         null
       )
     }));
