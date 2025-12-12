@@ -22,7 +22,7 @@ import CalendarPage from "./pages/Calendar/CalendarPage";
 
 function App() {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // o tu lógica real de auth
 
   const handleLogin = async (email, password) => {
     try {
@@ -76,22 +76,8 @@ function App() {
       <Toaster position="top-center" reverseOrder={false} />
       <Navigation user={user} logout={handleLogOut} />
       <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <Landing />
-            </>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <>
-              <RegisterUser />
-            </>
-          }
-        />
+        <Route path="/" element={<Landing user={user} />} />
+        <Route path="/register" element={<RegisterUser />} />
         <Route
           path="/login"
           element={
@@ -100,22 +86,12 @@ function App() {
             </>
           }
         />
-        <Route
-          path="/searchPage"
-          element={
-            <>
-              <SearchPage user={user} />
-            </>
-          }
-        />
-        <Route
-          path="/calendario"
-          element={<CalendarPage />}
-        />
+        <Route path="/searchPage" element={<SearchPage user={user} />} />
+        <Route path="/calendario" element={<CalendarPage />} />
         <Route path="*" element={<NotFoundPage />} />
-        //Aqui van las rutas que solo dependen del usuario
+        {/* Aqui van las rutas que solo dependen del usuario */}
         <Route
-          element={<ProtectedRoute isAllowed={!!user} loading={loading} />}
+          element={<ProtectedRoute isAllowed={!!user} loading={loading}/>}
         >
           <Route
             path="/dashboard"
@@ -162,7 +138,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
       </Routes>
       <Footer />
     </BrowserRouter>

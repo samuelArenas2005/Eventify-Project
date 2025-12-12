@@ -1,6 +1,7 @@
 // src/pages/Landing.jsx
 import React, { useState, useEffect } from "react";
 import style from "./Landing.module.css";
+
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -22,6 +23,9 @@ import {
 } from "lucide-react";
 import EventCard from "../../components/UI/EventCard/EventCard.jsx";
 import { getEvents } from "../SearchEvent/searchPage.js";
+import ConfirmarModal from "../../components/UI/ConfirmarModal/ConfirmarModal.jsx";
+import { confirmEventRegistration } from "../../api/api.js";
+import { toast } from "react-hot-toast";
 
 const HERO_IMAGE_URL = "/hero.jpg";
 const LOGO_IMAGE_URL = "/logoEventify.png";
@@ -34,13 +38,15 @@ const HERO_WORDS = [
   "Impactantes",
 ];
 
-function Landing() {
+// Asegúrate de recibir user como prop
+function Landing({ user }) {
   const navigate = useNavigate();
   const [featuredEvents, setFeaturedEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [highlightIndex, setHighlightIndex] = useState(0);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [confirmState, setConfirmState] = useState({ open: false, event: null });
   const currentHeroWord = HERO_WORDS[highlightIndex];
 
   useEffect(() => {
@@ -50,21 +56,73 @@ function Landing() {
     return () => clearInterval(interval);
   }, []);
 
+  // Función para registrar usuario en evento
+  const onRegistrar = (event) => {
+    // Usa el user recibido; como respaldo, revisa tokens en localStorage
+    const hasSession =
+      !!user ||
+      !!localStorage.getItem("token") ||
+      !!localStorage.getItem("access_token");
+
+    if (!hasSession) {
+      navigate("/login");
+      return;
+    }
+    setConfirmState({ open: true, event });
+  };
+
+  const handleCancelConfirm = () => {
+    setConfirmState({ open: false, event: null });
+  };
+
+  const handleConfirmRegistration = async () => {
+    const eventId = confirmState.event?.id;
+    if (!eventId) return;
+
+    try {
+      await confirmEventRegistration(eventId);
+      toast.success("¡Tu registro al evento ha sido exitoso!");
+      setConfirmState({ open: false, event: null });
+      navigate("/dashboard");
+    } catch (error) {
+      const detail =
+        error?.response?.data?.detail ||
+        error?.detail ||
+        error?.message ||
+        "No pudimos completar tu registro, inténtalo nuevamente.";
+
+      if (typeof detail === 'string' && detail.toLowerCase().includes('ya estás inscrito')) {
+        toast.error("Ya estás inscrito en este evento.");
+      } else {
+        toast.error(detail);
+      }
+
+      setConfirmState({ open: false, event: null });
+    }
+  };
+
   // Cargar eventos activos
   useEffect(() => {
     const loadEvents = async () => {
       try {
         setLoadingEvents(true);
         const events = await getEvents();
-        // Filtrar solo eventos activos
         const activeEvents = events.filter(event => {
-          // Verificar si el evento tiene una fecha de inicio válida y es futura
           if (event.date && event.date !== "Por definir") {
             return true;
           }
-          return true; // Por ahora mostrar todos, puedes ajustar la lógica
+          return true;
         });
-        setFeaturedEvents(activeEvents);
+        // Mapear eventos con funciones de registro
+        const eventsWithHandlers = activeEvents.map((event) => ({
+          ...event,
+          handleImageTitleClick: () => {
+            setSelectedEvent(event.formattedDetailEvent);
+          },
+          onRegisterClick: () => onRegistrar(event),
+          showRegisterButton: true,
+        }));
+        setFeaturedEvents(eventsWithHandlers);
         setCurrentEventIndex(0);
       } catch (error) {
         console.error("Error al cargar eventos:", error);
@@ -299,9 +357,6 @@ function Landing() {
                   <EventCard
                     key={featuredEvents[leftEventIndex].id}
                     {...featuredEvents[leftEventIndex]}
-                    handleImageTitleClick={() => {
-                      setSelectedEvent(featuredEvents[leftEventIndex].formattedDetailEvent);
-                    }}
                   />
                 </div>
               )}
@@ -312,9 +367,6 @@ function Landing() {
                   <EventCard
                     key={featuredEvents[centerEventIndex].id}
                     {...featuredEvents[centerEventIndex]}
-                    handleImageTitleClick={() => {
-                      setSelectedEvent(featuredEvents[centerEventIndex].formattedDetailEvent);
-                    }}
                   />
                 </div>
               )}
@@ -325,9 +377,6 @@ function Landing() {
                   <EventCard
                     key={featuredEvents[rightEventIndex].id}
                     {...featuredEvents[rightEventIndex]}
-                    handleImageTitleClick={() => {
-                      setSelectedEvent(featuredEvents[rightEventIndex].formattedDetailEvent);
-                    }}
                   />
                 </div>
               )}
@@ -461,6 +510,16 @@ function Landing() {
           </Link>
         </div>
       </section >
+      {/* Modal de confirmación de registro */}
+      <ConfirmarModal
+        isOpen={confirmState.open}
+        title="Confirmar registro"
+        description="¿Deseas registrarte en este evento? Recibirás todas las actualizaciones en tu panel."
+        confirmLabel="Confirmar"
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmRegistration}
+        onCancel={handleCancelConfirm}
+      />
     </div >
   );
 }
