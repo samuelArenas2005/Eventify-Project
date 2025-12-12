@@ -378,32 +378,68 @@ export const getUserByCedula = (cedula) => {
 	});
 }
 
+/* --- SECCIÓN RATINGS --- */
+
+// Obtener todas las calificaciones de un evento específico
+export const getEventRatings = async (eventId) => {
+	try {
+		// Usamos params para enviar ?event=ID tal como lo espera tu views.py
+		const response = await axios.get(`${BASE_URL}rating/ratings/`, {
+			params: { event: eventId },
+			withCredentials: true
+		});
+		return response.data; // Devuelve un array de objetos Rating
+	} catch (error) {
+		console.error("Error obteniendo ratings:", error);
+		return [];
+	}
+}
+
+// Crear una calificación (Corrigiendo la función que tenías incompleta)
+export const createRating = async (eventId, score, comment) => {
+	try {
+		const response = await axios.post(
+			`${BASE_URL}rating/ratings/`, // Ruta hacia tu RatingViewSet
+			{
+				event: eventId,
+				score: score,
+				comment: comment
+			},
+			{ withCredentials: true }
+		);
+		return response.data;
+	} catch (error) {
+		// Lanzamos el error para que el componente lo maneje y muestre el mensaje
+		throw error;
+	}
+};
+
 export const setEventFavorite = async (eventId) => {
-  try {
-    const response = await axios.post(
-      `${BASE_URL}event/events/${eventId}/favorite/`,
-      {},
-      { withCredentials: true }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error marcando favorito:", error);
-    throw error;
-  }
+	try {
+		const response = await axios.post(
+			`${BASE_URL}event/events/${eventId}/favorite/`,
+			{},
+			{ withCredentials: true }
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error marcando favorito:", error);
+		throw error;
+	}
 };
 
 export const unsetEventFavorite = async (eventId) => {
-  try {
-    const response = await axios.post(
-      `${BASE_URL}event/events/${eventId}/unfavorite/`,
-      {},
-      { withCredentials: true }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error quitando favorito:", error);
-    throw error;
-  }
+	try {
+		const response = await axios.post(
+			`${BASE_URL}event/events/${eventId}/unfavorite/`,
+			{},
+			{ withCredentials: true }
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error quitando favorito:", error);
+		throw error;
+	}
 };
 
 

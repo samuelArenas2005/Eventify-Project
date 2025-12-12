@@ -85,7 +85,7 @@ class User(AbstractUser):
         },
     )
     
-    # Usar ImageField para el avatar
+    # Usar ImageField - django-cloudinary-storage maneja Cloudinary automáticamente
     avatar = models.ImageField(
         upload_to='avatars/',
         blank=True,

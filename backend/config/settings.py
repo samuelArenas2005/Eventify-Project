@@ -14,6 +14,10 @@ from pathlib import Path
 from datetime import timedelta
 import os
 import dj_database_url
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde .env
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +30,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-l#u6#gs!o*!1(ty$^27b3p7)a9uw2&mu7%=5h^mzncj26*ice)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Leer DEBUG de variable de entorno, por defecto True para desarrollo local
+DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 ALLOWED_HOSTS = [
     "localhost", 
@@ -49,6 +54,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
+    'cloudinary_storage',  # Debe ir antes de 'django.contrib.staticfiles'
+    'cloudinary',  # Cloudinary SDK
     'apps.base',
     'apps.event',
     'apps.rating',
@@ -175,8 +182,33 @@ SIMPLE_JWT = {
 }
 
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+# Configuración de Cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', ''),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', ''),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', ''),
+}
+
+# Verificar si Cloudinary está configurado (todas las variables deben estar presentes)
+USE_CLOUDINARY = all([
+    os.getenv('CLOUDINARY_CLOUD_NAME'),
+    os.getenv('CLOUDINARY_API_KEY'),
+    os.getenv('CLOUDINARY_API_SECRET')
+])
+
+# Lógica de almacenamiento
+# Si estamos en producción (DEBUG=False) Y Cloudinary está configurado, usar Cloudinary
+# De lo contrario, usar almacenamiento local
+if not DEBUG and USE_CLOUDINARY:
+    # EN PRODUCCIÓN con Cloudinary configurado
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
+    # No definimos MEDIA_ROOT cuando usamos Cloudinary
+else:
+    # EN DESARROLLO o si Cloudinary no está configurado
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
 DATA_UPLOAD_MAX_MEMORY_SIZE = None
 
 AUTH_USER_MODEL = 'user.User'
