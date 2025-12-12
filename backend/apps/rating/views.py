@@ -2,13 +2,13 @@ from rest_framework import viewsets, permissions
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from .models import Rating
 from .serializers import RatingSerializer
-from apps.event.models import EventAttendee, Event # Importamos los modelos necesarios
-from django.utils import timezone
+from apps.event.models import EventAttendee, Event
+from django.utils import timezone # Asegúrate de tener esto importado
 
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
-    permission_classes = [permissions.IsAuthenticated] # Cambiado a IsAuthenticated para obligar login
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -21,8 +21,7 @@ class RatingViewSet(viewsets.ModelViewSet):
         user = self.request.user
         event = serializer.validated_data['event']
 
-        # 1. Validar que el usuario está inscrito y confirmado en el evento
-        # Ajusta los estados según tu lógica (REGISTERED o CONFIRMED)
+        # 1. Validar inscripción
         has_attended = EventAttendee.objects.filter(
             user=user, 
             event=event, 
@@ -32,12 +31,13 @@ class RatingViewSet(viewsets.ModelViewSet):
         if not has_attended:
             raise ValidationError("No puedes calificar un evento al que no estás inscrito.")
 
-        # 2. (Opcional) Validar que el evento ya terminó o está activo
-        # Si solo quieres calificaciones post-evento, descomenta esto:
-        # if event.end_date > timezone.now():
-        #     raise ValidationError("El evento aún no ha terminado, no puedes calificarlo.")
+        # 2. VALIDACIÓN DE FECHA (Lógica solicitada)
+        # Si el evento tiene fecha de fin y esa fecha es FUTURA (mayor a ahora), bloqueamos.
+        if event.end_date and event.end_date > timezone.now():
+             raise ValidationError("El evento aún no ha finalizado, por lo tanto no puedes calificarlo todavía.")
 
         serializer.save(user=user)
+
 
     def perform_update(self, serializer):
         if serializer.instance.user != self.request.user:

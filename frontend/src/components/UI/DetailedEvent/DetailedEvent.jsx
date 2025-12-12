@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styles from "./DetailedEvent.module.css";
 import {
   X, MapPin, Calendar, Users, User, Tag, ClipboardList,
@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 
 import StarRating from "../StarRating/StarRating";
-// Importamos la nueva función getEventRatings
+// Importamos la función para crear y obtener ratings
 import { createRating, getEventRatings } from "../../../api/api";
 
 const estadoColors = {
@@ -34,6 +34,8 @@ const EventDetailModal = ({
   fechaCreacion,
   myRating,
   onClose,
+
+  // Flags de botones
   showBorrar = false,
   showEditar = false,
   showRegistrar = false,
@@ -69,18 +71,26 @@ const EventDetailModal = ({
     }
   }, [myRating]);
 
-  // Validamos si el evento está finalizado
-  const isFinished = estado === 'Finalizado' || estado === 'FINISHED';
+  // --- VALIDACIÓN DE EVENTO FINALIZADO ---
+  // Se considera finalizado si el estado explícito lo dice O SI la fecha actual > fecha fin
+  const isFinished = useMemo(() => {
+    // 1. Si el backend ya lo marcó como finalizado, es finalizado.
+    if (estado === 'Finalizado' || estado === 'FINISHED') return true;
+
+    // 2. Si no, verificamos el reloj: ¿Ya pasó la hora de fin?
+    if (!fechaFin) return false;
+    const now = new Date();
+    const end = new Date(fechaFin);
+    return now > end;
+  }, [estado, fechaFin]);
 
   // --- LÓGICA: Cargar Comentarios ---
-  // Solo cargamos si el evento está finalizado y tenemos un ID
+  // Solo cargamos si el evento está finalizado (por estado o por fecha) y tenemos un ID
   useEffect(() => {
     const fetchComments = async () => {
       if (isFinished && id) {
         setLoadingComments(true);
         const data = await getEventRatings(id);
-        // Opcional: Filtramos para no mostrar mi propio comentario en la lista general 
-        // (ya que se muestra arriba en "Tu Reseña"), o lo dejamos. Aquí mostramos todos.
         setCommentsList(data);
         setLoadingComments(false);
       }
