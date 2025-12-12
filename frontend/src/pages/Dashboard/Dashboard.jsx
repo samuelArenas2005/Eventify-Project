@@ -196,49 +196,22 @@ const UserProfileDashboard = ({ user }) => {
     setSelectedEventForScan(null);
   };
 
-  const loadEvents = async () => {
-    // setLoading(true); // Opcional: no poner loading para que no parpadee al calificar
-
-    // 1. Obtenemos TODOS los registros (incluye activos y finalizados)
-    const allRegisteredData = await getRegisteredEvents(handleCloseModal);
-
-    // 2. Filtramos para el Tab "Registrados" (Solo Activos o Pendientes)
-    const activeRegistered = allRegisteredData.filter(ev => ev.status === 'ACTIVE' || ev.status === 'IN_PROGRESS');
-    setregisteredEventsData(activeRegistered);
-
-    // 3. Filtramos para el Tab "Historial" (Solo Finalizados)
-    const pastEvents = allRegisteredData.filter(ev => ev.status === 'FINISHED');
-    setHistoryData(pastEvents);
-
-    // ... resto de cargas (Pending, Created, Counts) ...
-    const PendingData = await getPendingEvents(handleCloseModal);
-    const CreatedData = await getCreatedEvent();
-    const allRegistered = await getAllRegisteredEventsCount();
-    const allCreated = await getAllCreatedEventsCount();
-
-    setpendingEventData(PendingData);
-    setMyEventsData(CreatedData);
-    setTotalRegisteredCount(allRegistered.data.length);
-
-    const activeAndFinishedCount = allCreated.data.filter(
-      (event) => event.status === "ACTIVE" || event.status === "FINISHED"
-    ).length;
-    setTotalCreatedCount(activeAndFinishedCount);
-
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    loadEvents();
-  }, []);
-
-
-  console.log(user);
-
   useEffect(() => {
     async function loadEvents() {
       setLoading(true);
-      const Registerdata = await getRegisteredEvents();
+      
+      // 1. Obtenemos TODOS los registros (incluye activos y finalizados)
+      const allRegisteredData = await getRegisteredEvents(handleCloseModal);
+
+      // 2. Filtramos para el Tab "Registrados" (Solo Activos o Pendientes)
+      const activeRegistered = allRegisteredData.filter(ev => ev.status === 'ACTIVE' || ev.status === 'IN_PROGRESS');
+      setregisteredEventsData(activeRegistered);
+
+      // 3. Filtramos para el Tab "Historial" (Solo Finalizados)
+      const pastEvents = allRegisteredData.filter(ev => ev.status === 'FINISHED');
+      setHistoryData(pastEvents);
+
+      // Resto de cargas
       const PendingData = await getPendingEvents(handleCloseModal);
       const CreatedData = await getCreatedEvent();
       const HistoryData = await getConfirmedEvents(handleCloseModal);
@@ -247,8 +220,6 @@ const UserProfileDashboard = ({ user }) => {
       const allRegistered = await getAllRegisteredEventsCount();
       const allCreated = await getAllCreatedEventsCount();
 
-      setLoading(false);
-      setregisteredEventsData(Registerdata);
       setpendingEventData(PendingData);
       setMyEventsData(CreatedData);
       setHistoryEventsData(HistoryData);
@@ -259,7 +230,8 @@ const UserProfileDashboard = ({ user }) => {
         (event) => event.status === "ACTIVE" || event.status === "FINISHED"
       ).length;
       setTotalCreatedCount(activeAndFinishedCount);
-      console.log(user);
+      
+      setLoading(false);
     }
 
     loadEvents();

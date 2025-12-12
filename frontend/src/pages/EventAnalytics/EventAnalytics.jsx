@@ -54,18 +54,52 @@ const EventAnalytics = () => {
           console.log("📌 Tu  Event en analytics:", formattedData);
           console.log("📌 Tu  Event status:", formattedData.status);
 
-          // Lógica de imágenes (igual que tenías)
-          if (data.images && Array.isArray(data.images)) {
-            // ... tu lógica de imagenes existente ...
-            // Para simplificar el ejemplo aquí asumo que funciona igual
-            // Si necesitas el bloque completo de imagenes dímelo, pero lo dejé igual en tu código
+          // Lógica de imágenes
+          const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+          // Remover /api/ del final si existe para obtener la URL base
+          const API_BASE = BASE_URL.replace(/\/api\/?$/, '');
+          const imagesArray = [];
+
+          // Función helper para convertir URL relativa a absoluta
+          const getFullImageUrl = (url) => {
+            if (!url) return null;
+            // Si ya es una URL completa (http/https), retornarla tal cual
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+              return url;
+            }
+            // Si es una URL de Cloudinary, retornarla tal cual
+            if (url.includes('cloudinary.com') || url.includes('res.cloudinary.com')) {
+              return url;
+            }
+            // Si es relativa, agregar la URL base del backend
+            return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+          };
+
+          if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+            // Si hay imágenes en el array, procesarlas
+            for (const img of data.images) {
+              const imageUrl = img.image || img;
+              const fullUrl = getFullImageUrl(imageUrl);
+              if (fullUrl) {
+                imagesArray.push({ 
+                  url: fullUrl, 
+                  file: null // Para edición, se cargará cuando sea necesario
+                });
+              }
+            }
           } else if (data.main_image) {
-            // ... tu lógica main_image ...
-            const response = await fetch(data.main_image);
-            const blob = await response.blob();
-            const file = new File([blob], 'main_image.jpg', { type: blob.type });
-            formattedData.images = [{ url: URL.createObjectURL(file), file: file }];
+            // Si solo hay main_image, procesarla
+            const fullUrl = getFullImageUrl(data.main_image);
+            if (fullUrl) {
+              imagesArray.push({ 
+                url: fullUrl, 
+                file: null 
+              });
+            }
           }
+
+          formattedData.images = imagesArray;
+          console.log("📌 Imágenes procesadas:", imagesArray);
           setFormattedEventData(formattedData);
         }
       } catch (error) {
@@ -96,24 +130,13 @@ const EventAnalytics = () => {
               ? new Date(attendee.created_at).toISOString().split('T')[0]
               : new Date().toISOString().split('T')[0]
           }));
+          console.log("formattedAttendees", formattedAttendees);
           setAttendees(formattedAttendees);
+          console.log("attendees", formattedAttendees);
         } catch (error) {
-          console.error("Error inscritos:", error);
-          toast.error("Error al cargar inscritos");
-        }
-      }
-
-      // B) Si la vista es COMENTARIOS (NUEVO)
-      if (activeView === "comments") {
-        setLoadingComments(true);
-        try {
-          const data = await getEventRatings(eventId);
-          setComments(data);
-        } catch (error) {
-          console.error("Error comentarios:", error);
-          toast.error("Error al cargar comentarios");
-        } finally {
-          setLoadingComments(false);
+          console.error("Error al obtener inscritos:", error);
+          toast.error("No se pudo cargar la lista de inscritos");
+          setAttendees([]); // por si llegara a fallar que espero que no, lista vacia de usuarios
         }
       }
     };
@@ -125,7 +148,7 @@ const EventAnalytics = () => {
   const eventData = {
     title: formattedEventData?.title,
     date: formattedEventData?.startDate,
-    attendees: attendees.length > 0 ? `${attendees.length} inscritos` : "Cargando...",
+    attendees: attendees.length,
     image: formattedEventData?.images[0]?.url,
   };
 
@@ -136,9 +159,175 @@ const EventAnalytics = () => {
     { id: "comments", icon: <MessageCircle size={20} />, label: "Comentarios" }
   ];
 
-  // Datos chart (igual que tenías)
-  const chartData = [{ label: "15 Nov", value: 5 } /* ... resto de tus datos ... */];
-  const chartStats = [ /* ... tus datos stats ... */];
+  // Datos falsos para la lista de usuarios
+  const fakeUsers = [
+    {
+      id: 1,
+      name: "María García",
+      email: "maria.garcia@email.com",
+      status: "confirmed",
+      registrationDate: "2025-11-15",
+    },
+    {
+      id: 2,
+      name: "Carlos Rodríguez",
+      email: "carlos.rodriguez@email.com",
+      status: "confirmed",
+      registrationDate: "2025-11-16",
+    },
+    {
+      id: 3,
+      name: "Ana Martínez",
+      email: "ana.martinez@email.com",
+      status: "pending",
+      registrationDate: "2025-11-17",
+    },
+    {
+      id: 4,
+      name: "José López",
+      email: "jose.lopez@email.com",
+      status: "confirmed",
+      registrationDate: "2025-11-18",
+    },
+    {
+      id: 5,
+      name: "Laura Sánchez",
+      email: "laura.sanchez@email.com",
+      status: "confirmed",
+      registrationDate: "2025-11-19",
+    },
+    {
+      id: 6,
+      name: "Pedro Hernández",
+      email: "pedro.hernandez@email.com",
+      status: "cancelled",
+      registrationDate: "2025-11-20",
+    },
+    {
+      id: 7,
+      name: "Sofia Ramírez",
+      email: "sofia.ramirez@email.com",
+      status: "confirmed",
+      registrationDate: "2025-11-21",
+    },
+    {
+      id: 8,
+      name: "Miguel Torres",
+      email: "miguel.torres@email.com",
+      status: "pending",
+      registrationDate: "2025-11-22",
+    },
+  ];
+
+  // Generar datos de la gráfica a partir de attendees reales
+  const generateChartData = () => {
+    if (!attendees || attendees.length === 0) {
+      return [];
+    }
+
+    // Agrupar attendees por fecha de registro
+    const registrationsByDate = {};
+
+    attendees.forEach(attendee => {
+      const date = attendee.registrationDate;
+      if (date) {
+        if (!registrationsByDate[date]) {
+          registrationsByDate[date] = 0;
+        }
+        registrationsByDate[date]++;
+      }
+    });
+
+    // Convertir a array y ordenar por fecha
+    const sortedDates = Object.keys(registrationsByDate).sort();
+
+    // Crear datos acumulativos para la gráfica
+    let cumulativeCount = 0;
+    const chartData = sortedDates.map(date => {
+      cumulativeCount += registrationsByDate[date];
+
+      // Formatear la fecha para mostrar (ej: "15 Nov")
+      const dateObj = new Date(date + 'T00:00:00');
+      const day = dateObj.getDate();
+      const month = dateObj.toLocaleDateString('es-ES', { month: 'short' });
+      const formattedLabel = `${day} ${month.charAt(0).toUpperCase() + month.slice(1)}`;
+
+      return {
+        label: formattedLabel,
+        value: cumulativeCount
+      };
+    });
+    console.log("chartData22", chartData);
+
+    console.log("chartData con prueba", chartData);
+
+    return chartData;
+  };
+
+  const chartData = generateChartData();
+
+  // Calcular estadísticas reales
+  const calculateChartStats = () => {
+    const totalInscritos = attendees.length;
+
+    if (totalInscritos === 0) {
+      return [
+        { label: "Total Inscritos", value: "0", trend: { positive: true, text: "Sin datos" } },
+        { label: "Promedio Diario", value: "0", trend: { positive: true, text: "Sin datos" } },
+        { label: "Pico Máximo", value: "0", trend: { positive: false, text: "Sin datos" } },
+        { label: "Tasa de Conversión", value: "0%", trend: { positive: true, text: "Sin datos" } },
+      ];
+    }
+
+    // Calcular promedio diario
+    const registrationsByDate = {};
+    attendees.forEach(attendee => {
+      const date = attendee.registrationDate;
+      if (date) {
+        registrationsByDate[date] = (registrationsByDate[date] || 0) + 1;
+      }
+    });
+
+    const uniqueDays = Object.keys(registrationsByDate).length;
+    const averagePerDay = uniqueDays > 0 ? (totalInscritos / uniqueDays).toFixed(1) : "0";
+
+    // Encontrar el día con más inscripciones
+    let maxDate = "";
+    let maxCount = 0;
+    Object.entries(registrationsByDate).forEach(([date, count]) => {
+      if (count > maxCount) {
+        maxCount = count;
+        maxDate = date;
+      }
+    });
+
+    const maxDateFormatted = maxDate ? new Date(maxDate + 'T00:00:00').toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    }) : "Sin datos";
+
+    return [
+      {
+        label: "Total Inscritos",
+        value: totalInscritos.toString(),
+        trend: { positive: true, text: `${uniqueDays} días` },
+      },
+      {
+        label: "Promedio Diario",
+        value: averagePerDay,
+        trend: { positive: true, text: "inscritos/día" },
+      },
+      {
+        label: "Pico Máximo",
+        value: maxCount.toString(),
+        trend: { positive: false, text: maxDateFormatted },
+      },
+
+    ];
+  };
+
+  const chartStats = calculateChartStats();
 
   const renderContent = () => {
     if (activeView === "users") {
