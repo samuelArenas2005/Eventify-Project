@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Event, Category, EventAttendee, EventImage
 from django.contrib.auth import get_user_model
+from apps.rating.models import Rating
 
 User = get_user_model()
 
@@ -27,6 +28,9 @@ class EventListSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     attendees_count = serializers.SerializerMethodField()
     images = EventImageSerializer(many=True, read_only=True)
+    
+    # NUEVO CAMPO: Para saber si el usuario ya calificó este evento
+    my_rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
@@ -36,13 +40,31 @@ class EventListSerializer(serializers.ModelSerializer):
             'location_info', 'capacity', 'status', 
             'creator', 'category', 'attendees_count',
             'images', 
+            'my_rating', # <--- No olvides agregarlo aquí
             'created_at', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
 
     def get_attendees_count(self, obj):
         return obj.attendees.count()
-    
+
+    def get_my_rating(self, obj):
+        """
+        Devuelve la calificación del usuario actual para este evento.
+        Retorna null si no lo ha calificado.
+        """
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            # Usamos 'ratings' porque es el related_name definido en tu modelo Rating
+            rating = obj.ratings.filter(user=request.user).first()
+            if rating:
+                return {
+                    "id": rating.id,
+                    "score": rating.score,
+                    "comment": rating.comment
+                }
+        return None
+        
 class EventAttendeeSerializer(serializers.ModelSerializer):
     user = UserBasicSerializer(read_only=True)
     event = EventListSerializer(read_only=True)

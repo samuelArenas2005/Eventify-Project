@@ -22,7 +22,7 @@ function hora12Colombia(iso) {
 
 const formattedDetailEvent = (event, onCloseHandler, showCancelar, showRegistrar, onBorrarHandler, onRegisterHandler) => {
   return {
-
+    id: event.id, // IMPORTANTE: El ID es necesario para enviar la calificación
     titulo: event.title || "Sin título",
     descripcion: event.description || "Sin descripción",
     imag: event.images || [event.main_image || "https://via.placeholder.com/300x200"],
@@ -34,8 +34,11 @@ const formattedDetailEvent = (event, onCloseHandler, showCancelar, showRegistrar
     organizador: event.creator?.username || "Desconocido",
     categoria: event.category?.name || "Sin categoría",
     estado: event.status || "Activo",
-    local_info: event.location_info || "Por definir",   // detalle del local
-    fechaCreacion: event.created_at || null,     // string ISO o similar
+    local_info: event.location_info || "Por definir",
+    fechaCreacion: event.created_at || null,
+
+    // NUEVO CAMPO: Pasamos la calificación al detalle (modal)
+    myRating: event.my_rating || null,
 
     onClose: onCloseHandler,
     showBorrar: false,
@@ -49,7 +52,6 @@ const formattedDetailEvent = (event, onCloseHandler, showCancelar, showRegistrar
 
 export const getRegisteredEvents = async (closeModalHandler) => {
   try {
-    // Llamada al backend
     const events = await getEventRegisteredUser();
     let userIdObtenido = null;
 
@@ -92,20 +94,26 @@ export const getRegisteredEvents = async (closeModalHandler) => {
       }
     };
 
-    const formattedFromApi = events.data.map((events, index) => ({
-      id: events.event.id || index,
-      imageUrl: events.event.main_image || "https://via.placeholder.com/300x200",
-      category: events.event.category?.name || "Sin categoría",
-      title: events.event.title,
-      description: events.event.description,
-      date: diaMes(events.event.start_date) || "Por definir",
-      time: hora12Colombia(events.event.start_date) || "Por definir",
-      location: events.event.address || "Por definir",
-      currentParticipants: events.event.attendees_count || 0,
-      totalParticipants: events.event.capacity || 100,
-      organizer: events.event.creator.username || "Desconocido",
-      onRegisterClick: () => alert(`Ver detalle de registro ${events.event.id}`),
-      onHeartClick: () => console.log(`Heart ${hora12Colombia(events.event.start_date)}`),
+    // El endpoint devuelve EventAttendee (objeto con .event dentro)
+    const formattedFromApi = events.data.map((item, index) => ({
+      id: item.event.id || index,
+      imageUrl: item.event.main_image || "https://via.placeholder.com/300x200",
+      category: item.event.category?.name || "Sin categoría",
+      title: item.event.title,
+      description: item.event.description,
+      date: diaMes(item.event.start_date) || "Por definir",
+      time: hora12Colombia(item.event.start_date) || "Por definir",
+      location: item.event.address || "Por definir",
+      currentParticipants: item.event.attendees_count || 0,
+      totalParticipants: item.event.capacity || 100,
+      organizer: item.event.creator.username || "Desconocido",
+
+      // CAMPOS CLAVE PARA EL HISTORIAL Y RATING:
+      status: item.event.status,         // Para saber si es FINISHED
+      myRating: item.event.my_rating,    // Objeto {score, comment} o null
+
+      onRegisterClick: () => alert(`Ver detalle de registro ${item.event.id}`),
+      onHeartClick: () => console.log(`Heart`),
       showRegisterButton: false,
       showHeartButton: false,
       readQRCode: true,
@@ -119,17 +127,11 @@ export const getRegisteredEvents = async (closeModalHandler) => {
       )
     }));
 
-
-    /* const map = new Map();
-    registeredEventsDataObjet.forEach((e) => map.set(e.id, e));
-    formattedFromApi.forEach((e) => map.set(e.id, e));
-    return Array.from(map.values());  */
-    return formattedFromApi
-
+    return formattedFromApi;
 
   } catch (error) {
     console.error("Error al obtener eventos:", error);
-    return []; // retornar array vacío en caso de error
+    return [];
   }
 };
 
@@ -146,6 +148,7 @@ export const getPendingEvents = async (closeModalHandler) => {
       title: events.event.title,
       description: events.event.description,
       date: diaMes(events.event.start_date) || "Por definir",
+      time: hora12Colombia(events.event.start_date) || "Por definir",
       time: hora12Colombia(events.event.start_date) || "Por definir",
       location: events.event.address || "Por definir",
       currentParticipants: events.event.attendees_count || 0,

@@ -40,6 +40,8 @@ import ConfirmarModal from "../../components/UI/ConfirmarModal/ConfirmarModal";
 import { confirmEventRegistration } from "../../api/api";
 import { toast } from "react-hot-toast";
 
+const historyData = [];
+
 // --- Componente Principal ---
 const UserProfileDashboard = ({ user }) => {
   const navigate = useNavigate();
@@ -60,6 +62,7 @@ const UserProfileDashboard = ({ user }) => {
   const [selectedEventForQR, setSelectedEventForQR] = useState(null);
   const [isScanQRModalOpen, setIsScanQRModalOpen] = useState(false);
   const [selectedEventForScan, setSelectedEventForScan] = useState(null);
+  const [historyData, setHistoryData] = useState([]);
 
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [confirmState, setConfirmState] = useState({ open: false, event: null }); // <-- nuevo
@@ -193,6 +196,43 @@ const UserProfileDashboard = ({ user }) => {
     setSelectedEventForScan(null);
   };
 
+  const loadEvents = async () => {
+    // setLoading(true); // Opcional: no poner loading para que no parpadee al calificar
+
+    // 1. Obtenemos TODOS los registros (incluye activos y finalizados)
+    const allRegisteredData = await getRegisteredEvents(handleCloseModal);
+
+    // 2. Filtramos para el Tab "Registrados" (Solo Activos o Pendientes)
+    const activeRegistered = allRegisteredData.filter(ev => ev.status === 'ACTIVE' || ev.status === 'IN_PROGRESS');
+    setregisteredEventsData(activeRegistered);
+
+    // 3. Filtramos para el Tab "Historial" (Solo Finalizados)
+    const pastEvents = allRegisteredData.filter(ev => ev.status === 'FINISHED');
+    setHistoryData(pastEvents);
+
+    // ... resto de cargas (Pending, Created, Counts) ...
+    const PendingData = await getPendingEvents(handleCloseModal);
+    const CreatedData = await getCreatedEvent();
+    const allRegistered = await getAllRegisteredEventsCount();
+    const allCreated = await getAllCreatedEventsCount();
+
+    setpendingEventData(PendingData);
+    setMyEventsData(CreatedData);
+    setTotalRegisteredCount(allRegistered.data.length);
+
+    const activeAndFinishedCount = allCreated.data.filter(
+      (event) => event.status === "ACTIVE" || event.status === "FINISHED"
+    ).length;
+    setTotalCreatedCount(activeAndFinishedCount);
+
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+
   console.log(user);
 
   useEffect(() => {
@@ -297,6 +337,11 @@ const UserProfileDashboard = ({ user }) => {
     let type = "";
 
     switch (activeTab) {
+      case "historial":
+        title = `Historial (${historyData.length})`;
+        data = historyData; // AHORA USA EL ESTADO, NO LA CONSTANTE VACÍA
+        emptyMessage = "No tienes eventos finalizados en tu historial.";
+        break;
       case "registrados":
         title = `Eventos Registrados (${registeredEventsData.length})`;
         data = registeredEventsData;
@@ -488,7 +533,7 @@ const UserProfileDashboard = ({ user }) => {
                       <EventCard
                         key={event.id}
                         {...event}
-                        generateQRCode = {false}
+                        generateQRCode={false}
                       />
                     ))}
                   </div>
@@ -509,7 +554,7 @@ const UserProfileDashboard = ({ user }) => {
                       <EventCard
                         key={event.id}
                         {...event}
-                        generateQRCode = {false}
+                        generateQRCode={false}
                         handleImageTitleClick={() => { }}  // Función vacía para eventos cancelados
                       />
                     ))}
@@ -531,7 +576,7 @@ const UserProfileDashboard = ({ user }) => {
                       <EventCard
                         key={event.id}
                         {...event}
-                        generateQRCode = {false}
+                        generateQRCode={false}
                       />
                     ))}
                   </div>
@@ -548,7 +593,9 @@ const UserProfileDashboard = ({ user }) => {
             </>
           )}
         </>
+
       );
+
     }
 
     // Render normal para otros tabs
@@ -747,7 +794,20 @@ const UserProfileDashboard = ({ user }) => {
         onConfirm={handleConfirmRegistration}
         onCancel={handleCancelConfirm}
       />
+
+      {selectedEvent && (
+        <EventModal
+          {...selectedEvent}
+          onRatingUpdate={() => {
+            // Cuando el usuario califica, recargamos los eventos para que aparezcan las estrellas
+            loadEvents();
+            // Opcional: cerrar el modal o dejarlo abierto
+            // handleCloseModal(); 
+          }}
+        />
+      )}
     </div>
+
   );
 };
 
