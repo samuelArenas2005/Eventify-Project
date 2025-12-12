@@ -54,18 +54,52 @@ const EventAnalytics = () => {
           console.log("📌 Tu  Event en analytics:", formattedData);
           console.log("📌 Tu  Event status:", formattedData.status);
 
-          // Lógica de imágenes (igual que tenías)
-          if (data.images && Array.isArray(data.images)) {
-            // ... tu lógica de imagenes existente ...
-            // Para simplificar el ejemplo aquí asumo que funciona igual
-            // Si necesitas el bloque completo de imagenes dímelo, pero lo dejé igual en tu código
+          // Lógica de imágenes
+          const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+          // Remover /api/ del final si existe para obtener la URL base
+          const API_BASE = BASE_URL.replace(/\/api\/?$/, '');
+          const imagesArray = [];
+
+          // Función helper para convertir URL relativa a absoluta
+          const getFullImageUrl = (url) => {
+            if (!url) return null;
+            // Si ya es una URL completa (http/https), retornarla tal cual
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+              return url;
+            }
+            // Si es una URL de Cloudinary, retornarla tal cual
+            if (url.includes('cloudinary.com') || url.includes('res.cloudinary.com')) {
+              return url;
+            }
+            // Si es relativa, agregar la URL base del backend
+            return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+          };
+
+          if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+            // Si hay imágenes en el array, procesarlas
+            for (const img of data.images) {
+              const imageUrl = img.image || img;
+              const fullUrl = getFullImageUrl(imageUrl);
+              if (fullUrl) {
+                imagesArray.push({ 
+                  url: fullUrl, 
+                  file: null // Para edición, se cargará cuando sea necesario
+                });
+              }
+            }
           } else if (data.main_image) {
-            // ... tu lógica main_image ...
-            const response = await fetch(data.main_image);
-            const blob = await response.blob();
-            const file = new File([blob], 'main_image.jpg', { type: blob.type });
-            formattedData.images = [{ url: URL.createObjectURL(file), file: file }];
+            // Si solo hay main_image, procesarla
+            const fullUrl = getFullImageUrl(data.main_image);
+            if (fullUrl) {
+              imagesArray.push({ 
+                url: fullUrl, 
+                file: null 
+              });
+            }
           }
+
+          formattedData.images = imagesArray;
+          console.log("📌 Imágenes procesadas:", imagesArray);
           setFormattedEventData(formattedData);
         }
       } catch (error) {
