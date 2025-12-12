@@ -23,3 +23,7 @@ gunicorn
 
 psycopg2-binary
 dj-database-url
+
+#Cloudinary for image storage in production
+django-cloudinary-storage
+cloudinary

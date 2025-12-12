@@ -3,6 +3,25 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
 from django.utils import timezone
 
+# Importar CloudinaryField condicionalmente
+try:
+    from cloudinary_storage.storage import MediaCloudinaryStorage
+    from cloudinary.models import CloudinaryField
+    CLOUDINARY_AVAILABLE = True
+except ImportError:
+    CLOUDINARY_AVAILABLE = False
+    CloudinaryField = None
+
+def get_image_field(upload_to, **kwargs):
+    """
+    Retorna CloudinaryField si no está en DEBUG y Cloudinary está disponible,
+    de lo contrario retorna ImageField normal.
+    """
+    if not settings.DEBUG and CLOUDINARY_AVAILABLE and CloudinaryField:
+        return CloudinaryField(upload_to=upload_to, **kwargs)
+    else:
+        return models.ImageField(upload_to=upload_to, **kwargs)
+
 class Category(models.Model):
     name = models.CharField(
         max_length=60,
@@ -53,7 +72,7 @@ class Event(models.Model):
         blank=False,
         null=False
     )
-    main_image = models.ImageField(
+    main_image = get_image_field(
         upload_to='events/',
         blank=True,
         null=True
@@ -179,7 +198,7 @@ class EventImage(models.Model):
         on_delete=models.CASCADE,
         related_name='images'
     )
-    image = models.ImageField(
+    image = get_image_field(
         upload_to='events/images/',
         blank=False,
         null=False
