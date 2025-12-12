@@ -30,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-l#u6#gs!o*!1(ty$^27b3p7)a9uw2&mu7%=5h^mzncj26*ice)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False   # Cambiar a True para desarrollo local
+DEBUG = True  # Cambiar a True para desarrollo local
 
 ALLOWED_HOSTS = [
     "localhost", 
@@ -183,23 +183,19 @@ SIMPLE_JWT = {
 
 # Configuración de Cloudinary
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', ''),
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
-# Configuración de archivos multimedia
-# Si no está en DEBUG y Cloudinary está configurado, usar Cloudinary
-# De lo contrario, usar almacenamiento local
-if not DEBUG and all([
-    os.getenv('CLOUDINARY_CLOUD_NAME'),
-    os.getenv('CLOUDINARY_API_KEY'),
-    os.getenv('CLOUDINARY_API_SECRET')
-]):
+# Lógica de almacenamiento
+if not DEBUG:
+    # EN PRODUCCIÓN (Render)
+    # Forzamos el uso de Cloudinary. Si faltan las llaves, esto dará error (es mejor que falle a que guarde mal)
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = '/media/'
 else:
-    # Almacenamiento local para desarrollo
+    # EN DESARROLLO (Local)
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
