@@ -385,7 +385,16 @@ const EventDashboard = ({
       <div className={styles.dashboardContainer}>
         {/* Contenido Principal */}
         <main className={styles.mainContent}>
-          {/* Botón Volver al Dashboard */}
+          {/* Botón Volver al Dashboard - Solo en modo creación */}
+          {!isEditMode && (
+            <div className={styles.backButtonContainer}>
+              <Link to="/dashboard" className={styles.backButton}>
+                <ArrowLeft size={16} />
+                Volver al Dashboard
+              </Link>
+            </div>
+          )}
+
           <form
             onSubmit={handleSubmit(handleCreateEvent, onError)}
             className={styles.formGrid}
@@ -856,7 +865,7 @@ const EventDashboard = ({
             </section>
           </form>
         </main>
-      </div>
+      </div >
     </>
   );
 };

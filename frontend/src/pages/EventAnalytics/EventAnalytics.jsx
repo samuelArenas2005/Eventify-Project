@@ -3,28 +3,24 @@ import AnalyticsLayout from "../../components/Analytics/layout/AnalyticsLayout";
 import EventAnalyticsHeader from "../../components/Analytics/headers/EventAnalyticsHeader";
 import UserListView from "../../components/Analytics/views/UserListView";
 import TimeSeriesChart from "../../components/Analytics/charts/TimeSeriesChart";
-// import CommentsPlaceholder from "../../components/Analytics/views/CommentsPlaceholder"; // YA NO LO NECESITAMOS
-import CommentsListView from "../../components/Analytics/views/CommentsListView"; // IMPORTAMOS EL NUEVO
-import { Edit } from 'lucide-react';
+import CommentsListView from "../../components/Analytics/views/CommentsListView";
 import { Pencil } from 'lucide-react';
 import ModifyEventView from "../../components/Analytics/views/modifyEventView";
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
-// IMPORTANTE: Agregamos getEventRatings aquí
 import { getEventById, getEventAttendees, getEventRatings } from '../../api/api';
 import { Loader2 } from 'lucide-react';
-import styles from './EventAnalytics.module.css'; // Asegúrate de importar los estilos como objeto si usas modules
+import styles from './EventAnalytics.module.css';
 
 const EventAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
   const { eventId } = useParams();
   const [formattedEventData, setFormattedEventData] = useState(null);
   const [attendees, setAttendees] = useState([]);
-
-  // NUEVOS ESTADOS PARA COMENTARIOS
   const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(false);
+  const [loadingAttendees, setLoadingAttendees] = useState(false);
 
   // 1. Cargar datos del evento (Header)
   useEffect(() => {
@@ -54,7 +50,7 @@ const EventAnalytics = () => {
           console.log("📌 Tu  Event en analytics:", formattedData);
           console.log("📌 Tu  Event status:", formattedData.status);
 
-          // Lógica de imágenes
+          // Lógica de imágenes - Cargar como File objects para que EventForm las muestre
           const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
           // Remover /api/ del final si existe para obtener la URL base
           const API_BASE = BASE_URL.replace(/\/api\/?$/, '');
@@ -75,31 +71,53 @@ const EventAnalytics = () => {
             return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
           };
 
+          // Función para cargar imagen como File object
+          const loadImageAsFile = async (imageUrl) => {
+            try {
+              const fullUrl = getFullImageUrl(imageUrl);
+              if (!fullUrl) return null;
+
+              const response = await fetch(fullUrl);
+              if (!response.ok) {
+                console.error("Error al cargar imagen:", response.status);
+                return { url: fullUrl, file: null };
+              }
+
+              const blob = await response.blob();
+              const fileName = imageUrl.split('/').pop() || 'image.jpg';
+              const file = new File([blob], fileName, { type: blob.type });
+              
+              return { 
+                url: URL.createObjectURL(file), 
+                file: file 
+              };
+            } catch (error) {
+              console.error("Error al cargar imagen:", error);
+              // Si falla, retornar solo la URL
+              const fullUrl = getFullImageUrl(imageUrl);
+              return { url: fullUrl, file: null };
+            }
+          };
+
+          // Cargar imágenes existentes
           if (data.images && Array.isArray(data.images) && data.images.length > 0) {
             // Si hay imágenes en el array, procesarlas
-            for (const img of data.images) {
+            const imagePromises = data.images.map(async (img) => {
               const imageUrl = img.image || img;
-              const fullUrl = getFullImageUrl(imageUrl);
-              if (fullUrl) {
-                imagesArray.push({ 
-                  url: fullUrl, 
-                  file: null // Para edición, se cargará cuando sea necesario
-                });
-              }
-            }
+              return await loadImageAsFile(imageUrl);
+            });
+            
+            const loadedImages = await Promise.all(imagePromises);
+            formattedData.images = loadedImages.filter(img => img !== null);
           } else if (data.main_image) {
             // Si solo hay main_image, procesarla
-            const fullUrl = getFullImageUrl(data.main_image);
-            if (fullUrl) {
-              imagesArray.push({ 
-                url: fullUrl, 
-                file: null 
-              });
+            const loadedImage = await loadImageAsFile(data.main_image);
+            if (loadedImage) {
+              formattedData.images = [loadedImage];
             }
           }
 
-          formattedData.images = imagesArray;
-          console.log("📌 Imágenes procesadas:", imagesArray);
+          console.log("📌 Imágenes procesadas:", formattedData.images);
           setFormattedEventData(formattedData);
         }
       } catch (error) {
@@ -117,6 +135,7 @@ const EventAnalytics = () => {
 
       // A) Si la vista es USUARIOS
       if (activeView === "users") {
+        setLoadingAttendees(true);
         try {
           const data = await getEventAttendees(eventId);
           const formattedAttendees = data.map(attendee => ({
@@ -132,11 +151,26 @@ const EventAnalytics = () => {
           }));
           console.log("formattedAttendees", formattedAttendees);
           setAttendees(formattedAttendees);
-          console.log("attendees", formattedAttendees);
         } catch (error) {
           console.error("Error al obtener inscritos:", error);
           toast.error("No se pudo cargar la lista de inscritos");
-          setAttendees([]); // por si llegara a fallar que espero que no, lista vacia de usuarios
+          setAttendees([]);
+        } finally {
+          setLoadingAttendees(false);
+        }
+      }
+
+      // B) Si la vista es COMENTARIOS
+      if (activeView === "comments") {
+        setLoadingComments(true);
+        try {
+          const data = await getEventRatings(eventId);
+          setComments(data);
+        } catch (error) {
+          console.error("Error comentarios:", error);
+          toast.error("Error al cargar comentarios");
+        } finally {
+          setLoadingComments(false);
         }
       }
     };
@@ -148,8 +182,8 @@ const EventAnalytics = () => {
   const eventData = {
     title: formattedEventData?.title,
     date: formattedEventData?.startDate,
-    attendees: attendees.length,
-    image: formattedEventData?.images[0]?.url,
+    attendees: loadingAttendees ? "Cargando..." : `${attendees.length} inscritos`,
+    image: formattedEventData?.images?.[0]?.url,
   };
 
   const menuItems = [
@@ -157,66 +191,6 @@ const EventAnalytics = () => {
     { id: "users", icon: <Users size={20} />, label: "Lista de Inscritos" },
     { id: "registrations", icon: <TrendingUp size={20} />, label: "Inscripciones por Día" },
     { id: "comments", icon: <MessageCircle size={20} />, label: "Comentarios" }
-  ];
-
-  // Datos falsos para la lista de usuarios
-  const fakeUsers = [
-    {
-      id: 1,
-      name: "María García",
-      email: "maria.garcia@email.com",
-      status: "confirmed",
-      registrationDate: "2025-11-15",
-    },
-    {
-      id: 2,
-      name: "Carlos Rodríguez",
-      email: "carlos.rodriguez@email.com",
-      status: "confirmed",
-      registrationDate: "2025-11-16",
-    },
-    {
-      id: 3,
-      name: "Ana Martínez",
-      email: "ana.martinez@email.com",
-      status: "pending",
-      registrationDate: "2025-11-17",
-    },
-    {
-      id: 4,
-      name: "José López",
-      email: "jose.lopez@email.com",
-      status: "confirmed",
-      registrationDate: "2025-11-18",
-    },
-    {
-      id: 5,
-      name: "Laura Sánchez",
-      email: "laura.sanchez@email.com",
-      status: "confirmed",
-      registrationDate: "2025-11-19",
-    },
-    {
-      id: 6,
-      name: "Pedro Hernández",
-      email: "pedro.hernandez@email.com",
-      status: "cancelled",
-      registrationDate: "2025-11-20",
-    },
-    {
-      id: 7,
-      name: "Sofia Ramírez",
-      email: "sofia.ramirez@email.com",
-      status: "confirmed",
-      registrationDate: "2025-11-21",
-    },
-    {
-      id: 8,
-      name: "Miguel Torres",
-      email: "miguel.torres@email.com",
-      status: "pending",
-      registrationDate: "2025-11-22",
-    },
   ];
 
   // Generar datos de la gráfica a partir de attendees reales
@@ -257,9 +231,6 @@ const EventAnalytics = () => {
         value: cumulativeCount
       };
     });
-    console.log("chartData22", chartData);
-
-    console.log("chartData con prueba", chartData);
 
     return chartData;
   };
@@ -275,7 +246,6 @@ const EventAnalytics = () => {
         { label: "Total Inscritos", value: "0", trend: { positive: true, text: "Sin datos" } },
         { label: "Promedio Diario", value: "0", trend: { positive: true, text: "Sin datos" } },
         { label: "Pico Máximo", value: "0", trend: { positive: false, text: "Sin datos" } },
-        { label: "Tasa de Conversión", value: "0%", trend: { positive: true, text: "Sin datos" } },
       ];
     }
 
@@ -323,7 +293,6 @@ const EventAnalytics = () => {
         value: maxCount.toString(),
         trend: { positive: false, text: maxDateFormatted },
       },
-
     ];
   };
 
@@ -343,13 +312,12 @@ const EventAnalytics = () => {
         />
       );
     }
-    // NUEVO RENDERIZADO
     if (activeView === "comments") {
       return (
         <CommentsListView
           comments={comments}
           loading={loadingComments}
-          styles={styles} // Pasamos los estilos al hijo
+          styles={styles}
         />
       );
     }
