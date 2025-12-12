@@ -1,0 +1,370 @@
+/* ... MANTÉN TUS ESTILOS BASE ANTERIORES ... */
+
+.pageContainer {
+    padding: 8rem 2rem 4rem 2rem;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    display: flex;
+    justify-content: center;
+}
+
+.contentWrapper {
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 4px 20px var(--color-shadow);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+}
+
+.calendarSection {
+    flex: 2;
+    padding: 2rem;
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ... HEADER Y CONTROLES (IGUAL QUE ANTES) ... */
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    align-items: center;
+}
+
+.titleContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.iconTitle {
+    color: var(--color-primary);
+}
+
+.pageTitle {
+    font-family: var(--font-title);
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    background: var(--color-light-bg);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    align-items: center;
+}
+
+.currentMonth {
+    font-family: var(--font-title);
+    font-size: 1rem;
+    color: var(--text-primary);
+    min-width: 140px;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.navButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secundary);
+    display: flex;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.navButton:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--color-primary);
+}
+
+/* Grid */
+.weekDaysGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 1rem;
+}
+
+.weekDayName {
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-secundary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.daysGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.dayCell {
+    aspect-ratio: 1;
+    border-radius: var(--border-radius-md);
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid transparent;
+}
+
+.dayCell:hover {
+    background-color: var(--color-light-bg);
+    border-color: var(--color-border);
+}
+
+.emptyCell {
+    pointer-events: none;
+}
+
+.dayNumber {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-bottom: 4px;
+}
+
+/* --- PUNTITOS DE COLORES --- */
+.eventDots {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+/* Evento donde estoy inscrito: Morado/Secundario */
+.dotRegistered {
+    background-color: var(--color-secondary);
+}
+
+/* Evento público (no inscrito): Azul/Primario (u otro color suave) */
+.dotPublic {
+    background-color: #9CA3AF;
+    opacity: 0.6;
+}
+
+
+/* --- TU FIX PARA TODAY CELL --- */
+.todayCell .dayNumber {
+    background-color: #b35297;
+    color: white;
+    font-weight: 700;
+}
+
+.selectedCell.todayCell .dayNumber {
+    background-color: #b35297 !important;
+    color: white !important;
+}
+
+.selectedCell {
+    background-color: rgba(11, 114, 185, 0.1);
+    border-color: var(--color-primary);
+}
+
+/* Leyenda */
+.legend {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secundary);
+}
+
+/* --- SECCIÓN DETALLES --- */
+.detailsSection {
+    flex: 1;
+    padding: 2rem;
+    background-color: var(--color-light-bg);
+    display: flex;
+    flex-direction: column;
+}
+
+.detailsHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--color-border);
+    gap: 0.5rem;
+}
+
+.headerIcon {
+    color: var(--color-primary);
+}
+
+.detailsTitle {
+    font-family: var(--font-title);
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.clearFilterBtn {
+    background: none;
+    border: 1px solid var(--color-border);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: var(--color-primary);
+    transition: all 0.2s;
+}
+
+.clearFilterBtn:hover {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.eventsList {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-right: 5px;
+}
+
+.eventCard {
+    background-color: var(--color-white);
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 2px 4px var(--color-shadow);
+    border-left: 4px solid #ccc;
+    /* Default gris */
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Borde izquierdo dinámico? Puedes hacerlo con JS inline style si quieres, o dejarlo generico */
+.eventCard:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px var(--color-shadow);
+    border-left-color: var(--color-primary);
+}
+
+.dateBadge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-secundary);
+    border-bottom-left-radius: 8px;
+}
+
+.registeredBadge {
+    background-color: var(--color-secondary);
+    color: white;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+.eventTimeBox {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.eventCardTitle {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.eventLocation {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--text-secundary);
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secundary);
+    opacity: 0.7;
+    gap: 1rem;
+}
+
+.loaderContainer {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-primary);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 900px) {
+    .contentWrapper {
+        flex-direction: column;
+    }
+
+    .calendarSection {
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+    }
+}

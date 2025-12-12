@@ -132,16 +132,11 @@ export default function EditPerfilPage() {
       await updateUser(updateData);
       toast.success('Perfil actualizado correctamente');
       
-      // Recargar datos del usuario
-      const updatedData = await getUser();
-      setUserData(updatedData);
-      
-      // Limpiar contraseñas
-      setFormData(prev => ({
-        ...prev,
-        password: '',
-        password2: ''
-      }));
+      // Redirigir al dashboard y refrescar la página para ver los cambios
+      setTimeout(() => {
+        navigate('/dashboard');
+        window.location.reload();
+      }, 500); // Pequeño delay para que se vea el toast
     } catch (error) {
       console.error('Error updating user:', error);
       const errorMessage = error.response?.data?.message || 

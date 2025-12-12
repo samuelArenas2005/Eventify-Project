@@ -1,29 +1,16 @@
 from rest_framework import viewsets, permissions
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.response import Response
-from rest_framework import status
-
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from .models import Rating
 from .serializers import RatingSerializer
-
+from apps.event.models import EventAttendee, Event # Importamos los modelos necesarios
+from django.utils import timezone
 
 class RatingViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet para gestionar las calificaciones (Ratings) de los eventos.
-
-    
-    Permite listar, crear, ver, actualizar y eliminar ratings.
-    Solo el usuario que creó una calificación puede modificarla o eliminarla.
-    Se asigna automáticamente el user desde el request (no se pasa por JSON).
-    """
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated] # Cambiado a IsAuthenticated para obligar login
 
     def get_queryset(self):
-        """
-        Si se pasa el parámetro ?event=<id>, filtra por ese evento.
-        """
         queryset = super().get_queryset()
         event_id = self.request.query_params.get("event")
         if event_id:
@@ -31,23 +18,33 @@ class RatingViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        """
-        Asigna automáticamente el usuario autenticado como autor de la calificación.
-        """
-        serializer.save(user=self.request.user)
+        user = self.request.user
+        event = serializer.validated_data['event']
+
+        # 1. Validar que el usuario está inscrito y confirmado en el evento
+        # Ajusta los estados según tu lógica (REGISTERED o CONFIRMED)
+        has_attended = EventAttendee.objects.filter(
+            user=user, 
+            event=event, 
+            status__in=['CONFIRMED', 'REGISTERED'] 
+        ).exists()
+
+        if not has_attended:
+            raise ValidationError("No puedes calificar un evento al que no estás inscrito.")
+
+        # 2. (Opcional) Validar que el evento ya terminó o está activo
+        # Si solo quieres calificaciones post-evento, descomenta esto:
+        # if event.end_date > timezone.now():
+        #     raise ValidationError("El evento aún no ha terminado, no puedes calificarlo.")
+
+        serializer.save(user=user)
 
     def perform_update(self, serializer):
-        """
-        Solo el autor puede actualizar su propia calificación.
-        """
         if serializer.instance.user != self.request.user:
             raise PermissionDenied("No puedes modificar una calificación de otro usuario.")
         serializer.save()
 
     def perform_destroy(self, instance):
-        """
-        Solo el autor puede eliminar su propia calificación.
-        """
         if instance.user != self.request.user:
             raise PermissionDenied("No puedes eliminar una calificación de otro usuario.")
         instance.delete()

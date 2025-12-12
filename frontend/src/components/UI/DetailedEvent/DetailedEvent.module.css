@@ -5,12 +5,15 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro semitransparente */
-  backdrop-filter: blur(5px); /* Efecto "glass" moderno */
+  background-color: rgba(0, 0, 0, 0.6);
+  /* Fondo oscuro semitransparente */
+  backdrop-filter: blur(5px);
+  /* Efecto "glass" moderno */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Z-index alto */
+  z-index: 1000;
+  /* Z-index alto */
   padding: 1rem;
 }
 
@@ -20,12 +23,16 @@
   border-radius: var(--border-radius-lg);
   box-shadow: 0 10px 30px -5px var(--color-shadow);
   width: 100%;
-  max-width: 1200px; /* Ancho máximo del modal más grande */
-  max-height: 90vh; /* Altura máxima */
+  max-width: 1200px;
+  /* Ancho máximo del modal más grande */
+  max-height: 90vh;
+  /* Altura máxima */
   z-index: 1001;
   display: flex;
-  flex-direction: row; /* Cambio clave: ahora es horizontal */
-  overflow: hidden; /* Clave para que el body tenga scroll */
+  flex-direction: row;
+  /* Cambio clave: ahora es horizontal */
+  overflow: hidden;
+  /* Clave para que el body tenga scroll */
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -34,6 +41,7 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -56,19 +64,20 @@
   z-index: 10;
   color: #333;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .closeButton:hover {
   background: var(--color-danger);
   color: white;
   transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* --- Sección Izquierda: Galería --- */
 .gallerySection {
-  flex: 0 0 45%; /* 45% del ancho */
+  flex: 0 0 45%;
+  /* 45% del ancho */
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   display: flex;
   flex-direction: column;
@@ -133,23 +142,31 @@
   justify-content: center;
   cursor: pointer;
   color: #333;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   transition: all 0.3s ease;
   opacity: 0.8;
 }
+
 .galleryNav:hover {
   background-color: white;
   transform: translateY(-50%) scale(1.15);
   opacity: 1;
 }
-.prev { left: 15px; }
-.next { right: 15px; }
+
+.prev {
+  left: 15px;
+}
+
+.next {
+  right: 15px;
+}
 
 .thumbnailList {
   display: flex;
   gap: 0.5rem;
   padding: 1rem;
-  overflow-x: auto; /* Permite scroll horizontal si hay muchas imgs */
+  overflow-x: auto;
+  /* Permite scroll horizontal si hay muchas imgs */
   background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
 }
@@ -211,7 +228,7 @@
   font-family: var(--font-base);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* --- Grid de Información --- */
@@ -241,7 +258,8 @@
 }
 
 .infoIcon {
-  color: var(--color-primary); /* Iconos en color primario */
+  color: var(--color-primary);
+  /* Iconos en color primario */
   flex-shrink: 0;
   margin-top: 3px;
   background: rgba(var(--color-primary-rgb, 0, 123, 255), 0.1);
@@ -310,7 +328,8 @@
   font-size: 1.05rem;
   color: var(--text-secundary);
   line-height: 1.7;
-  white-space: pre-wrap; /* Respeta saltos de línea y espacios */
+  white-space: pre-wrap;
+  /* Respeta saltos de línea y espacios */
 }
 
 /* --- Pie de Página (Acciones) --- */
@@ -322,7 +341,8 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 1rem;
-  flex-shrink: 0; /* Evita que se encoja */
+  flex-shrink: 0;
+  /* Evita que se encoja */
 }
 
 .button {
@@ -340,28 +360,92 @@
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .button:hover {
-  transform: translateY(-3px); /* Efecto sutil al pasar el mouse */
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  transform: translateY(-3px);
+  /* Efecto sutil al pasar el mouse */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
 .button:active {
   transform: translateY(-1px);
 }
 
-.registerButton { 
+.registerButton {
   background: var(--color-success);
 }
 
-.editButton { 
+.editButton {
   background: var(--color-warning);
 }
 
-.deleteButton { 
+.deleteButton {
   background: var(--color-danger);
+}
+
+/* Sección contenedora */
+.ratingSection {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  /* Fondo gris muy suave */
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Caja de lectura (cuando ya comentó) */
+.ratingCommentBox {
+  width: 100%;
+  padding: 1rem;
+  background-color: #fff;
+  border-left: 4px solid #FFD700;
+  /* Borde dorado */
+  color: #374151;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* El área de texto (input) */
+.ratingTextarea {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-family: 'Poppins', sans-serif;
+  /* Usar tu fuente principal */
+  resize: vertical;
+  /* Permite estirar hacia abajo */
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: #fff;
+}
+
+.ratingTextarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  /* Tu color azul/morado */
+  box-shadow: 0 0 0 3px rgba(11, 114, 185, 0.1);
+  /* Ajusta el color RGB según tu primary */
+}
+
+/* Botón de enviar */
+.submitRatingButton {
+  background-color: var(--color-primary);
+  margin-top: 10px;
+  width: 100%;
+  /* Botón ancho en móviles */
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .submitRatingButton {
+    width: auto;
+    /* Botón normal en PC */
+    align-self: flex-start;
+  }
 }
 
 /* --- Responsive Design --- */
@@ -397,4 +481,101 @@
     flex: 1;
     justify-content: center;
   }
+}
+
+/* --- AGREGAR AL FINAL DE DetailedEvent.module.css --- */
+
+.commentsContainer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.commentsTitle {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+/* Área con SCROLLBAR */
+.commentsScrollArea {
+  max-height: 350px;
+  /* Altura fija para forzar scroll si hay muchos */
+  overflow-y: auto;
+  /* Scroll vertical */
+  padding-right: 8px;
+  /* Espacio para el scrollbar */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Estilo del Scrollbar (Navegadores WebKit: Chrome, Edge, Safari) */
+.commentsScrollArea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.commentsScrollArea::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.commentsScrollArea::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  /* Color gris suave */
+  border-radius: 4px;
+}
+
+.commentsScrollArea::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+/* Tarjeta individual de comentario */
+.commentCard {
+  background-color: #fff;
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.commentCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.commentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.commentUser {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.commentDate {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.commentText {
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.errorMessage {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
 }

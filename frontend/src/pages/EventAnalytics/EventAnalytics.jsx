@@ -3,30 +3,32 @@ import AnalyticsLayout from "../../components/Analytics/layout/AnalyticsLayout";
 import EventAnalyticsHeader from "../../components/Analytics/headers/EventAnalyticsHeader";
 import UserListView from "../../components/Analytics/views/UserListView";
 import TimeSeriesChart from "../../components/Analytics/charts/TimeSeriesChart";
-import CommentsPlaceholder from "../../components/Analytics/views/CommentsPlaceholder";
-import { Edit } from 'lucide-react';
+import CommentsListView from "../../components/Analytics/views/CommentsListView";
 import { Pencil } from 'lucide-react';
 import ModifyEventView from "../../components/Analytics/views/modifyEventView";
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
-import { getEventById, getEventAttendees } from '../../api/api';
+import { getEventById, getEventAttendees, getEventRatings } from '../../api/api';
 import { Loader2 } from 'lucide-react';
+import styles from './EventAnalytics.module.css';
 
 const EventAnalytics = () => {
   const [activeView, setActiveView] = useState("users");
   const { eventId } = useParams();
   const [formattedEventData, setFormattedEventData] = useState(null);
   const [attendees, setAttendees] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [loadingAttendees, setLoadingAttendees] = useState(false);
 
+  // 1. Cargar datos del evento (Header)
   useEffect(() => {
     const fetchEventData = async () => {
       if (!eventId) return;
-
       try {
         const data = await getEventById(eventId);
         if (data) {
-          // Mapear los datos de la API al formato del formulario
           const startDateObj = new Date(data.start_date);
           const endDateObj = new Date(data.end_date);
 
@@ -41,43 +43,81 @@ const EventAnalytics = () => {
             address: data.address,
             venueInfo: data.location_info,
             capacity: data.capacity,
-            category: data.category.id.toString(),
+            category: data.category?.id?.toString(),
             images: []
           };
           console.log("📌 Tu  Event es :", data);
           console.log("📌 Tu  Event en analytics:", formattedData);
           console.log("📌 Tu  Event status:", formattedData.status);
 
-          // Manejar imágenes existentes
-          if (data.images && Array.isArray(data.images)) {
-            const imagePromises = data.images.map(async (imgUrl) => {
-              try {
-                const url = typeof imgUrl === 'string' ? imgUrl : imgUrl.image;
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const filename = url.split('/').pop() || 'image.jpg';
-                const file = new File([blob], filename, { type: blob.type });
+          // Lógica de imágenes - Cargar como File objects para que EventForm las muestre
+          const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+          // Remover /api/ del final si existe para obtener la URL base
+          const API_BASE = BASE_URL.replace(/\/api\/?$/, '');
+          const imagesArray = [];
 
-                return { url: URL.createObjectURL(file), file: file };
-              } catch (err) {
-                console.error("Error cargando imagen existente:", err);
-                return null;
-              }
-            });
+          // Función helper para convertir URL relativa a absoluta
+          const getFullImageUrl = (url) => {
+            if (!url) return null;
+            // Si ya es una URL completa (http/https), retornarla tal cual
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+              return url;
+            }
+            // Si es una URL de Cloudinary, retornarla tal cual
+            if (url.includes('cloudinary.com') || url.includes('res.cloudinary.com')) {
+              return url;
+            }
+            // Si es relativa, agregar la URL base del backend
+            return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+          };
 
-            const processedImages = await Promise.all(imagePromises);
-            formattedData.images = processedImages.filter(img => img !== null);
-          } else if (data.main_image) {
+          // Función para cargar imagen como File object
+          const loadImageAsFile = async (imageUrl) => {
             try {
-              const response = await fetch(data.main_image);
+              const fullUrl = getFullImageUrl(imageUrl);
+              if (!fullUrl) return null;
+
+              const response = await fetch(fullUrl);
+              if (!response.ok) {
+                console.error("Error al cargar imagen:", response.status);
+                return { url: fullUrl, file: null };
+              }
+
               const blob = await response.blob();
-              const file = new File([blob], 'main_image.jpg', { type: blob.type });
-              formattedData.images = [{ url: URL.createObjectURL(file), file: file }];
-            } catch (err) {
-              console.error("Error cargando main_image:", err);
+              const fileName = imageUrl.split('/').pop() || 'image.jpg';
+              const file = new File([blob], fileName, { type: blob.type });
+              
+              return { 
+                url: URL.createObjectURL(file), 
+                file: file 
+              };
+            } catch (error) {
+              console.error("Error al cargar imagen:", error);
+              // Si falla, retornar solo la URL
+              const fullUrl = getFullImageUrl(imageUrl);
+              return { url: fullUrl, file: null };
+            }
+          };
+
+          // Cargar imágenes existentes
+          if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+            // Si hay imágenes en el array, procesarlas
+            const imagePromises = data.images.map(async (img) => {
+              const imageUrl = img.image || img;
+              return await loadImageAsFile(imageUrl);
+            });
+            
+            const loadedImages = await Promise.all(imagePromises);
+            formattedData.images = loadedImages.filter(img => img !== null);
+          } else if (data.main_image) {
+            // Si solo hay main_image, procesarla
+            const loadedImage = await loadImageAsFile(data.main_image);
+            if (loadedImage) {
+              formattedData.images = [loadedImage];
             }
           }
 
+          console.log("📌 Imágenes procesadas:", formattedData.images);
           setFormattedEventData(formattedData);
         }
       } catch (error) {
@@ -85,140 +125,72 @@ const EventAnalytics = () => {
         toast.error("No se pudo cargar la información del evento");
       }
     };
-
     fetchEventData();
   }, [eventId]);
 
-
+  // 2. Cargar Inscritos o Comentarios según la vista activa
   useEffect(() => {
-    const fetchAttendees = async () => {
+    const fetchDataByView = async () => {
       if (!eventId) return;
 
-      try {
-        const data = await getEventAttendees(eventId);
+      // A) Si la vista es USUARIOS
+      if (activeView === "users") {
+        setLoadingAttendees(true);
+        try {
+          const data = await getEventAttendees(eventId);
+          const formattedAttendees = data.map(attendee => ({
+            id: attendee.user?.id || attendee.id,
+            name: attendee.user?.name
+              ? `${attendee.user.name} ${attendee.user.last_name || ''}`.trim()
+              : attendee.user?.username || 'Usuario',
+            email: attendee.user?.email || 'No disponible',
+            status: attendee.status || 'CONFIRMED',
+            registrationDate: attendee.created_at
+              ? new Date(attendee.created_at).toISOString().split('T')[0]
+              : new Date().toISOString().split('T')[0]
+          }));
+          console.log("formattedAttendees", formattedAttendees);
+          setAttendees(formattedAttendees);
+        } catch (error) {
+          console.error("Error al obtener inscritos:", error);
+          toast.error("No se pudo cargar la lista de inscritos");
+          setAttendees([]);
+        } finally {
+          setLoadingAttendees(false);
+        }
+      }
 
-        // datos para UserListView
-        const formattedAttendees = data.map(attendee => ({
-          id: attendee.user?.id || attendee.id,
-          name: attendee.user?.name
-            ? `${attendee.user.name} ${attendee.user.last_name || ''}`.trim()
-            : attendee.user?.username || 'Usuario',
-          email: attendee.user?.email || 'No disponible',
-          status: attendee.status || 'CONFIRMED', // Si no hay status se asigna CONFIRMED
-          registrationDate: attendee.created_at
-            ? new Date(attendee.created_at).toISOString().split('T')[0]
-            : new Date().toISOString().split('T')[0]
-        }));
-        console.log("formattedAttendees", formattedAttendees);
-
-        setAttendees(formattedAttendees);
-        console.log("attendees", attendees);
-      } catch (error) {
-        console.error("Error al obtener inscritos:", error);
-        toast.error("No se pudo cargar la lista de inscritos");
-        setAttendees([]); // por si llegara a fallar que espero que no, lista vacia de usuarios
+      // B) Si la vista es COMENTARIOS
+      if (activeView === "comments") {
+        setLoadingComments(true);
+        try {
+          const data = await getEventRatings(eventId);
+          setComments(data);
+        } catch (error) {
+          console.error("Error comentarios:", error);
+          toast.error("Error al cargar comentarios");
+        } finally {
+          setLoadingComments(false);
+        }
       }
     };
 
-    if (activeView === "users") {
-      fetchAttendees();
-    }
+    fetchDataByView();
   }, [eventId, activeView]);
 
-  // Imprimir el eventId en consola
-
-
-  // Datos del evento
+  // Datos para el Header lateral
   const eventData = {
     title: formattedEventData?.title,
     date: formattedEventData?.startDate,
-    attendees: attendees.length,
-    image: formattedEventData?.images[0]?.url,
+    attendees: loadingAttendees ? "Cargando..." : `${attendees.length} inscritos`,
+    image: formattedEventData?.images?.[0]?.url,
   };
 
-  // Opciones del menú
   const menuItems = [
-    {
-      id: "Modificar_evento",
-      icon: <Pencil size={20} />,
-      label: "Modificar evento",
-    },
-    {
-      id: "users",
-      icon: <Users size={20} />,
-      label: "Lista de Inscritos",
-    },
-    {
-      id: "registrations",
-      icon: <TrendingUp size={20} />,
-      label: "Inscripciones por Día",
-    },
-    {
-      id: "comments",
-      icon: <MessageCircle size={20} />,
-      label: "Comentarios",
-    }
-
-  ];
-
-  // Datos falsos para la lista de usuarios
-  const fakeUsers = [
-    {
-      id: 1,
-      name: "María García",
-      email: "maria.garcia@email.com",
-      status: "confirmed",
-      registrationDate: "2025-11-15",
-    },
-    {
-      id: 2,
-      name: "Carlos Rodríguez",
-      email: "carlos.rodriguez@email.com",
-      status: "confirmed",
-      registrationDate: "2025-11-16",
-    },
-    {
-      id: 3,
-      name: "Ana Martínez",
-      email: "ana.martinez@email.com",
-      status: "pending",
-      registrationDate: "2025-11-17",
-    },
-    {
-      id: 4,
-      name: "José López",
-      email: "jose.lopez@email.com",
-      status: "confirmed",
-      registrationDate: "2025-11-18",
-    },
-    {
-      id: 5,
-      name: "Laura Sánchez",
-      email: "laura.sanchez@email.com",
-      status: "confirmed",
-      registrationDate: "2025-11-19",
-    },
-    {
-      id: 6,
-      name: "Pedro Hernández",
-      email: "pedro.hernandez@email.com",
-      status: "cancelled",
-      registrationDate: "2025-11-20",
-    },
-    {
-      id: 7,
-      name: "Sofia Ramírez",
-      email: "sofia.ramirez@email.com",
-      status: "confirmed",
-      registrationDate: "2025-11-21",
-    },
-    {
-      id: 8,
-      name: "Miguel Torres",
-      email: "miguel.torres@email.com",
-      status: "pending",
-      registrationDate: "2025-11-22",
-    },
+    { id: "Modificar_evento", icon: <Pencil size={20} />, label: "Modificar evento" },
+    { id: "users", icon: <Users size={20} />, label: "Lista de Inscritos" },
+    { id: "registrations", icon: <TrendingUp size={20} />, label: "Inscripciones por Día" },
+    { id: "comments", icon: <MessageCircle size={20} />, label: "Comentarios" }
   ];
 
   // Generar datos de la gráfica a partir de attendees reales
@@ -259,9 +231,6 @@ const EventAnalytics = () => {
         value: cumulativeCount
       };
     });
-    console.log("chartData22", chartData);
-
-    console.log("chartData con prueba", chartData);
 
     return chartData;
   };
@@ -277,7 +246,6 @@ const EventAnalytics = () => {
         { label: "Total Inscritos", value: "0", trend: { positive: true, text: "Sin datos" } },
         { label: "Promedio Diario", value: "0", trend: { positive: true, text: "Sin datos" } },
         { label: "Pico Máximo", value: "0", trend: { positive: false, text: "Sin datos" } },
-        { label: "Tasa de Conversión", value: "0%", trend: { positive: true, text: "Sin datos" } },
       ];
     }
 
@@ -325,7 +293,6 @@ const EventAnalytics = () => {
         value: maxCount.toString(),
         trend: { positive: false, text: maxDateFormatted },
       },
-
     ];
   };
 
@@ -333,7 +300,7 @@ const EventAnalytics = () => {
 
   const renderContent = () => {
     if (activeView === "users") {
-      return <UserListView users={attendees} />; // Usar attendees reales en lugar de fakeUsers
+      return <UserListView users={attendees} />;
     }
     if (activeView === "registrations") {
       return (
@@ -346,7 +313,13 @@ const EventAnalytics = () => {
       );
     }
     if (activeView === "comments") {
-      return <CommentsPlaceholder />;
+      return (
+        <CommentsListView
+          comments={comments}
+          loading={loadingComments}
+          styles={styles}
+        />
+      );
     }
     if (activeView === "Modificar_evento") {
       return <ModifyEventView event={formattedEventData} id={eventId} />
@@ -367,4 +340,3 @@ const EventAnalytics = () => {
 };
 
 export default EventAnalytics;
-
