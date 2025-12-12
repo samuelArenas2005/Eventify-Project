@@ -18,6 +18,7 @@ import EventAnalytics from "./pages/EventAnalytics/EventAnalytics.jsx";
 import NotFoundPage from "./pages/NotFound/NotFoundPage";
 import SearchPage from "./pages/SearchEvent/SearchPage.jsx";
 import ScrollToTop from "./components/UI/ScrollTop/ScrollToTop";
+import CalendarPage from "./pages/Calendar/CalendarPage";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -107,6 +108,10 @@ function App() {
             </>
           }
         />
+        <Route
+          path="/calendario"
+          element={<CalendarPage />}
+        />
         <Route path="*" element={<NotFoundPage />} />
         //Aqui van las rutas que solo dependen del usuario
         <Route
@@ -157,6 +162,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
       </Routes>
       <Footer />
     </BrowserRouter>
