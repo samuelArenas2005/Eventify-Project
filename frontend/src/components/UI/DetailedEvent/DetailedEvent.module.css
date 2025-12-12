@@ -232,6 +232,7 @@
   padding: 0.5rem;
   border-radius: var(--border-radius-sm);
   transition: all 0.3s ease;
+  min-width: 0; /* Permite que el contenido se trunque */
 }
 
 .infoItem:hover {
@@ -252,6 +253,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0; /* Permite que el contenido se trunque */
+  flex: 1; /* Toma el espacio disponible */
 }
 
 .infoLabel {
@@ -266,6 +269,14 @@
   font-size: 1rem;
   color: var(--text-primary);
   font-weight: 600;
+}
+
+.locationValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block;
 }
 
 /* --- Sección de Descripción --- */

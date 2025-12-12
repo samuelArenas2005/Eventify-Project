@@ -159,7 +159,7 @@ const EventCard = ({
         <div className={styles.detailItem}>
           {/* Iconos más grandes */}
           <MapPin size={20} className={styles.detailIcon} />
-          <span className={styles.detailText}>{location}</span>
+          <span className={`${styles.detailText} ${styles.locationText}`}>{location}</span>
         </div>
         <div className={styles.detailItem}>
           {/* Iconos más grandes */}

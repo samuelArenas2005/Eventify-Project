@@ -477,6 +477,7 @@ const UserProfileDashboard = ({ user }) => {
                       <EventCard
                         key={event.id}
                         {...event}
+                        generateQRCode = {false}
                         handleQRCodeClick={() => handleQRCodeClick(event)}
                         handleReadQrCodeClick={() =>
                           handleReadQrCodeClick(event)
@@ -501,6 +502,7 @@ const UserProfileDashboard = ({ user }) => {
                       <EventCard
                         key={event.id}
                         {...event}
+                        generateQRCode = {false}
                         handleImageTitleClick={() => { }}  // Función vacía para eventos cancelados
                         handleQRCodeClick={() => { }}      // No permite generar QR
                         handleReadQrCodeClick={() => { }}  // No permite leer QR
@@ -524,6 +526,7 @@ const UserProfileDashboard = ({ user }) => {
                       <EventCard
                         key={event.id}
                         {...event}
+                        generateQRCode = {false}
                         handleQRCodeClick={() => handleQRCodeClick(event)}
                         handleReadQrCodeClick={() =>
                           handleReadQrCodeClick(event)
