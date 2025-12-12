@@ -132,7 +132,7 @@ const EventAnalytics = () => {
   const eventData = {
     title: formattedEventData?.title,
     date: formattedEventData?.startDate,
-    attendees: "Dos perras",
+    attendees: attendees.length,
     image: formattedEventData?.images[0]?.url,
   };
 
