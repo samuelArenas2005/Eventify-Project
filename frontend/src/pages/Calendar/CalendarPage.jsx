@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin, Info, Compass } from 'lucide-react';
 import styles from './CalendarPage.module.css';
-import { getEventRegisteredUser } from '../../api/api';
-import EventDetailModal from '../../components/UI/DetailedEvent/DetailedEvent'; // Ajusta la ruta si es necesario
+import { getEventRegisteredUser, getAllEvents } from '../../api/api';
+import EventDetailModal from '../../components/UI/DetailedEvent/DetailedEvent';
 import { Loader2 } from 'lucide-react';
 
 const CalendarPage = () => {
@@ -10,40 +10,68 @@ const CalendarPage = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Estado para la interacción
-    const [selectedDate, setSelectedDate] = useState(new Date()); // Por defecto el día de hoy
-    const [selectedEventId, setSelectedEventId] = useState(null); // Para el modal
-    const [modalData, setModalData] = useState(null); // Datos formateados para el modal
+    // INTERACCIÓN
+    // Inicializamos en null para mostrar "Eventos Cercanos" por defecto
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedEventId, setSelectedEventId] = useState(null);
+    const [modalData, setModalData] = useState(null);
 
-    // Cargar eventos registrados
+    // --- 1. CARGA DE DATOS (PÚBLICOS + REGISTRADOS) ---
     useEffect(() => {
-        const fetchEvents = async () => {
+        const fetchAllData = async () => {
+            setLoading(true);
             try {
-                const response = await getEventRegisteredUser();
-                // La API devuelve un array de objetos { event: { ... }, status: ... }
-                // Mapeamos para tener una estructura más limpia
-                const formatted = response.data.map(item => ({
-                    ...item.event,
-                    attendanceStatus: item.status, // Guardamos el estado (REGISTERED, CONFIRMED, etc)
-                    rawOriginal: item // Guardamos referencia completa por si acaso
-                }));
-                setEvents(formatted);
+                // Ejecutamos ambas peticiones en paralelo
+                // Nota: getAllEvents trae eventos activos donde NO estoy registrado
+                // getEventRegisteredUser trae eventos donde SI estoy registrado
+                const [publicData, registeredData] = await Promise.allSettled([
+                    getAllEvents(),
+                    getEventRegisteredUser()
+                ]);
+
+                let combinedEvents = [];
+
+                // 1. Procesar eventos públicos (Explore)
+                if (publicData.status === 'fulfilled' && Array.isArray(publicData.value)) {
+                    const publicFormatted = publicData.value.map(ev => ({
+                        ...ev,
+                        isRegistered: false // Marca visual
+                    }));
+                    combinedEvents = [...combinedEvents, ...publicFormatted];
+                }
+
+                // 2. Procesar eventos registrados (Si el usuario está logueado)
+                if (registeredData.status === 'fulfilled' && registeredData.value && Array.isArray(registeredData.value.data)) {
+                    // Nota: getEventRegisteredUser devuelve { data: [...] } o array directo dependiendo de tu axios config.
+                    // Asumiré que viene como en tu código anterior: response.data
+                    const regList = registeredData.value.data || registeredData.value;
+
+                    const registeredFormatted = regList.map(item => ({
+                        ...item.event, // Aplanamos el objeto
+                        attendanceStatus: item.status,
+                        isRegistered: true // Marca visual
+                    }));
+                    combinedEvents = [...combinedEvents, ...registeredFormatted];
+                }
+
+                setEvents(combinedEvents);
+
             } catch (error) {
-                console.error("Error cargando eventos:", error);
+                console.error("Error cargando calendario global:", error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchEvents();
+
+        fetchAllData();
     }, []);
 
-    // --- Lógica de Calendario ---
+    // --- LÓGICA CALENDARIO ---
     const getDaysInMonth = (date) => {
         const year = date.getFullYear();
         const month = date.getMonth();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const firstDayOfMonth = new Date(year, month, 1).getDay();
-        // Ajustar lunes como primer día (0=Lunes en mi grid, JS 0=Domingo)
         let startingDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
 
         const days = [];
@@ -66,12 +94,22 @@ const CalendarPage = () => {
         return events.filter(event => isSameDay(event.start_date, dayDate));
     };
 
+    // --- LÓGICA "PRÓXIMOS EVENTOS" (Cuando no hay día seleccionado) ---
+    const getUpcomingEvents = () => {
+        const now = new Date();
+        // Filtramos eventos futuros y ordenamos por fecha ascendente
+        return events
+            .filter(ev => new Date(ev.start_date) >= now)
+            .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
+            .slice(0, 10); // Mostramos solo los 10 más cercanos
+    };
+
     const handleDayClick = (day) => {
         if (day) setSelectedDate(day);
     };
 
     const handleEventClick = (event) => {
-        // Formatear datos para el modal DetailedEvent
+        // Preparar datos para el modal
         const formatted = {
             id: event.id,
             titulo: event.title,
@@ -82,14 +120,14 @@ const CalendarPage = () => {
             direccion: event.address,
             capacidad: event.capacity,
             asistentes: event.attendees_count,
-            organizador: event.creator?.username || "Desconocido",
-            categoria: event.category?.name || "Evento",
-            estado: event.status,
+            organizador: event.creator?.username || "Organizador",
+            categoria: event.category?.name || "General",
+            estado: event.status || "Activo",
             local_info: event.location_info,
             fechaCreacion: event.created_at,
-            myRating: event.my_rating, // Para ver y crear comentarios
-            showBorrar: false, // En calendario solo visualizamos
-            showRegistrar: false
+            myRating: event.my_rating,
+            showBorrar: false,
+            showRegistrar: !event.isRegistered, // Mostrar botón registrar si no lo está
         };
 
         setModalData(formatted);
@@ -101,11 +139,16 @@ const CalendarPage = () => {
         setModalData(null);
     };
 
-    // Renderizado
+    // Variables de renderizado
     const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const weekDays = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
     const daysToRender = getDaysInMonth(currentDate);
-    const selectedDayEvents = getEventsForDay(selectedDate);
+
+    // Decisión: ¿Qué lista mostrar a la derecha?
+    const displayEvents = selectedDate ? getEventsForDay(selectedDate) : getUpcomingEvents();
+    const displayTitle = selectedDate
+        ? `Eventos del ${selectedDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}`
+        : "Próximos Eventos Cercanos";
 
     if (loading) return <div className={styles.loaderContainer}><Loader2 className={styles.spinner} /></div>;
 
@@ -113,12 +156,12 @@ const CalendarPage = () => {
         <div className={styles.pageContainer}>
             <div className={styles.contentWrapper}>
 
-                {/* COLUMNA IZQUIERDA: CALENDARIO */}
+                {/* CALENDARIO */}
                 <div className={styles.calendarSection}>
                     <div className={styles.header}>
                         <div className={styles.titleContainer}>
                             <CalendarIcon className={styles.iconTitle} size={24} />
-                            <h1 className={styles.pageTitle}>Planificación</h1>
+                            <h1 className={styles.pageTitle}>Calendario de Eventos</h1>
                         </div>
                         <div className={styles.controls}>
                             <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))} className={styles.navButton}>
@@ -157,10 +200,16 @@ const CalendarPage = () => {
                                     {day && (
                                         <>
                                             <span className={styles.dayNumber}>{day.getDate()}</span>
-                                            {/* Puntos indicadores de eventos */}
                                             <div className={styles.eventDots}>
-                                                {dayEvents.map(ev => (
-                                                    <span key={ev.id} className={`${styles.dot} ${ev.status === 'FINISHED' ? styles.dotFinished : ''}`} />
+                                                {dayEvents.map((ev, i) => (
+                                                    <span
+                                                        key={i}
+                                                        className={`
+                              ${styles.dot} 
+                              ${ev.isRegistered ? styles.dotRegistered : styles.dotPublic}
+                            `}
+                                                        title={ev.title}
+                                                    />
                                                 ))}
                                             </div>
                                         </>
@@ -169,39 +218,56 @@ const CalendarPage = () => {
                             );
                         })}
                     </div>
+
+                    <div className={styles.legend}>
+                        <div className={styles.legendItem}><span className={`${styles.dot} ${styles.dotRegistered}`}></span> Inscrito</div>
+                        <div className={styles.legendItem}><span className={`${styles.dot} ${styles.dotPublic}`}></span> Disponible</div>
+                    </div>
                 </div>
 
-                {/* COLUMNA DERECHA: DETALLES DEL DÍA */}
+                {/* LISTA DE EVENTOS (Próximos o del día) */}
                 <div className={styles.detailsSection}>
-                    <h3 className={styles.detailsTitle}>
-                        {selectedDate
-                            ? `Eventos del ${selectedDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}`
-                            : "Selecciona un día"}
-                    </h3>
+                    <div className={styles.detailsHeader}>
+                        {selectedDate ? <Clock size={20} className={styles.headerIcon} /> : <Compass size={20} className={styles.headerIcon} />}
+                        <h3 className={styles.detailsTitle}>{displayTitle}</h3>
+                        {selectedDate && (
+                            <button className={styles.clearFilterBtn} onClick={() => setSelectedDate(null)} title="Ver todos los próximos">
+                                Ver próximos
+                            </button>
+                        )}
+                    </div>
 
                     <div className={styles.eventsList}>
-                        {selectedDayEvents.length === 0 ? (
+                        {displayEvents.length === 0 ? (
                             <div className={styles.emptyState}>
                                 <Info size={40} className={styles.emptyIcon} />
-                                <p>No tienes eventos inscritos para este día.</p>
+                                <p>{selectedDate ? "No hay eventos este día." : "No hay eventos próximos."}</p>
                             </div>
                         ) : (
-                            selectedDayEvents.map(event => (
+                            displayEvents.map(event => (
                                 <div
                                     key={event.id}
                                     className={`${styles.eventCard} ${event.status === 'FINISHED' ? styles.eventFinished : ''}`}
                                     onClick={() => handleEventClick(event)}
                                 >
+                                    {/* Etiqueta de fecha si estamos en vista de "Próximos" */}
+                                    {!selectedDate && (
+                                        <div className={styles.dateBadge}>
+                                            {new Date(event.start_date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}
+                                        </div>
+                                    )}
+
                                     <div className={styles.eventTimeBox}>
                                         <Clock size={14} />
                                         <span>{new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        {event.isRegistered && <span className={styles.registeredBadge}>Inscrito</span>}
                                     </div>
+
                                     <div className={styles.eventInfo}>
                                         <h4 className={styles.eventCardTitle}>{event.title}</h4>
                                         <div className={styles.eventLocation}>
-                                            <MapPin size={12} /> {event.address || "Ubicación por definir"}
+                                            <MapPin size={12} /> {event.address || "Por definir"}
                                         </div>
-                                        {event.status === 'FINISHED' && <span className={styles.badgeFinished}>Finalizado</span>}
                                     </div>
                                 </div>
                             ))
@@ -211,7 +277,6 @@ const CalendarPage = () => {
 
             </div>
 
-            {/* MODAL DETALLES */}
             {selectedEventId && modalData && (
                 <EventDetailModal
                     {...modalData}

@@ -108,6 +108,10 @@ function App() {
             </>
           }
         />
+        <Route
+          path="/calendario"
+          element={<CalendarPage />}
+        />
         <Route path="*" element={<NotFoundPage />} />
         //Aqui van las rutas que solo dependen del usuario
         <Route
@@ -158,14 +162,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/calendario"
-          element={
-            <ProtectedRoute isAllowed={!!user} loading={loading}>
-              <CalendarPage />
-            </ProtectedRoute>
-          }
-        />
+
       </Routes>
       <Footer />
     </BrowserRouter>
