@@ -118,11 +118,11 @@ export const getRegisteredEvents = async (closeModalHandler) => {
       showHeartButton: false,
       readQRCode: true,
       formattedDetailEvent: formattedDetailEvent(
-        events.event,
+        item.event,
         closeModalHandler,
         true,
         false,
-        () => handleBorrarRegistro(userIdObtenido, events.event.id),
+        () => handleBorrarRegistro(userIdObtenido, item.event.id),
         null
       )
     }));
