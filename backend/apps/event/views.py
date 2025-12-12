@@ -222,7 +222,44 @@ class EventViewSet(viewsets.ModelViewSet):
                             notification=notification,
                             state=UserNotification.State.DELIVERED
                         )
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def favorite(self, request, pk=None):
+        """
+        Marca un evento como favorito para el usuario autenticado.
+        Ruta: POST /api/event/events/{pk}/favorite/
+        """
+        event = self.get_object()
+        attendee, created = EventAttendee.objects.get_or_create(
+            event=event,
+            user=request.user,
+            defaults={'status': 'FAVORITE'}
+        )
+        if not created and attendee.status != 'FAVORITE':
+            attendee.status = 'FAVORITE'
+            attendee.save(update_fields=['status', 'updated_at'])
 
+        serializer = EventAttendeeSerializer(attendee, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def unfavorite(self, request, pk=None):
+        """
+        Quita un evento de favoritos del usuario autenticado.
+        Ruta: POST /api/event/events/{pk}/unfavorite/
+        """
+        event = self.get_object()
+        try:
+            attendee = EventAttendee.objects.get(event=event, user=request.user)
+            # Si estaba en favoritos, eliminar la relación o cambiar estado
+            if attendee.status == 'FAVORITE':
+                attendee.delete()
+            else:
+                # Opcional: si no era FAVORITE, no hacemos nada
+                return Response({'detail': 'Not favorite'}, status=status.HTTP_200_OK)
+            return Response({'detail': 'Removed from favorites'}, status=status.HTTP_204_NO_CONTENT)
+        except EventAttendee.DoesNotExist:
+            return Response({'detail': 'Not favorite'}, status=status.HTTP_200_OK)
+        
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def attend(self, request, pk=None):
         """
@@ -621,39 +658,28 @@ class ConfirmEventRegistrationView(APIView):
 
     def post(self, request, event_id):
         event = get_object_or_404(Event, pk=event_id)
-        
-        # Verificar si el usuario ya está inscrito
-        existing_attendee = EventAttendee.objects.filter(
-            event=event,
-            user=request.user
-        ).first()
-        
-        if existing_attendee:
-            return Response(
-                {"detail": "Ya estás inscrito en este evento."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Crear nueva inscripción
-        attendee = EventAttendee.objects.create(
-            event=event,
-            user=request.user,
-            status='REGISTERED'
-        )
 
-        # Buscar si ya existe una notificación de recordatorio para este evento
-        reminder_notif = Notification.objects.filter(
-            event=event, 
-            type=Notification.NotificationType.REMINDER
-        ).first()
-        
-        if reminder_notif:
-            # Suscribir al usuario a esa notificación existente
-            UserNotification.objects.get_or_create(
-                user=request.user,
-                notification=reminder_notif
-            )
-        
+        attendee = EventAttendee.objects.filter(event=event, user=request.user).first()
+        if attendee:
+            # Si viene de FAVORITE, cambia a REGISTERED
+            if attendee.status == 'FAVORITE':
+                attendee.status = 'REGISTERED'
+                attendee.save(update_fields=['status'])
+                serializer = EventAttendeeSerializer(attendee, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            # Si ya está REGISTERED o CONFIRMED, no crear duplicado
+            if attendee.status in ('REGISTERED', 'CONFIRMED'):
+                return Response({"detail": "Ya estás inscrito en este evento."}, status=status.HTTP_200_OK)
+
+            # Cualquier otro estado, llevar a REGISTERED
+            attendee.status = 'REGISTERED'
+            attendee.save(update_fields=['status'])
+            serializer = EventAttendeeSerializer(attendee, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # No existe relación: crear como REGISTERED
+        attendee = EventAttendee.objects.create(event=event, user=request.user, status='REGISTERED')
         serializer = EventAttendeeSerializer(attendee, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

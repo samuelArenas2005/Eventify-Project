@@ -36,6 +36,9 @@ import EventDashboard from "../../components/UI/EventCreate/EventForm";
 import Loanding from "../../components/UI/Loanding/Loanding";
 import ModalQr from "../../components/UI/modalQR/ModalQr";
 import ScanQr from "../../components/UI/ScanQr/ScanQr";
+import ConfirmarModal from "../../components/UI/ConfirmarModal/ConfirmarModal";
+import { confirmEventRegistration } from "../../api/api";
+import { toast } from "react-hot-toast";
 
 // --- Componente Principal ---
 const UserProfileDashboard = ({ user }) => {
@@ -56,6 +59,7 @@ const UserProfileDashboard = ({ user }) => {
   const [selectedEventForScan, setSelectedEventForScan] = useState(null);
 
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [confirmState, setConfirmState] = useState({ open: false, event: null }); // <-- nuevo
 
   // Estados para filtros de "Mis Eventos"
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -85,8 +89,41 @@ const UserProfileDashboard = ({ user }) => {
     setSelectedEvent(null);
   };
 
-  const removeStatusFilter = () => {
-    setSelectedStatusFilter("");
+  // Igual que en SearchPage: abrir modal de confirmación
+  const onRegistrar = (event) => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    setConfirmState({ open: true, event });
+  };
+
+  const handleCancelConfirm = () => {
+    setConfirmState({ open: false, event: null });
+  };
+
+  const handleConfirmRegistration = async () => {
+    const eventId = confirmState.event?.id;
+    if (!eventId) return;
+
+    try {
+      await confirmEventRegistration(eventId);
+      toast.success("¡Tu registro al evento ha sido exitoso!");
+      setConfirmState({ open: false, event: null });
+      window.location.reload();
+    } catch (error) {
+      const detail =
+        error?.response?.data?.detail ||
+        error?.detail ||
+        error?.message ||
+        "No pudimos completar tu registro, inténtalo nuevamente.";
+      if (typeof detail === "string" && detail.toLowerCase().includes("ya estás inscrito")) {
+        toast.error("Ya estás inscrito en este evento.");
+      } else {
+        toast.error(detail);
+      }
+      setConfirmState({ open: false, event: null });
+    }
   };
 
   // Función para finalizar eventos activos que ya pasaron su fecha de finalización
@@ -531,10 +568,18 @@ const UserProfileDashboard = ({ user }) => {
                 {...event}
                 handleQRCodeClick={() => handleQRCodeClick(event)}
                 handleReadQrCodeClick={() => handleReadQrCodeClick(event)}
-                handleImageTitleClick={() => setSelectedEvent({
-                  ...event.formattedDetailEvent,
-                  onClose: handleCloseModal
-                })}
+                handleImageTitleClick={() =>
+                  setSelectedEvent({
+                    ...event.formattedDetailEvent,
+                    // Solo mostrar botón de registro en favoritos en el cases de megustas
+                    showRegistrar: activeTab === "megustas",
+                    // Pasa onRegistrar solo si es favoritos
+                    onRegistrar: activeTab === "megustas" ? () => onRegistrar(event) : undefined,
+                    onClose: handleCloseModal,
+                  })
+                }
+                // Solo mostrar botón de registro en cards si es favoritos
+                onRegisterClick={activeTab === "megustas" ? () => onRegistrar(event) : undefined}
               />
             ))}
           </div>
@@ -675,6 +720,17 @@ const UserProfileDashboard = ({ user }) => {
 
       {/* Modal Detail Event */}
       {selectedEvent && <EventModal {...selectedEvent} />}
+
+      {/* Modal de Confirmación (igual que en SearchPage) */}
+      <ConfirmarModal
+        isOpen={confirmState.open}
+        title="Confirmar registro"
+        description="¿Deseas registrarte en este evento? Recibirás todas las actualizaciones en tu panel."
+        confirmLabel="Confirmar"
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmRegistration}
+        onCancel={handleCancelConfirm}
+      />
     </div>
   );
 };
