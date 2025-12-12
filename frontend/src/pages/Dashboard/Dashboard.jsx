@@ -478,10 +478,6 @@ const UserProfileDashboard = ({ user }) => {
                         key={event.id}
                         {...event}
                         generateQRCode = {false}
-                        handleQRCodeClick={() => handleQRCodeClick(event)}
-                        handleReadQrCodeClick={() =>
-                          handleReadQrCodeClick(event)
-                        }
                       />
                     ))}
                   </div>
@@ -504,8 +500,6 @@ const UserProfileDashboard = ({ user }) => {
                         {...event}
                         generateQRCode = {false}
                         handleImageTitleClick={() => { }}  // Función vacía para eventos cancelados
-                        handleQRCodeClick={() => { }}      // No permite generar QR
-                        handleReadQrCodeClick={() => { }}  // No permite leer QR
                       />
                     ))}
                   </div>
@@ -527,10 +521,6 @@ const UserProfileDashboard = ({ user }) => {
                         key={event.id}
                         {...event}
                         generateQRCode = {false}
-                        handleQRCodeClick={() => handleQRCodeClick(event)}
-                        handleReadQrCodeClick={() =>
-                          handleReadQrCodeClick(event)
-                        }
                       />
                     ))}
                   </div>
