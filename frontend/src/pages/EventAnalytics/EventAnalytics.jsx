@@ -96,33 +96,14 @@ const EventAnalytics = () => {
               ? new Date(attendee.created_at).toISOString().split('T')[0]
               : new Date().toISOString().split('T')[0]
           }));
+          console.log("formattedAttendees", formattedAttendees);
           setAttendees(formattedAttendees);
+          console.log("attendees", formattedAttendees);
         } catch (error) {
-          console.error("Error inscritos:", error);
-          toast.error("Error al cargar inscritos");
+          console.error("Error al obtener inscritos:", error);
+          toast.error("No se pudo cargar la lista de inscritos");
+          setAttendees([]); // por si llegara a fallar que espero que no, lista vacia de usuarios
         }
-      }
-
-        // datos para UserListView
-        const formattedAttendees = data.map(attendee => ({
-          id: attendee.user?.id || attendee.id,
-          name: attendee.user?.name
-            ? `${attendee.user.name} ${attendee.user.last_name || ''}`.trim()
-            : attendee.user?.username || 'Usuario',
-          email: attendee.user?.email || 'No disponible',
-          status: attendee.status || 'CONFIRMED', // Si no hay status se asigna CONFIRMED
-          registrationDate: attendee.created_at
-            ? new Date(attendee.created_at).toISOString().split('T')[0]
-            : new Date().toISOString().split('T')[0]
-        }));
-        console.log("formattedAttendees", formattedAttendees);
-
-        setAttendees(formattedAttendees);
-        console.log("attendees", attendees);
-      } catch (error) {
-        console.error("Error al obtener inscritos:", error);
-        toast.error("No se pudo cargar la lista de inscritos");
-        setAttendees([]); // por si llegara a fallar que espero que no, lista vacia de usuarios
       }
     };
 
