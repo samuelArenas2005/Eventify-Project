@@ -30,8 +30,8 @@ const EventDashboard = ({
   onClose = null,
   isEditMode = false,
   initialData = null,
-  onDelete = () => { },
-  onUpdate = () => { }
+  onDelete = () => {},
+  onUpdate = () => {},
 }) => {
   // --- Estados ---
   const [images, setImages] = useState([]); // Almacena { url: '...', file: File }
@@ -44,7 +44,10 @@ const EventDashboard = ({
 
   console.log("hola soy onClose", onClose);
   console.log("hola soy initialData", initialData);
-  console.log("hola soy initialData category", initialData?.category.toString());
+  console.log(
+    "hola soy initialData category",
+    initialData?.category.toString()
+  );
 
   // --- React Hook Form ---
   const {
@@ -92,7 +95,9 @@ const EventDashboard = ({
       // Cargar imágenes si existen en initialData
       // Solo cargamos imágenes que tengan tanto url como file válidos
       if (initialData.images && Array.isArray(initialData.images)) {
-        const validImages = initialData.images.filter(img => img.url && img.file);
+        const validImages = initialData.images.filter(
+          (img) => img.url && img.file
+        );
         if (validImages.length > 0) {
           setImages(validImages);
         }
@@ -265,12 +270,11 @@ const EventDashboard = ({
   // --- Manejador de Envío ---
 
   const onSubmit = async (data, statusOverride = null) => {
-    const status = (typeof statusOverride === 'string') ? statusOverride : 'ACTIVE';
+    const status =
+      typeof statusOverride === "string" ? statusOverride : "ACTIVE";
     setIsSubmitting(true);
     const loadingToast = toast.loading(
-      status === "DRAFT"
-        ? "Guardando borrador..."
-        : "Registrando tu evento..."
+      status === "DRAFT" ? "Guardando borrador..." : "Registrando tu evento..."
     );
 
     if (images.length === 0) {
@@ -321,11 +325,11 @@ const EventDashboard = ({
         // Redirigir al usuario al evento creado después de 2 segundos
         typeof onClose === "function"
           ? setTimeout(() => {
-            onClose();
-          }, 1000)
+              onClose();
+            }, 1000)
           : setTimeout(() => {
-            navigate(`/dashboard`);
-          }, 1000);
+              navigate(`/dashboard`);
+            }, 1000);
       } else {
         console.log("⚠️ Evento no encontrado tras creación:");
         toast.warning(
@@ -360,7 +364,7 @@ const EventDashboard = ({
 
   const handleCreateEvent = (data) => {
     onSubmit(data, "ACTIVE");
-  }
+  };
 
   // Nueva función para manejar la actualización en modo edición
   const handleUpdateEvent = (data) => {
@@ -368,7 +372,7 @@ const EventDashboard = ({
     const dataWithImages = {
       ...data,
       images: images,
-      mainImageIndex: mainImageIndex
+      mainImageIndex: mainImageIndex,
     };
     console.log("📸 Datos con imágenes para actualizar:", dataWithImages);
     onUpdate(dataWithImages);
@@ -378,7 +382,11 @@ const EventDashboard = ({
     console.log("Errores de validación:", formErrors);
     toast.error("Por favor, revisa los campos marcados en rojo.");
   };
-  const hoy = new Date().toISOString().split("T")[0];
+  const getTodayInBogota = () =>
+    new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(
+      new Date()
+    );
+  const todayColombia = getTodayInBogota();
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
@@ -403,7 +411,8 @@ const EventDashboard = ({
             <section className={`${styles.formColumn} ${styles.softAnimation}`}>
               <h1 className={styles.title}>
                 {" "}
-                <LayoutDashboard size={28} /> {isEditMode ? "Modificar Evento" : "Crear Nuevo Evento"}
+                <LayoutDashboard size={28} />{" "}
+                {isEditMode ? "Modificar Evento" : "Crear Nuevo Evento"}
               </h1>
               <h2 className={styles.columnTitle}>Detalles del Evento</h2>
 
@@ -468,19 +477,13 @@ const EventDashboard = ({
                   <input
                     id="startDate"
                     type="date"
-                    min={hoy}
+                    min={todayColombia}
                     className={styles.input}
                     {...register("startDate", {
                       required: "La fecha de inicio es obligatoria",
                       validate: (val) => {
-                        const colombiaDate = new Date(
-                          new Date().toLocaleString("en-US", {
-                            timeZone: "America/Bogota",
-                          })
-                        );
-                        colombiaDate.setHours(0, 0, 0, 0);
                         return (
-                          new Date(val) >= colombiaDate ||
+                          val >= todayColombia ||
                           "La fecha no puede ser en el pasado"
                         );
                       },
@@ -520,19 +523,13 @@ const EventDashboard = ({
                   <input
                     id="endDate"
                     type="date"
-                    min={hoy}
+                    min={todayColombia}
                     className={styles.input}
                     {...register("endDate", {
                       required: "La fecha de fin es obligatoria",
                       validate: (val) => {
-                        const colombiaDate = new Date(
-                          new Date().toLocaleString("en-US", {
-                            timeZone: "America/Bogota",
-                          })
-                        );
-                        colombiaDate.setHours(0, 0, 0, 0);
                         return (
-                          new Date(val) >= colombiaDate ||
+                          val >= todayColombia ||
                           "La fecha no puede ser en el pasado"
                         );
                       },
@@ -641,7 +638,7 @@ const EventDashboard = ({
                   >
                     <option value="">Selecciona una...</option>
                     {categories.map((cat) => (
-                      <option key={cat.id} value={String(cat.id)} >
+                      <option key={cat.id} value={String(cat.id)}>
                         {cat.name}
                       </option>
                     ))}
@@ -663,10 +660,23 @@ const EventDashboard = ({
                         type="button"
                         onClick={onDelete}
                         className={styles.deleteButton} // Asegúrate de tener estilos para esto o usa inline style temporalmente
-                        style={{ backgroundColor: "#ef4444", color: "white", padding: "0.75rem 1.5rem", borderRadius: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem", border: "none", cursor: "pointer", fontWeight: "600" }}
+                        style={{
+                          backgroundColor: "#ef4444",
+                          color: "white",
+                          padding: "0.75rem 1.5rem",
+                          borderRadius: "0.5rem",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          border: "none",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                        }}
                       >
                         <X size={20} />
-                        {initialData?.status === "DRAFT" ? "Borrar" : "Borrar evento"}
+                        {initialData?.status === "DRAFT"
+                          ? "Borrar"
+                          : "Borrar evento"}
                       </button>
                       <button
                         type="button" // Cambiado a button para manejar onUpdate manualmente o submit si prefieres
@@ -682,7 +692,9 @@ const EventDashboard = ({
                         ) : (
                           <>
                             <Send size={20} />
-                            {initialData?.status === "DRAFT" ? "Publicar" : "Guardar"}
+                            {initialData?.status === "DRAFT"
+                              ? "Publicar"
+                              : "Guardar"}
                           </>
                         )}
                       </button>
@@ -817,8 +829,9 @@ const EventDashboard = ({
                     {images.map((image, index) => (
                       <div
                         key={index}
-                        className={`${styles.thumbnail} ${mainImageIndex === index ? styles.active : ""
-                          }`}
+                        className={`${styles.thumbnail} ${
+                          mainImageIndex === index ? styles.active : ""
+                        }`}
                         onClick={() => setAsMainImage(index)}
                       >
                         <img
@@ -865,7 +878,7 @@ const EventDashboard = ({
             </section>
           </form>
         </main>
-      </div >
+      </div>
     </>
   );
 };

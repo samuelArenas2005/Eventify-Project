@@ -37,6 +37,7 @@ const mapEventToCard = (event) => ({
     event.creator?.username || event.creator?.email || "Organizador anónimo",
   showRegisterButton: false,
   showHeartButton: false,
+  handleImageTitleClick: () => {},
 });
 
 const PopularEventsView = () => {
