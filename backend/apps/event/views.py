@@ -296,30 +296,43 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-    @action(detail=True, methods=['put', 'patch'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=True, methods=['put', 'patch', 'delete'], permission_classes=[permissions.IsAuthenticated])
     def confirm_attendance(self, request, pk=None):
         """
         Actualiza el status del EventAttendee del usuario autenticado a 'CONFIRMED'.
         Recibe el nuevo status en el body (opcional, por defecto 'CONFIRMED').
+        Si se usa DELETE, elimina el registro del EventAttendee.
         """
         event = self.get_object()
         user = request.user
-        new_status = request.data.get('status', 'CONFIRMED')
-        
-        # Validar que el status sea válido
-        valid_statuses = [choice[0] for choice in EventAttendee.STATUS_CHOICES]
-        if new_status not in valid_statuses:
-            return Response(
-                {'detail': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         
         try:
             attendee = EventAttendee.objects.get(event=event, user=user)
+            
+            # Si el método es DELETE, eliminar el attendee
+            if request.method == 'DELETE':
+                attendee.delete()
+                return Response(
+                    {'detail': 'Successfully unregistered from the event'},
+                    status=status.HTTP_204_NO_CONTENT
+                )
+            
+            # Para PUT y PATCH, actualizar el status
+            new_status = request.data.get('status', 'CONFIRMED')
+            
+            # Validar que el status sea válido
+            valid_statuses = [choice[0] for choice in EventAttendee.STATUS_CHOICES]
+            if new_status not in valid_statuses:
+                return Response(
+                    {'detail': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             attendee.status = new_status
             attendee.save()
             serializer = EventAttendeeSerializer(attendee, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
+            
         except EventAttendee.DoesNotExist:
             return Response(
                 {'detail': 'You are not registered to this event'},

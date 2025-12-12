@@ -386,20 +386,6 @@ const EventDashboard = ({
         {/* Contenido Principal */}
         <main className={styles.mainContent}>
           {/* Botón Volver al Dashboard */}
-          <div className={styles.backButtonContainer}>
-            {typeof onClose === "function" ? (
-              <button className={styles.closeButton} onClick={onClose}>
-                <ArrowLeft size={16} />
-                Cerrar
-              </button>
-            ) : (
-              <Link to="/dashboard" className={styles.backButton}>
-                <ArrowLeft size={16} />
-                Volver al Dashboard
-              </Link>
-            )}
-          </div>
-
           <form
             onSubmit={handleSubmit(handleCreateEvent, onError)}
             className={styles.formGrid}
@@ -662,35 +648,37 @@ const EventDashboard = ({
               {/* Botones de Envío */}
               <div className={styles.submitButtonsContainer}>
                 {isEditMode ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={onDelete}
-                      className={styles.deleteButton} // Asegúrate de tener estilos para esto o usa inline style temporalmente
-                      style={{ backgroundColor: "#ef4444", color: "white", padding: "0.75rem 1.5rem", borderRadius: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem", border: "none", cursor: "pointer", fontWeight: "600" }}
-                    >
-                      <X size={20} />
-                      Borrar evento
-                    </button>
-                    <button
-                      type="button" // Cambiado a button para manejar onUpdate manualmente o submit si prefieres
-                      onClick={handleSubmit(handleUpdateEvent, onError)}
-                      className={styles.submitButton}
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 size={20} className="animate-spin" />
-                          Guardando...
-                        </>
-                      ) : (
-                        <>
-                          <Send size={20} />
-                          Guardar
-                        </>
-                      )}
-                    </button>
-                  </>
+                  initialData?.status !== "FINISHED" ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={onDelete}
+                        className={styles.deleteButton} // Asegúrate de tener estilos para esto o usa inline style temporalmente
+                        style={{ backgroundColor: "#ef4444", color: "white", padding: "0.75rem 1.5rem", borderRadius: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem", border: "none", cursor: "pointer", fontWeight: "600" }}
+                      >
+                        <X size={20} />
+                        {initialData?.status === "DRAFT" ? "Borrar" : "Borrar evento"}
+                      </button>
+                      <button
+                        type="button" // Cambiado a button para manejar onUpdate manualmente o submit si prefieres
+                        onClick={handleSubmit(handleUpdateEvent, onError)}
+                        className={styles.submitButton}
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 size={20} className="animate-spin" />
+                            Guardando...
+                          </>
+                        ) : (
+                          <>
+                            <Send size={20} />
+                            {initialData?.status === "DRAFT" ? "Publicar" : "Guardar"}
+                          </>
+                        )}
+                      </button>
+                    </>
+                  ) : null
                 ) : (
                   <>
                     <button

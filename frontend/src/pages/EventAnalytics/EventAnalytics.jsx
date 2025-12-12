@@ -33,6 +33,7 @@ const EventAnalytics = () => {
           const formattedData = {
             title: data.title,
             description: data.description,
+            status: data.status,
             startDate: startDateObj.toISOString().split('T')[0],
             startTime: startDateObj.toTimeString().slice(0, 5),
             endDate: endDateObj.toISOString().split('T')[0],
@@ -43,8 +44,9 @@ const EventAnalytics = () => {
             category: data.category.id.toString(),
             images: []
           };
-          console.log("📌 Tu puto Event es 1:", data);
-          console.log("📌 Tu puto Event en analytics:", formattedData);
+          console.log("📌 Tu  Event es :", data);
+          console.log("📌 Tu  Event en analytics:", formattedData);
+          console.log("📌 Tu  Event status:", formattedData.status);
 
           // Manejar imágenes existentes
           if (data.images && Array.isArray(data.images)) {

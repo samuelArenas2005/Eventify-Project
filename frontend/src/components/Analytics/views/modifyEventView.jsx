@@ -7,6 +7,7 @@ import { cancelEvent } from '../../../api/api';
 
 const ModifyEventView = ({ event, id }) => {
     console.log("📌 Evento recibido en ModifyEventView:", event);
+    console.log("📌 Evento recibido en ModifyEventView:", event.status);
     //aaa
     const handleUpdate = async (data) => {
         console.log("📝 Datos recibidos del formulario:", data);
@@ -54,10 +55,18 @@ const ModifyEventView = ({ event, id }) => {
             }
 
             // Llamar a la API de actualización
-            const response = await updateEvent(id, formData);
+            if (event.status === "DRAFT") {
+                formData.append("status", "ACTIVE");
+                const response = await updateEvent(id, formData);
+                console.log("✅ Respuesta del servidor:", response);
+                toast.success("¡Evento actualizado exitosamente!");
+            }
+            else {
+                const response = await updateEvent(id, formData);
+                console.log("✅ Respuesta del servidor:", response);
+                toast.success("¡Evento actualizado exitosamente!");
+            }
 
-            console.log("✅ Respuesta del servidor:", response);
-            toast.success("¡Evento actualizado exitosamente!");
 
         } catch (error) {
             console.error("❌ Error al actualizar evento:", error);

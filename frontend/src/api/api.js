@@ -152,9 +152,8 @@ export const cancelEvent = async (eventId) => {
 export const cancelAttendee = async (eventId, userId) => {
 	console.log("🚀 cancelAttendee called with eventId:", eventId, "and userId:", userId);
 	try {
-		const response = await axios.put(
+		const response = await axios.delete(
 			`${BASE_URL}event/events/${eventId}/confirm_attendance/`,
-			{ status: "CANCELLED" },
 			{
 				withCredentials: true
 			}
