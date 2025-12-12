@@ -109,8 +109,10 @@ const EventAnalytics = () => {
             ? new Date(attendee.created_at).toISOString().split('T')[0]
             : new Date().toISOString().split('T')[0]
         }));
+        console.log("formattedAttendees", formattedAttendees);
 
         setAttendees(formattedAttendees);
+        console.log("attendees", attendees);
       } catch (error) {
         console.error("Error al obtener inscritos:", error);
         toast.error("No se pudo cargar la lista de inscritos");
@@ -130,7 +132,7 @@ const EventAnalytics = () => {
   const eventData = {
     title: formattedEventData?.title,
     date: formattedEventData?.startDate,
-    attendees: "Dos perras",
+    attendees: attendees.length,
     image: formattedEventData?.images[0]?.url,
   };
 
@@ -219,46 +221,115 @@ const EventAnalytics = () => {
     },
   ];
 
-  // Datos falsos para la gráfica
-  const chartData = [
-    { label: "15 Nov", value: 5 },
-    { label: "16 Nov", value: 12 },
-    { label: "17 Nov", value: 18 },
-    { label: "18 Nov", value: 15 },
-    { label: "19 Nov", value: 25 },
-    { label: "20 Nov", value: 32 },
-    { label: "21 Nov", value: 28 },
-    { label: "22 Nov", value: 35 },
-    { label: "23 Nov", value: 42 },
-    { label: "24 Nov", value: 38 },
-    { label: "25 Nov", value: 45 },
-    { label: "26 Nov", value: 52 },
-    { label: "27 Nov", value: 48 },
-    { label: "28 Nov", value: 55 },
-  ];
+  // Generar datos de la gráfica a partir de attendees reales
+  const generateChartData = () => {
+    if (!attendees || attendees.length === 0) {
+      return [];
+    }
 
-  const chartStats = [
-    {
-      label: "Total Inscritos",
-      value: "55",
-      trend: { positive: true, text: "+12% esta semana" },
-    },
-    {
-      label: "Promedio Diario",
-      value: "3.9",
-      trend: { positive: true, text: "+8% vs anterior" },
-    },
-    {
-      label: "Pico Máximo",
-      value: "55",
-      trend: { positive: false, text: "28 Nov 2025" },
-    },
-    {
-      label: "Tasa de Conversión",
-      value: "68%",
-      trend: { positive: true, text: "+5%" },
-    },
-  ];
+    // Agrupar attendees por fecha de registro
+    const registrationsByDate = {};
+
+    attendees.forEach(attendee => {
+      const date = attendee.registrationDate;
+      if (date) {
+        if (!registrationsByDate[date]) {
+          registrationsByDate[date] = 0;
+        }
+        registrationsByDate[date]++;
+      }
+    });
+
+    // Convertir a array y ordenar por fecha
+    const sortedDates = Object.keys(registrationsByDate).sort();
+
+    // Crear datos acumulativos para la gráfica
+    let cumulativeCount = 0;
+    const chartData = sortedDates.map(date => {
+      cumulativeCount += registrationsByDate[date];
+
+      // Formatear la fecha para mostrar (ej: "15 Nov")
+      const dateObj = new Date(date + 'T00:00:00');
+      const day = dateObj.getDate();
+      const month = dateObj.toLocaleDateString('es-ES', { month: 'short' });
+      const formattedLabel = `${day} ${month.charAt(0).toUpperCase() + month.slice(1)}`;
+
+      return {
+        label: formattedLabel,
+        value: cumulativeCount
+      };
+    });
+    console.log("chartData22", chartData);
+
+    console.log("chartData con prueba", chartData);
+
+    return chartData;
+  };
+
+  const chartData = generateChartData();
+
+  // Calcular estadísticas reales
+  const calculateChartStats = () => {
+    const totalInscritos = attendees.length;
+
+    if (totalInscritos === 0) {
+      return [
+        { label: "Total Inscritos", value: "0", trend: { positive: true, text: "Sin datos" } },
+        { label: "Promedio Diario", value: "0", trend: { positive: true, text: "Sin datos" } },
+        { label: "Pico Máximo", value: "0", trend: { positive: false, text: "Sin datos" } },
+        { label: "Tasa de Conversión", value: "0%", trend: { positive: true, text: "Sin datos" } },
+      ];
+    }
+
+    // Calcular promedio diario
+    const registrationsByDate = {};
+    attendees.forEach(attendee => {
+      const date = attendee.registrationDate;
+      if (date) {
+        registrationsByDate[date] = (registrationsByDate[date] || 0) + 1;
+      }
+    });
+
+    const uniqueDays = Object.keys(registrationsByDate).length;
+    const averagePerDay = uniqueDays > 0 ? (totalInscritos / uniqueDays).toFixed(1) : "0";
+
+    // Encontrar el día con más inscripciones
+    let maxDate = "";
+    let maxCount = 0;
+    Object.entries(registrationsByDate).forEach(([date, count]) => {
+      if (count > maxCount) {
+        maxCount = count;
+        maxDate = date;
+      }
+    });
+
+    const maxDateFormatted = maxDate ? new Date(maxDate + 'T00:00:00').toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    }) : "Sin datos";
+
+    return [
+      {
+        label: "Total Inscritos",
+        value: totalInscritos.toString(),
+        trend: { positive: true, text: `${uniqueDays} días` },
+      },
+      {
+        label: "Promedio Diario",
+        value: averagePerDay,
+        trend: { positive: true, text: "inscritos/día" },
+      },
+      {
+        label: "Pico Máximo",
+        value: maxCount.toString(),
+        trend: { positive: false, text: maxDateFormatted },
+      },
+
+    ];
+  };
+
+  const chartStats = calculateChartStats();
 
   const renderContent = () => {
     if (activeView === "users") {
