@@ -18,6 +18,7 @@ import EventAnalytics from "./pages/EventAnalytics/EventAnalytics.jsx";
 import NotFoundPage from "./pages/NotFound/NotFoundPage";
 import SearchPage from "./pages/SearchEvent/SearchPage.jsx";
 import ScrollToTop from "./components/UI/ScrollTop/ScrollToTop";
+import CalendarPage from "./pages/Calendar/CalendarPage";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -154,6 +155,14 @@ function App() {
               redirectTo="/dashboard"
             >
               <AdminAnalytics />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/calendario"
+          element={
+            <ProtectedRoute isAllowed={!!user} loading={loading}>
+              <CalendarPage />
             </ProtectedRoute>
           }
         />
