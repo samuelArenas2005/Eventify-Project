@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import EventCard from "../../components/UI/EventCard/EventCard";
 import EventModal from "../../components/UI/DetailedEvent/DetailedEvent.jsx";
@@ -43,7 +43,10 @@ import { toast } from "react-hot-toast";
 // --- Componente Principal ---
 const UserProfileDashboard = ({ user }) => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("registrados");
+  const [searchParams] = useSearchParams();
+  // Leer el parámetro 'tab' de la URL, por defecto "registrados"
+  const defaultTab = searchParams.get('tab') || "registrados";
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [loading, setLoading] = useState(true);
   const [registeredEventsData, setregisteredEventsData] = useState([]);
   const [pendingEventData, setpendingEventData] = useState([]);
@@ -221,6 +224,14 @@ const UserProfileDashboard = ({ user }) => {
 
     loadEvents();
   }, []);
+
+  // Actualizar el tab activo cuando cambie el parámetro de la URL
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   if (loading) return <Loanding />;
 
@@ -653,28 +664,40 @@ const UserProfileDashboard = ({ user }) => {
         <button
           className={`${styles.tabButton} ${activeTab === "registrados" ? styles.active : ""
             }`}
-          onClick={() => setActiveTab("registrados")}
+          onClick={() => {
+            setActiveTab("registrados");
+            navigate('/dashboard?tab=registrados', { replace: true });
+          }}
         >
           Eventos Registrados
         </button>
         <button
           className={`${styles.tabButton} ${activeTab === "megustas" ? styles.active : ""
             }`}
-          onClick={() => setActiveTab("megustas")}
+          onClick={() => {
+            setActiveTab("megustas");
+            navigate('/dashboard?tab=megustas', { replace: true });
+          }}
         >
           Eventos Favoritos
         </button>
         <button
           className={`${styles.tabButton} ${activeTab === "misEventos" ? styles.active : ""
             }`}
-          onClick={() => setActiveTab("misEventos")}
+          onClick={() => {
+            setActiveTab("misEventos");
+            navigate('/dashboard?tab=misEventos', { replace: true });
+          }}
         >
           Mis Eventos
         </button>
         <button
           className={`${styles.tabButton} ${activeTab === "Confirmados" ? styles.active : ""
             }`}
-          onClick={() => setActiveTab("Confirmados")}
+          onClick={() => {
+            setActiveTab("Confirmados");
+            navigate('/dashboard?tab=Confirmados', { replace: true });
+          }}
         >
           Confirmados
         </button>

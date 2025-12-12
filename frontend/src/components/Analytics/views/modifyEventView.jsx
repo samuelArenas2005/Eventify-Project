@@ -1,15 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import EventDashboard from '../../UI/EventCreate/EventForm';
 import { toast } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { updateEvent } from '../../../api/api';
 import { cancelEvent } from '../../../api/api';
+import ConfirmarModal from '../../UI/ConfirmarModal/ConfirmarModal';
 
 const ModifyEventView = ({ event, id }) => {
+    const navigate = useNavigate();
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [pendingUpdateData, setPendingUpdateData] = useState(null);
+
     console.log("📌 Evento recibido en ModifyEventView:", event);
     console.log("📌 Evento recibido en ModifyEventView:", event.status);
-    //aaa
+    
     const handleUpdate = async (data) => {
+        // Guardar los datos y mostrar modal de confirmación
+        setPendingUpdateData(data);
+        setShowUpdateModal(true);
+    };
+
+    const confirmUpdate = async () => {
+        if (!pendingUpdateData) return;
+
+        const data = pendingUpdateData;
         console.log("📝 Datos recibidos del formulario:", data);
 
         try {
@@ -67,6 +83,10 @@ const ModifyEventView = ({ event, id }) => {
                 toast.success("¡Evento actualizado exitosamente!");
             }
 
+            // Cerrar modal y redirigir al dashboard con tab de mis eventos
+            setShowUpdateModal(false);
+            setPendingUpdateData(null);
+            navigate('/dashboard?tab=misEventos');
 
         } catch (error) {
             console.error("❌ Error al actualizar evento:", error);
@@ -75,24 +95,41 @@ const ModifyEventView = ({ event, id }) => {
                 || error?.message
                 || "Hubo un error al actualizar el evento";
             toast.error(errorMessage);
+            setShowUpdateModal(false);
+            setPendingUpdateData(null);
         }
     };
 
-    const handleDelete = async () => {
-        if (window.confirm("¿Estás seguro de que deseas cancelar este evento?")) {
-            try {
-                const response = await cancelEvent(id);
-                console.log("✅ Respuesta del servidor:", response);
-                toast.success("¡Evento cancelado exitosamente!");
-            } catch (error) {
-                console.error("❌ Error al cancelar evento:", error);
-                const errorMessage = error?.response?.data?.detail
-                    || error?.response?.data?.message
-                    || error?.message
-                    || "Hubo un error al cancelar el evento";
-                toast.error(errorMessage);
-            }
+    const cancelUpdate = () => {
+        setShowUpdateModal(false);
+        setPendingUpdateData(null);
+    };
+
+    const handleDelete = () => {
+        setShowCancelModal(true);
+    };
+
+    const confirmCancel = async () => {
+        try {
+            const response = await cancelEvent(id);
+            console.log("✅ Respuesta del servidor:", response);
+            toast.success("¡Evento cancelado exitosamente!");
+            setShowCancelModal(false);
+            // Redirigir al dashboard con tab de mis eventos
+            navigate('/dashboard?tab=misEventos');
+        } catch (error) {
+            console.error("❌ Error al cancelar evento:", error);
+            const errorMessage = error?.response?.data?.detail
+                || error?.response?.data?.message
+                || error?.message
+                || "Hubo un error al cancelar el evento";
+            toast.error(errorMessage);
+            setShowCancelModal(false);
         }
+    };
+
+    const cancelDelete = () => {
+        setShowCancelModal(false);
     };
 
 
@@ -113,6 +150,28 @@ const ModifyEventView = ({ event, id }) => {
                 onUpdate={handleUpdate}
                 onDelete={handleDelete}
                 onClose={() => console.log("Cerrar vista de modificación")}
+            />
+            
+            {/* Modal de confirmación para cancelar evento */}
+            <ConfirmarModal
+                isOpen={showCancelModal}
+                title="Cancelar evento"
+                description="¿Estás seguro de que deseas cancelar este evento? Esta acción no se puede deshacer."
+                confirmLabel="Sí, cancelar evento"
+                cancelLabel="No, mantener evento"
+                onConfirm={confirmCancel}
+                onCancel={cancelDelete}
+            />
+
+            {/* Modal de confirmación para actualizar evento */}
+            <ConfirmarModal
+                isOpen={showUpdateModal}
+                title="Confirmar modificación"
+                description="¿Estás seguro de que deseas guardar los cambios realizados en este evento?"
+                confirmLabel="Sí, guardar cambios"
+                cancelLabel="Cancelar"
+                onConfirm={confirmUpdate}
+                onCancel={cancelUpdate}
             />
         </div>
     );
