@@ -37,9 +37,13 @@ const EventDetailModal = ({
   showBorrar = false,
   showEditar = false,
   showRegistrar = false,
+  showCancelar = false,
+
+  // Funciones de botones
   onBorrar,
   onEditar,
   onRegistrar,
+  onCancelar,
   onRatingUpdate,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -141,9 +145,14 @@ const EventDetailModal = ({
               {imagenes.length > 1 && (
                 <div className={styles.thumbnailList}>
                   {imagenes.map((imgUrl, index) => (
-                    <img key={index} src={imgUrl} alt="Thumb"
-                      className={`${styles.thumbnail} ${index === activeIndex ? styles.activeThumbnail : ""}`}
-                      onClick={() => handleThumbnailClick(index)} />
+                    <img
+                      key={index}
+                      src={imgUrl}
+                      alt={`Miniatura ${index + 1}`}
+                      className={`${styles.thumbnail} ${index === activeIndex ? styles.activeThumbnail : ""
+                        }`}
+                      onClick={() => handleThumbnailClick(index)}
+                    />
                   ))}
                 </div>
               )}
@@ -274,8 +283,8 @@ const EventDetailModal = ({
             )}
           </div>
 
-          {/* Botones de Acción (Footer) */}
-          {(showBorrar || showEditar || showRegistrar) && (
+          {/* --- Pie de Página (Acciones) --- */}
+          {(showBorrar || showEditar || showRegistrar || showCancelar) && (
             <div className={styles.modalFooter}>
               {showRegistrar && (
                 <button className={`${styles.button} ${styles.registerButton}`} onClick={onRegistrar}>
@@ -288,8 +297,19 @@ const EventDetailModal = ({
                 </button>
               )}
               {showBorrar && (
-                <button className={`${styles.button} ${styles.deleteButton}`} onClick={onBorrar}>
+                <button
+                  className={`${styles.button} ${styles.deleteButton}`}
+                  onClick={onBorrar}
+                >
                   <Trash2 size={18} /> Borrar
+                </button>
+              )}
+              {showCancelar && (
+                <button
+                  className={`${styles.button} ${styles.deleteButton}`}
+                  onClick={onCancelar}
+                >
+                  <X size={18} /> Cancelar
                 </button>
               )}
             </div>
@@ -300,14 +320,18 @@ const EventDetailModal = ({
   );
 };
 
-const InfoItem = ({ icon, label, value }) => (
-  <div className={styles.infoItem}>
-    <span className={styles.infoIcon}>{icon}</span>
-    <div className={styles.infoContent}>
-      <span className={styles.infoLabel}>{label}</span>
-      <span className={styles.infoValue}>{value}</span>
+// Pequeño componente auxiliar para los items de información
+const InfoItem = ({ icon, label, value }) => {
+  const isLocation = label === "Ubicación" || label === "Información del Lugar";
+  return (
+    <div className={styles.infoItem}>
+      <span className={styles.infoIcon}>{icon}</span>
+      <div className={styles.infoContent}>
+        <span className={styles.infoLabel}>{label}</span>
+        <span className={`${styles.infoValue} ${isLocation ? styles.locationValue : ""}`}>{value}</span>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default EventDetailModal;

@@ -109,6 +109,63 @@ export const updateUser = async (userData) => {
 	}
 }
 
+export const updateEvent = async (eventId, eventData) => {
+	console.log("🚀 updateEvent called with eventId:", eventId, "and eventData:", eventData);
+	try {
+		// Determine if eventData is FormData or regular object
+		const isFormData = eventData instanceof FormData;
+
+		const response = await axios.put(
+			`${BASE_URL}event/events/${eventId}/`,
+			eventData,
+			{
+				withCredentials: true,
+				headers: isFormData ? {
+					'Content-Type': 'multipart/form-data',
+				} : undefined
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error updating event:", error);
+		throw error;
+	}
+}
+
+export const cancelEvent = async (eventId) => {
+	try {
+		const response = await axios.patch(
+			`${BASE_URL}event/events/${eventId}/`,
+			{ status: "CANCELLED" },
+			{
+				withCredentials: true
+			}
+		);
+
+		return response.data;
+	} catch (error) {
+		console.error("Error canceling event:", error);
+		throw error;
+	}
+}
+
+export const cancelAttendee = async (eventId, userId) => {
+	console.log("🚀 cancelAttendee called with eventId:", eventId, "and userId:", userId);
+	try {
+		const response = await axios.delete(
+			`${BASE_URL}event/events/${eventId}/confirm_attendance/`,
+			{
+				withCredentials: true
+			}
+		);
+
+		return response.data;
+	} catch (error) {
+		console.error("Error canceling attendee:", error);
+		throw error;
+	}
+}
+
 export const getEventRegisteredUser = () => {
 	return axios.get(`${BASE_URL}event/registered/`, { withCredentials: true });
 }
@@ -353,6 +410,34 @@ export const createRating = async (eventId, score, comment) => {
 		return response.data;
 	} catch (error) {
 		// Lanzamos el error para que el componente lo maneje y muestre el mensaje
+		throw error;
+	}
+};
+
+export const setEventFavorite = async (eventId) => {
+	try {
+		const response = await axios.post(
+			`${BASE_URL}event/events/${eventId}/favorite/`,
+			{},
+			{ withCredentials: true }
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error marcando favorito:", error);
+		throw error;
+	}
+};
+
+export const unsetEventFavorite = async (eventId) => {
+	try {
+		const response = await axios.post(
+			`${BASE_URL}event/events/${eventId}/unfavorite/`,
+			{},
+			{ withCredentials: true }
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error quitando favorito:", error);
 		throw error;
 	}
 };

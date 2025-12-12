@@ -1,5 +1,5 @@
 # views.py
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, F, Q
 from django.db.models.functions import TruncDate
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
@@ -222,7 +222,44 @@ class EventViewSet(viewsets.ModelViewSet):
                             notification=notification,
                             state=UserNotification.State.DELIVERED
                         )
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def favorite(self, request, pk=None):
+        """
+        Marca un evento como favorito para el usuario autenticado.
+        Ruta: POST /api/event/events/{pk}/favorite/
+        """
+        event = self.get_object()
+        attendee, created = EventAttendee.objects.get_or_create(
+            event=event,
+            user=request.user,
+            defaults={'status': 'FAVORITE'}
+        )
+        if not created and attendee.status != 'FAVORITE':
+            attendee.status = 'FAVORITE'
+            attendee.save(update_fields=['status', 'updated_at'])
 
+        serializer = EventAttendeeSerializer(attendee, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def unfavorite(self, request, pk=None):
+        """
+        Quita un evento de favoritos del usuario autenticado.
+        Ruta: POST /api/event/events/{pk}/unfavorite/
+        """
+        event = self.get_object()
+        try:
+            attendee = EventAttendee.objects.get(event=event, user=request.user)
+            # Si estaba en favoritos, eliminar la relación o cambiar estado
+            if attendee.status == 'FAVORITE':
+                attendee.delete()
+            else:
+                # Opcional: si no era FAVORITE, no hacemos nada
+                return Response({'detail': 'Not favorite'}, status=status.HTTP_200_OK)
+            return Response({'detail': 'Removed from favorites'}, status=status.HTTP_204_NO_CONTENT)
+        except EventAttendee.DoesNotExist:
+            return Response({'detail': 'Not favorite'}, status=status.HTTP_200_OK)
+        
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def attend(self, request, pk=None):
         """
@@ -296,30 +333,43 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-    @action(detail=True, methods=['put', 'patch'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=True, methods=['put', 'patch', 'delete'], permission_classes=[permissions.IsAuthenticated])
     def confirm_attendance(self, request, pk=None):
         """
         Actualiza el status del EventAttendee del usuario autenticado a 'CONFIRMED'.
         Recibe el nuevo status en el body (opcional, por defecto 'CONFIRMED').
+        Si se usa DELETE, elimina el registro del EventAttendee.
         """
         event = self.get_object()
         user = request.user
-        new_status = request.data.get('status', 'CONFIRMED')
-        
-        # Validar que el status sea válido
-        valid_statuses = [choice[0] for choice in EventAttendee.STATUS_CHOICES]
-        if new_status not in valid_statuses:
-            return Response(
-                {'detail': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         
         try:
             attendee = EventAttendee.objects.get(event=event, user=user)
+            
+            # Si el método es DELETE, eliminar el attendee
+            if request.method == 'DELETE':
+                attendee.delete()
+                return Response(
+                    {'detail': 'Successfully unregistered from the event'},
+                    status=status.HTTP_204_NO_CONTENT
+                )
+            
+            # Para PUT y PATCH, actualizar el status
+            new_status = request.data.get('status', 'CONFIRMED')
+            
+            # Validar que el status sea válido
+            valid_statuses = [choice[0] for choice in EventAttendee.STATUS_CHOICES]
+            if new_status not in valid_statuses:
+                return Response(
+                    {'detail': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             attendee.status = new_status
             attendee.save()
             serializer = EventAttendeeSerializer(attendee, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
+            
         except EventAttendee.DoesNotExist:
             return Response(
                 {'detail': 'You are not registered to this event'},
@@ -429,6 +479,7 @@ class  ActiveEventsList(generics.ListAPIView):
     y si el usuario está autenticado excluye los eventos cuyo creador sea el mismo usuario.
     También excluye eventos donde el usuario tiene status REGISTERED o FAVORITE,
     y solo muestra eventos futuros (start_date > fecha actual).
+    Excluye eventos donde la capacidad ya se alcanzó (attendees_count >= capacity).
     """
     serializer_class = EventListSerializer
     permission_classes = [permissions.AllowAny]
@@ -450,7 +501,15 @@ class  ActiveEventsList(generics.ListAPIView):
                          queryset=EventAttendee.objects.select_related('user')
                      )
                  )
-                 .annotate(attendees_count=Count('attendees'))
+                 # Contar solo los asistentes con status REGISTERED o CONFIRMED (los que ocupan lugar)
+                 .annotate(
+                     attendees_count=Count(
+                         'eventattendee',
+                         filter=Q(eventattendee__status__in=['REGISTERED', 'CONFIRMED'])
+                     )
+                 )
+                 # Excluir eventos donde la capacidad ya se alcanzó
+                 .exclude(attendees_count__gte=F('capacity'))
                  .order_by('-start_date')
         )
 
@@ -635,39 +694,44 @@ class ConfirmEventRegistrationView(APIView):
 
     def post(self, request, event_id):
         event = get_object_or_404(Event, pk=event_id)
+
+        attendee = EventAttendee.objects.filter(event=event, user=request.user).first()
         
-        # Verificar si el usuario ya está inscrito
-        existing_attendee = EventAttendee.objects.filter(
+        # Verificar capacidad antes de registrar
+        # Contar solo asistentes con estado REGISTERED o CONFIRMED (los que ocupan lugar)
+        current_attendees = EventAttendee.objects.filter(
             event=event,
-            user=request.user
-        ).first()
+            status__in=['REGISTERED', 'CONFIRMED']
+        ).count()
         
-        if existing_attendee:
+        # Si el usuario ya está registrado/confirmado, no necesita verificar capacidad
+        # (ya está contado en current_attendees)
+        if attendee and attendee.status in ('REGISTERED', 'CONFIRMED'):
+            return Response({"detail": "Ya estás inscrito en este evento."}, status=status.HTTP_200_OK)
+        
+        # Si la capacidad está llena y el usuario no está registrado, rechazar
+        if current_attendees >= event.capacity:
             return Response(
-                {"detail": "Ya estás inscrito en este evento."},
+                {"detail": "El evento ha alcanzado su capacidad máxima. No se pueden aceptar más registros."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Crear nueva inscripción
-        attendee = EventAttendee.objects.create(
-            event=event,
-            user=request.user,
-            status='REGISTERED'
-        )
+        if attendee:
+            # Si viene de FAVORITE, cambia a REGISTERED
+            if attendee.status == 'FAVORITE':
+                attendee.status = 'REGISTERED'
+                attendee.save(update_fields=['status'])
+                serializer = EventAttendeeSerializer(attendee, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
-        # Buscar si ya existe una notificación de recordatorio para este evento
-        reminder_notif = Notification.objects.filter(
-            event=event, 
-            type=Notification.NotificationType.REMINDER
-        ).first()
-        
-        if reminder_notif:
-            # Suscribir al usuario a esa notificación existente
-            UserNotification.objects.get_or_create(
-                user=request.user,
-                notification=reminder_notif
-            )
-        
+            # Cualquier otro estado, llevar a REGISTERED
+            attendee.status = 'REGISTERED'
+            attendee.save(update_fields=['status'])
+            serializer = EventAttendeeSerializer(attendee, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # No existe relación: crear como REGISTERED
+        attendee = EventAttendee.objects.create(event=event, user=request.user, status='REGISTERED')
         serializer = EventAttendeeSerializer(attendee, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

@@ -184,7 +184,8 @@
   display: flex;
   align-items: center;
   /* Margen escalado (antes 8px) */
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
+  min-width: 0; /* Permite que el contenido se trunque */
 }
 
 .detailIcon {
@@ -201,6 +202,14 @@
   /* Fuente escalada (antes 10px) */
   font-size: 12px; 
   color: #6B7280;
+}
+
+.locationText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: inline-block;
 }
 
 .organizerSection {

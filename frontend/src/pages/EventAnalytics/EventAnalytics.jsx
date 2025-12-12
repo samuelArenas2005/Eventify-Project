@@ -39,6 +39,7 @@ const EventAnalytics = () => {
           const formattedData = {
             title: data.title,
             description: data.description,
+            status: data.status,
             startDate: startDateObj.toISOString().split('T')[0],
             startTime: startDateObj.toTimeString().slice(0, 5),
             endDate: endDateObj.toISOString().split('T')[0],
@@ -49,6 +50,9 @@ const EventAnalytics = () => {
             category: data.category?.id?.toString(),
             images: []
           };
+          console.log("📌 Tu  Event es :", data);
+          console.log("📌 Tu  Event en analytics:", formattedData);
+          console.log("📌 Tu  Event status:", formattedData.status);
 
           // Lógica de imágenes (igual que tenías)
           if (data.images && Array.isArray(data.images)) {
@@ -161,7 +165,7 @@ const EventAnalytics = () => {
       );
     }
     if (activeView === "Modificar_evento") {
-      return <ModifyEventView event={formattedEventData} />
+      return <ModifyEventView event={formattedEventData} id={eventId} />
     }
     return null;
   };
