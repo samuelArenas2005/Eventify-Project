@@ -115,6 +115,30 @@ class EventViewSet(viewsets.ModelViewSet):
         
         # Guardar el evento actualizado
         event = serializer.save()
+
+        # Enviar alerta y limpiar recordatorios cuando el evento se cancela
+        if old_status != Event.CANCELLED and event.status == Event.CANCELLED:
+            Notification.objects.filter(
+                event=event,
+                type=Notification.NotificationType.REMINDER
+            ).delete()
+
+            cancellation = Notification.objects.create(
+                event=event,
+                type=Notification.NotificationType.ALERT,
+                message=f"El evento '{event.title}' ha sido cancelado.",
+                visible_at=timezone.now()
+            )
+
+            attendees = EventAttendee.objects.filter(event=event).select_related('user')
+            for attendee in attendees:
+                UserNotification.objects.create(
+                    user=attendee.user,
+                    notification=cancellation,
+                    state=UserNotification.State.DELIVERED
+                )
+
+            return
         
         # Si el evento cambió de DRAFT a ACTIVE, crear la notificación de recordatorio
         if old_status == Event.DRAFT and event.status == Event.ACTIVE:
