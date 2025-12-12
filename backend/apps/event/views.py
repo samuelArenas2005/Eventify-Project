@@ -1,5 +1,5 @@
 # views.py
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, F, Q
 from django.db.models.functions import TruncDate
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
@@ -457,6 +457,7 @@ class  ActiveEventsList(generics.ListAPIView):
     y si el usuario está autenticado excluye los eventos cuyo creador sea el mismo usuario.
     También excluye eventos donde el usuario tiene status REGISTERED o FAVORITE,
     y solo muestra eventos futuros (start_date > fecha actual).
+    Excluye eventos donde la capacidad ya se alcanzó (attendees_count >= capacity).
     """
     serializer_class = EventListSerializer
     permission_classes = [permissions.AllowAny]
@@ -478,7 +479,15 @@ class  ActiveEventsList(generics.ListAPIView):
                          queryset=EventAttendee.objects.select_related('user')
                      )
                  )
-                 .annotate(attendees_count=Count('attendees'))
+                 # Contar solo los asistentes con status REGISTERED o CONFIRMED (los que ocupan lugar)
+                 .annotate(
+                     attendees_count=Count(
+                         'eventattendee',
+                         filter=Q(eventattendee__status__in=['REGISTERED', 'CONFIRMED'])
+                     )
+                 )
+                 # Excluir eventos donde la capacidad ya se alcanzó
+                 .exclude(attendees_count__gte=F('capacity'))
                  .order_by('-start_date')
         )
 
@@ -660,6 +669,26 @@ class ConfirmEventRegistrationView(APIView):
         event = get_object_or_404(Event, pk=event_id)
 
         attendee = EventAttendee.objects.filter(event=event, user=request.user).first()
+        
+        # Verificar capacidad antes de registrar
+        # Contar solo asistentes con estado REGISTERED o CONFIRMED (los que ocupan lugar)
+        current_attendees = EventAttendee.objects.filter(
+            event=event,
+            status__in=['REGISTERED', 'CONFIRMED']
+        ).count()
+        
+        # Si el usuario ya está registrado/confirmado, no necesita verificar capacidad
+        # (ya está contado en current_attendees)
+        if attendee and attendee.status in ('REGISTERED', 'CONFIRMED'):
+            return Response({"detail": "Ya estás inscrito en este evento."}, status=status.HTTP_200_OK)
+        
+        # Si la capacidad está llena y el usuario no está registrado, rechazar
+        if current_attendees >= event.capacity:
+            return Response(
+                {"detail": "El evento ha alcanzado su capacidad máxima. No se pueden aceptar más registros."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         if attendee:
             # Si viene de FAVORITE, cambia a REGISTERED
             if attendee.status == 'FAVORITE':
@@ -667,10 +696,6 @@ class ConfirmEventRegistrationView(APIView):
                 attendee.save(update_fields=['status'])
                 serializer = EventAttendeeSerializer(attendee, context={'request': request})
                 return Response(serializer.data, status=status.HTTP_200_OK)
-
-            # Si ya está REGISTERED o CONFIRMED, no crear duplicado
-            if attendee.status in ('REGISTERED', 'CONFIRMED'):
-                return Response({"detail": "Ya estás inscrito en este evento."}, status=status.HTTP_200_OK)
 
             # Cualquier otro estado, llevar a REGISTERED
             attendee.status = 'REGISTERED'
