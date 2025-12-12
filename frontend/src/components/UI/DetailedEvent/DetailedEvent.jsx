@@ -50,11 +50,13 @@ const EventDetailModal = ({
   showBorrar = false,
   showEditar = false,
   showRegistrar = false,
+  showCancelar = false,
 
   // Funciones de botones
   onBorrar,
   onEditar,
   onRegistrar,
+  onCancelar,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -142,9 +144,8 @@ const EventDetailModal = ({
                       key={index}
                       src={imgUrl}
                       alt={`Miniatura ${index + 1}`}
-                      className={`${styles.thumbnail} ${
-                        index === activeIndex ? styles.activeThumbnail : ""
-                      }`}
+                      className={`${styles.thumbnail} ${index === activeIndex ? styles.activeThumbnail : ""
+                        }`}
                       onClick={() => handleThumbnailClick(index)}
                     />
                   ))}
@@ -231,7 +232,7 @@ const EventDetailModal = ({
           </div>
 
           {/* --- Pie de Página (Acciones) --- */}
-          {(showBorrar || showEditar || showRegistrar) && (
+          {(showBorrar || showEditar || showRegistrar || showCancelar) && (
             <div className={styles.modalFooter}>
               {showRegistrar && (
                 <button
@@ -257,6 +258,14 @@ const EventDetailModal = ({
                   <Trash2 size={18} /> Borrar
                 </button>
               )}
+              {showCancelar && (
+                <button
+                  className={`${styles.button} ${styles.deleteButton}`}
+                  onClick={onCancelar}
+                >
+                  <X size={18} /> Cancelar
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -266,14 +275,17 @@ const EventDetailModal = ({
 };
 
 // Pequeño componente auxiliar para los items de información
-const InfoItem = ({ icon, label, value }) => (
-  <div className={styles.infoItem}>
-    <span className={styles.infoIcon}>{icon}</span>
-    <div className={styles.infoContent}>
-      <span className={styles.infoLabel}>{label}</span>
-      <span className={styles.infoValue}>{value}</span>
+const InfoItem = ({ icon, label, value }) => {
+  const isLocation = label === "Ubicación" || label === "Información del Lugar";
+  return (
+    <div className={styles.infoItem}>
+      <span className={styles.infoIcon}>{icon}</span>
+      <div className={styles.infoContent}>
+        <span className={styles.infoLabel}>{label}</span>
+        <span className={`${styles.infoValue} ${isLocation ? styles.locationValue : ""}`}>{value}</span>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default EventDetailModal;

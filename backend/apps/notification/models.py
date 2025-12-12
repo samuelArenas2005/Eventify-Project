@@ -10,6 +10,7 @@ class Notification(models.Model):
         INFO = "INFO", "Info"
         REMINDER = "REMINDER", "Reminder"
         ALERT = "ALERT", "Alert"
+        UPDATE = "UPDATE", "Update"
 
     event = models.ForeignKey(
         Event,

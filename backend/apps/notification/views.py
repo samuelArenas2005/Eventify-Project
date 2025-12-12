@@ -24,15 +24,46 @@ class UserNotificationViewSet(viewsets.ModelViewSet):
         """
         Filter notifications to show only those belonging to the current user
         AND that are ready to be shown (visible_at <= now or null).
+        También elimina notificaciones de eventos que ya terminaron.
         """
         now = timezone.now()
-        return UserNotification.objects.filter(
+        
+        # Obtener todas las notificaciones del usuario
+        user_notifications = UserNotification.objects.filter(
             user=self.request.user
         ).filter(
             # Mostrar si visible_at es NULL (inmediata) O si ya pasó la fecha programada
             models.Q(notification__visible_at__isnull=True) | 
             models.Q(notification__visible_at__lte=now)
-        ).select_related('notification', 'notification__event').order_by('-notification__sent_at')
+        ).select_related('notification', 'notification__event')
+        
+        # Identificar notificaciones de eventos que ya terminaron
+        finished_event_notifications = user_notifications.filter(
+            notification__event__isnull=False,
+            notification__event__end_date__lt=now
+        )
+        
+        # Eliminar las notificaciones de eventos terminados
+        if finished_event_notifications.exists():
+            # Obtener los IDs de las notificaciones principales para eliminarlas completamente
+            finished_notification_ids = list(finished_event_notifications.values_list('notification_id', flat=True))
+            
+            # Eliminar las notificaciones principales (esto eliminará las UserNotifications en cascada)
+            Notification.objects.filter(id__in=finished_notification_ids).delete()
+            
+            # Re-evaluar el queryset después de eliminar
+            user_notifications = UserNotification.objects.filter(
+                user=self.request.user
+            ).filter(
+                models.Q(notification__visible_at__isnull=True) | 
+                models.Q(notification__visible_at__lte=now)
+            ).select_related('notification', 'notification__event')
+        
+        # Retornar solo notificaciones de eventos activos o sin evento asociado
+        return user_notifications.filter(
+            models.Q(notification__event__isnull=True) |
+            models.Q(notification__event__end_date__gte=now)
+        ).order_by('-notification__sent_at')
 
     @action(detail=True, methods=['post'])
     def mark_as_read(self, request, pk=None):

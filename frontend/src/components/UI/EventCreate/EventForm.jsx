@@ -26,7 +26,13 @@ import {
 } from "lucide-react";
 import styles from "./CreateEventPage.module.css";
 
-const EventDashboard = ({ onClose = null }) => {
+const EventDashboard = ({
+  onClose = null,
+  isEditMode = false,
+  initialData = null,
+  onDelete = () => { },
+  onUpdate = () => { }
+}) => {
   // --- Estados ---
   const [images, setImages] = useState([]); // Almacena { url: '...', file: File }
   const [mainImageIndex, setMainImageIndex] = useState(0);
@@ -37,6 +43,9 @@ const EventDashboard = ({ onClose = null }) => {
   const navigate = useNavigate();
 
   console.log("hola soy onClose", onClose);
+  console.log("hola soy initialData", initialData);
+  console.log("hola soy initialData category", initialData?.category.toString());
+
   // --- React Hook Form ---
   const {
     register,
@@ -58,6 +67,39 @@ const EventDashboard = ({ onClose = null }) => {
       category: "",
     },
   });
+
+  // Efecto para cargar datos iniciales en modo edición
+  useEffect(() => {
+    if (initialData && categories.length > 0) {
+      // Convertir category a string para que coincida con los valores de las opciones
+      const categoryValue = initialData.category
+        ? String(initialData.category)
+        : "";
+
+      reset({
+        title: initialData.title || "",
+        description: initialData.description || "",
+        startDate: initialData.startDate || "",
+        startTime: initialData.startTime || "",
+        endDate: initialData.endDate || "",
+        endTime: initialData.endTime || "",
+        address: initialData.address || "",
+        venueInfo: initialData.venueInfo || "",
+        capacity: initialData.capacity || "",
+        category: categoryValue,
+      });
+
+      // Cargar imágenes si existen en initialData
+      // Solo cargamos imágenes que tengan tanto url como file válidos
+      if (initialData.images && Array.isArray(initialData.images)) {
+        const validImages = initialData.images.filter(img => img.url && img.file);
+        if (validImages.length > 0) {
+          setImages(validImages);
+        }
+      }
+    }
+  }, [initialData, categories, reset]);
+
   // 👇💡 Aquí agregas el useEffect
   const formValues = watch();
 
@@ -226,8 +268,8 @@ const EventDashboard = ({ onClose = null }) => {
     const status = (typeof statusOverride === 'string') ? statusOverride : 'ACTIVE';
     setIsSubmitting(true);
     const loadingToast = toast.loading(
-      status === "DRAFT" 
-        ? "Guardando borrador..." 
+      status === "DRAFT"
+        ? "Guardando borrador..."
         : "Registrando tu evento..."
     );
 
@@ -279,11 +321,11 @@ const EventDashboard = ({ onClose = null }) => {
         // Redirigir al usuario al evento creado después de 2 segundos
         typeof onClose === "function"
           ? setTimeout(() => {
-              onClose();
-            }, 1000)
+            onClose();
+          }, 1000)
           : setTimeout(() => {
-              navigate(`/dashboard`);
-            }, 1000);
+            navigate(`/dashboard`);
+          }, 1000);
       } else {
         console.log("⚠️ Evento no encontrado tras creación:");
         toast.warning(
@@ -291,8 +333,8 @@ const EventDashboard = ({ onClose = null }) => {
         );
       }
       toast.success(
-        status === "DRAFT" 
-          ? "¡Borrador guardado exitosamente!" 
+        status === "DRAFT"
+          ? "¡Borrador guardado exitosamente!"
           : "¡Evento creado exitosamente!"
       );
       reset();
@@ -302,8 +344,8 @@ const EventDashboard = ({ onClose = null }) => {
     } catch (error) {
       console.error("❌ Error al enviar evento:", error);
       toast.error(
-        status === "DRAFT" 
-          ? "Hubo un error al guardar el borrador." 
+        status === "DRAFT"
+          ? "Hubo un error al guardar el borrador."
           : "Hubo un error al registrar tu evento."
       );
     } finally {
@@ -318,7 +360,19 @@ const EventDashboard = ({ onClose = null }) => {
 
   const handleCreateEvent = (data) => {
     onSubmit(data, "ACTIVE");
-}
+  }
+
+  // Nueva función para manejar la actualización en modo edición
+  const handleUpdateEvent = (data) => {
+    // Agregar las imágenes y el índice de la imagen principal a los datos
+    const dataWithImages = {
+      ...data,
+      images: images,
+      mainImageIndex: mainImageIndex
+    };
+    console.log("📸 Datos con imágenes para actualizar:", dataWithImages);
+    onUpdate(dataWithImages);
+  };
 
   const onError = (formErrors) => {
     console.log("Errores de validación:", formErrors);
@@ -332,20 +386,6 @@ const EventDashboard = ({ onClose = null }) => {
         {/* Contenido Principal */}
         <main className={styles.mainContent}>
           {/* Botón Volver al Dashboard */}
-          <div className={styles.backButtonContainer}>
-            {typeof onClose === "function" ? (
-              <button className={styles.closeButton} onClick={onClose}>
-                <ArrowLeft size={16} />
-                Cerrar
-              </button>
-            ) : (
-              <Link to="/dashboard" className={styles.backButton}>
-                <ArrowLeft size={16} />
-                Volver al Dashboard
-              </Link>
-            )}
-          </div>
-
           <form
             onSubmit={handleSubmit(handleCreateEvent, onError)}
             className={styles.formGrid}
@@ -354,7 +394,7 @@ const EventDashboard = ({ onClose = null }) => {
             <section className={`${styles.formColumn} ${styles.softAnimation}`}>
               <h1 className={styles.title}>
                 {" "}
-                <LayoutDashboard size={28} /> Crear Nuevo Evento
+                <LayoutDashboard size={28} /> {isEditMode ? "Modificar Evento" : "Crear Nuevo Evento"}
               </h1>
               <h2 className={styles.columnTitle}>Detalles del Evento</h2>
 
@@ -567,6 +607,10 @@ const EventDashboard = ({ onClose = null }) => {
                         value: 1,
                         message: "La capacidad debe ser al menos 1",
                       },
+                      max: {
+                        value: 100000,
+                        message: "La capacidad máxima es de 100000",
+                      },
                     })}
                   />
                   {errors.capacity && (
@@ -588,7 +632,7 @@ const EventDashboard = ({ onClose = null }) => {
                   >
                     <option value="">Selecciona una...</option>
                     {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
+                      <option key={cat.id} value={String(cat.id)} >
                         {cat.name}
                       </option>
                     ))}
@@ -603,43 +647,77 @@ const EventDashboard = ({ onClose = null }) => {
 
               {/* Botones de Envío */}
               <div className={styles.submitButtonsContainer}>
-              <button
-                  type="button"
-                  onClick={handleSubmit(onSaveDraft, onError)}
-                  className={styles.draftButton}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
+                {isEditMode ? (
+                  initialData?.status !== "FINISHED" ? (
                     <>
-                      <Loader2 size={20} className="animate-spin" />
-                      Guardando...
+                      <button
+                        type="button"
+                        onClick={onDelete}
+                        className={styles.deleteButton} // Asegúrate de tener estilos para esto o usa inline style temporalmente
+                        style={{ backgroundColor: "#ef4444", color: "white", padding: "0.75rem 1.5rem", borderRadius: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem", border: "none", cursor: "pointer", fontWeight: "600" }}
+                      >
+                        <X size={20} />
+                        {initialData?.status === "DRAFT" ? "Borrar" : "Borrar evento"}
+                      </button>
+                      <button
+                        type="button" // Cambiado a button para manejar onUpdate manualmente o submit si prefieres
+                        onClick={handleSubmit(handleUpdateEvent, onError)}
+                        className={styles.submitButton}
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 size={20} className="animate-spin" />
+                            Guardando...
+                          </>
+                        ) : (
+                          <>
+                            <Send size={20} />
+                            {initialData?.status === "DRAFT" ? "Publicar" : "Guardar"}
+                          </>
+                        )}
+                      </button>
                     </>
-                  ) : (
-                    <>
-                      <FileText size={20} />
-                      Guardar como borrador
-                    </>
-                  )}
-                </button>
-              <button
-                  type="submit"
-                  className={styles.submitButton}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 size={20} className="animate-spin" />
-                      Registrando...
-                    </>
-                  ) : (
-                    <>
-                      <Send size={20} />
-                      Crear Evento
-                    </>
-                  )}
-                </button>
-                
-                
+                  ) : null
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleSubmit(onSaveDraft, onError)}
+                      className={styles.draftButton}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 size={20} className="animate-spin" />
+                          Guardando...
+                        </>
+                      ) : (
+                        <>
+                          <FileText size={20} />
+                          Guardar como borrador
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="submit"
+                      className={styles.submitButton}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 size={20} className="animate-spin" />
+                          Registrando...
+                        </>
+                      ) : (
+                        <>
+                          <Send size={20} />
+                          Crear Evento
+                        </>
+                      )}
+                    </button>
+                  </>
+                )}
               </div>
             </section>
 
@@ -730,9 +808,8 @@ const EventDashboard = ({ onClose = null }) => {
                     {images.map((image, index) => (
                       <div
                         key={index}
-                        className={`${styles.thumbnail} ${
-                          mainImageIndex === index ? styles.active : ""
-                        }`}
+                        className={`${styles.thumbnail} ${mainImageIndex === index ? styles.active : ""
+                          }`}
                         onClick={() => setAsMainImage(index)}
                       >
                         <img

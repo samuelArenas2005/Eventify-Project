@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import {
-  login as apilogin,
-  logout as apilogout,
-  getUser
-} from "./api/api";
+import { login as apilogin, logout as apilogout, getUser } from "./api/api";
 
 import Navigation from "./components/layout/Navigation";
 import Footer from "./components/layout/Footer";
@@ -17,7 +13,8 @@ import EditPerfilPage from "./pages/Dashboard/EditPerfilPage/EditPerfilPage";
 import RegisterUser from "./pages/RegisterUser";
 import CreateEventPage from "./pages/CreateEvent/CreateEventPage";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
-import Analytics from "./pages/Analytics/Analytics";
+import AdminAnalytics from "./pages/AdminAnalytics/AdminAnalytics.jsx";
+import EventAnalytics from "./pages/EventAnalytics/EventAnalytics.jsx";
 import NotFoundPage from "./pages/NotFound/NotFoundPage";
 import SearchPage from "./pages/SearchEvent/SearchPage.jsx";
 import ScrollToTop from "./components/UI/ScrollTop/ScrollToTop";
@@ -28,16 +25,22 @@ function App() {
 
   const handleLogin = async (email, password) => {
     try {
-      const success = await apilogin(email, password);
+      const { success } = await apilogin(email, password);
       if (success) {
-        const userData = await getUser(); // ← Añade await aquí
+        const userData = await getUser();
         setUser(userData);
+        return { success: true };
       }
-      console.log("success:", success);
-      return success;
+      return {
+        success: false,
+        message: "Credenciales inválidas. Por favor, verifica tus datos.",
+      };
     } catch (error) {
       console.error("Login failed:", error);
-      return false;
+      return {
+        success: false,
+        message: error.message || "No pudimos iniciar sesión.",
+      };
     }
   };
 
@@ -100,7 +103,7 @@ function App() {
           path="/searchPage"
           element={
             <>
-              <SearchPage  user={user} />
+              <SearchPage user={user} />
             </>
           }
         />
@@ -113,7 +116,7 @@ function App() {
             path="/dashboard"
             element={
               <>
-                <Dashboard user = {user}/>
+                <Dashboard user={user} />
               </>
             }
           />
@@ -133,16 +136,24 @@ function App() {
               </>
             }
           />
+          <Route
+            path="/event/:eventId/analytics"
+            element={
+              <>
+                <EventAnalytics />
+              </>
+            }
+          />
         </Route>
         <Route
-          path={"/analytics"}
+          path={"/admin"}
           element={
             <ProtectedRoute
               isAllowed={user ? user.is_admin : false}
               loading={loading}
               redirectTo="/dashboard"
             >
-              <Analytics />
+              <AdminAnalytics />
             </ProtectedRoute>
           }
         />

@@ -1,9 +1,21 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./EventCard.module.css";
-import { Calendar, Clock, MapPin, Users, Heart, UserPlus, QrCode, Scan } from "lucide-react";
-import { getCategories } from "../../../api/api";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  Heart,
+  UserPlus,
+  QrCode,
+  Scan,
+} from "lucide-react";
+import { getCategories, setEventFavorite, unsetEventFavorite } from "../../../api/api"; 
+import { toast } from "react-hot-toast";
 
 const EventCard = ({
+  id,
   imageUrl,
   category,
   title,
@@ -25,8 +37,17 @@ const EventCard = ({
   readQRCode = false,
   handleReadQrCodeClick,
 }) => {
+  const navigate = useNavigate();
   const [isHeartActive, setIsHeartActive] = useState(activeHeart);
   const [categoryColors, setCategoryColors] = useState({});
+
+  const handleTitleClick = () => {
+    if (handleImageTitleClick) {
+      handleImageTitleClick();
+    } else if (id) {
+      navigate(`/event/${id}/analytics`);
+    }
+  };
 
   // Cargar categorías y sus colores al montar el componente
   useEffect(() => {
@@ -48,8 +69,33 @@ const EventCard = ({
     loadCategories();
   }, []);
 
-  const handleHeartClick = () => {
-    setIsHeartActive(!isHeartActive);
+  const handleHeartClick = async () => {
+    const next = !isHeartActive;
+    setIsHeartActive(next);
+
+    try {
+      if (!id) return;
+      if (next) {
+        await setEventFavorite(id);
+        toast.success("Añadido a favoritos");
+                window.location.reload();
+
+      } else {
+        await unsetEventFavorite(id);
+        toast.success("Eliminado de favoritos");
+                window.location.reload();
+
+      }
+    } catch (error) {
+      // Revertir si falla
+      setIsHeartActive((prev) => !prev);
+      const detail =
+        error?.response?.data?.detail ||
+        error?.message ||
+        "Acción de favorito fallida";
+      toast.error(detail);
+    }
+
     onHeartClick && onHeartClick();
   };
 
@@ -64,7 +110,7 @@ const EventCard = ({
 
   return (
     <div className={styles.cardContainer}>
-      <div className={styles.imageWrapper} onClick={handleImageTitleClick}>
+      <div className={styles.imageWrapper} onClick={handleTitleClick}>
         <img src={imageUrl} alt={title} className={styles.eventImage} />
         <div className={styles.categoryTag} style={getCategoryStyle(category)}>
           <span className={styles.categoryText}>{category}</span>
@@ -72,7 +118,7 @@ const EventCard = ({
       </div>
       <div className={styles.contentWrapper}>
         <div className={styles.titleHeartContainer}>
-          <h3 className={styles.eventTitle} onClick={handleImageTitleClick}>
+          <h3 className={styles.eventTitle} onClick={handleTitleClick}>
             {title}
           </h3>
           {showHeartButton ? (
@@ -90,7 +136,10 @@ const EventCard = ({
             </div>
           ) : null}
           {readQRCode ? (
-            <div className={styles.qrCodeContainer} onClick={handleReadQrCodeClick}>
+            <div
+              className={styles.qrCodeContainer}
+              onClick={handleReadQrCodeClick}
+            >
               <Scan size={28} className={styles.qrCodeIcon} />
             </div>
           ) : null}
@@ -110,7 +159,7 @@ const EventCard = ({
         <div className={styles.detailItem}>
           {/* Iconos más grandes */}
           <MapPin size={20} className={styles.detailIcon} />
-          <span className={styles.detailText}>{location}</span>
+          <span className={`${styles.detailText} ${styles.locationText}`}>{location}</span>
         </div>
         <div className={styles.detailItem}>
           {/* Iconos más grandes */}

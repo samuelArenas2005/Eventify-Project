@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { Mail, Lock } from "lucide-react";
 import { Link as RouterLink } from "react-router-dom";
 import Link from "@mui/material/Link";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -18,6 +19,7 @@ import backgroundImage from "../assets/register_background.png";
 const Login = ({ login }) => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Para el login, solo necesitamos register, handleSubmit, reset y errors
   const {
@@ -36,28 +38,52 @@ const Login = ({ login }) => {
   }, []);
 
   const onSubmit = async (data) => {
-    const success = await login(data.email, data.password);
-    console.log("Login successful:", success);
-    if (success) {
-      toast.success("¡Bienvenido!", {
-        duration: 3000,
+    setIsLoading(true);
+    try {
+      const result = await login(data.email, data.password);
+      console.log("Login result:", result);
+
+      if (result?.success) {
+        toast.success("¡Bienvenido!", {
+          duration: 3000,
+          style: {
+            background: "var(--color-primary)",
+            color: "var(--color-white)",
+          },
+        });
+        navigate("/dashboard");
+        return;
+      }
+
+            const fallbackMessage =
+        "Credenciales inválidas. Por favor, verifica tu correo y contraseña.";
+
+      if(result?.message === "Refresh failed") {
+        result.message = fallbackMessage;
+      }
+
+      toast.error(result?.message || fallbackMessage, {
+        duration: 4000,
         style: {
-          background: "var(--color-primary)",
-          color: "var(--color-white)",
+          background: "#ef4444",
+          color: "white",
         },
       });
-      navigate("/dashboard"); // ← Redirige aquí
-    } else {
-      toast.error(
-        "Credenciales inválidas. Por favor, verifica tu correo y contraseña.",
-        {
-          duration: 4000,
-          style: {
-            background: "#ef4444",
-            color: "white",
-          },
-        }
-      );
+    } catch (error) {
+      const serverMessage =
+        error?.response?.data?.detail ||
+        error?.message ||
+        "Ocurrió un problema en el servidor. Inténtalo nuevamente.";
+
+      toast.error(serverMessage, {
+        duration: 4000,
+        style: {
+          background: "#b91c1c",
+          color: "white",
+        },
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -203,6 +229,7 @@ const Login = ({ login }) => {
               type="submit"
               variant="contained"
               fullWidth
+              disabled={isLoading}
               sx={{
                 // Mismo estilo de botón que el registro
                 mt: 2,
@@ -214,13 +241,27 @@ const Login = ({ login }) => {
                 padding: "12px 20",
                 boxShadow: "0 10px 8px rgba(57, 140, 170, 0.34)",
                 textTransform: "none",
+                gap: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 "&:hover": {
                   // Puedes definir un hover si lo deseas
                   // background: 'var(--color-primary-dark)'
                 },
               }}
             >
-              Iniciar Sesión
+              {isLoading ? (
+                <>
+                  <CircularProgress
+                    size={20}
+                    sx={{ color: "var(--color-white)" }}
+                  />
+                  Cargando...
+                </>
+              ) : (
+                "Iniciar Sesión"
+              )}
             </Button>
           </Stack>
         </form>

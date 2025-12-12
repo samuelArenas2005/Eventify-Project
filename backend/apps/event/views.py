@@ -1,13 +1,17 @@
 # views.py
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, F, Q
+from django.db.models.functions import TruncDate
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, JsonResponse
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 import json
 import base64
 from openai import OpenAI
@@ -16,6 +20,7 @@ import os
 
 from datetime import timedelta
 from apps.notification.models import Notification, UserNotification
+from apps.common.permissions import IsAdminAttributeUser, IsEventCreatorOrReadOnly
 from .models import Event, Category, EventAttendee, EventImage
 from .serializers import (
     CategorySerializer,
@@ -45,7 +50,7 @@ class EventViewSet(viewsets.ModelViewSet):
     - create/update -> EventCreateUpdateSerializer
     - acciones custom: POST /events/{pk}/attend/ y POST /events/{pk}/unattend/
     """
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsEventCreatorOrReadOnly]
 
     def get_queryset(self):
         return (
@@ -74,23 +79,187 @@ class EventViewSet(viewsets.ModelViewSet):
         event = serializer.save(creator=self.request.user)
 
         # --- Lógica de Notificación ---
-        # Crear recordatorio programado para 1 día antes
-        reminder_date = event.start_date - timedelta(days=1)
+        # Solo crear notificaciones si el evento NO es un borrador
+        if event.status != Event.DRAFT:
+            # Crear recordatorio programado para 1 día antes
+            reminder_date = event.start_date - timedelta(days=1)
+            
+            notification = Notification.objects.create(
+                event=event,
+                type=Notification.NotificationType.REMINDER,
+                message=f"¡Recordatorio! Tu evento '{event.title}' es mañana a las {event.start_date.strftime('%H:%M')}.",
+                visible_at=reminder_date
+            )
+
+            # Suscribir al creador al recordatorio
+            UserNotification.objects.create(
+                user=event.creator,
+                notification=notification,
+                state=UserNotification.State.DELIVERED
+            )
+
+    def perform_update(self, serializer):
+        # Obtener el evento antes de actualizarlo
+        old_event = self.get_object()
+        old_status = old_event.status
         
-        notification = Notification.objects.create(
+        # Diccionario para almacenar valores antiguos
+        old_values = {
+            'title': old_event.title,
+            'description': old_event.description,
+            'start_date': old_event.start_date,
+            'end_date': old_event.end_date,
+            'address': old_event.address,
+            'capacity': old_event.capacity,
+        }
+        
+        # Guardar el evento actualizado
+        event = serializer.save()
+        
+        # Si el evento cambió de DRAFT a ACTIVE, crear la notificación de recordatorio
+        if old_status == Event.DRAFT and event.status == Event.ACTIVE:
+            reminder_date = event.start_date - timedelta(days=1)
+            reminder = Notification.objects.create(
+                event=event,
+                type=Notification.NotificationType.REMINDER,
+                message=f"¡Recordatorio! Tu evento '{event.title}' es mañana a las {event.start_date.strftime('%H:%M')}.",
+                visible_at=reminder_date
+            )
+            
+            # Suscribir al creador
+            UserNotification.objects.create(
+                user=event.creator,
+                notification=reminder,
+                state=UserNotification.State.DELIVERED
+            )
+            
+            # Suscribir a todos los usuarios inscritos (si ya hay alguno)
+            attendees = EventAttendee.objects.filter(event=event).select_related('user')
+            for attendee in attendees:
+                UserNotification.objects.create(
+                    user=attendee.user,
+                    notification=reminder,
+                    state=UserNotification.State.DELIVERED
+                )
+        
+        # Solo procesar cambios y crear notificaciones si el evento NO es DRAFT
+        if event.status != Event.DRAFT:
+            # Mapeo de nombres de campos a textos legibles
+            field_labels = {
+                'title': 'título',
+                'description': 'descripción',
+                'start_date': 'fecha de inicio',
+                'end_date': 'fecha de finalización',
+                'address': 'ubicación',
+                'location_info': 'información de ubicación',
+                'capacity': 'capacidad',
+            }
+            
+            # Detectar cambios y crear notificaciones
+            for field, old_value in old_values.items():
+                new_value = getattr(event, field)
+                
+                if old_value != new_value:
+                    # Si cambió la fecha de inicio, eliminar y recrear el recordatorio
+                    if field == 'start_date':
+                        # Buscar y eliminar la notificación de recordatorio existente
+                        old_reminder = Notification.objects.filter(
+                            event=event,
+                            type=Notification.NotificationType.REMINDER
+                        ).first()
+                        
+                        if old_reminder:
+                            # Eliminar la notificación (esto también elimina las UserNotifications asociadas en cascada)
+                            old_reminder.delete()
+                        
+                        # Crear nuevo recordatorio con la nueva fecha
+                        new_reminder_date = new_value - timedelta(days=1)
+                        new_reminder = Notification.objects.create(
+                            event=event,
+                            type=Notification.NotificationType.REMINDER,
+                            message=f"¡Recordatorio! Tu evento '{event.title}' es mañana a las {new_value.strftime('%H:%M')}.",
+                            visible_at=new_reminder_date
+                        )
+                        
+                        # Suscribir a todos los usuarios inscritos al nuevo recordatorio
+                        attendees = EventAttendee.objects.filter(event=event).select_related('user')
+                        for attendee in attendees:
+                            UserNotification.objects.create(
+                                user=attendee.user,
+                                notification=new_reminder,
+                                state=UserNotification.State.DELIVERED
+                            )
+                    
+                    # Formatear valores para el mensaje
+                    if isinstance(old_value, timezone.datetime):
+                        old_str = old_value.strftime('%d/%m/%Y %H:%M')
+                        new_str = new_value.strftime('%d/%m/%Y %H:%M')
+                    else:
+                        old_str = str(old_value)
+                        new_str = str(new_value)
+                    
+                    # Determinar el tipo de notificación según el campo
+                    if field in ['start_date', 'address']:
+                        notification_type = Notification.NotificationType.ALERT
+                    else:
+                        notification_type = Notification.NotificationType.INFO
+                    
+                    pronoun = 'El' if field == 'title' else 'La'
+                    
+                    # Crear notificación para este cambio
+                    notification = Notification.objects.create(
+                        event=event,
+                        type=notification_type,
+                        message=f"{pronoun} {field_labels[field]} del evento '{event.title}' ha cambiado de '{old_str}' a '{new_str}'.",
+                        visible_at=timezone.now()
+                    )
+                    
+                    # Suscribir a todos los usuarios inscritos al evento
+                    attendees = EventAttendee.objects.filter(event=event).select_related('user')
+                    for attendee in attendees:
+                        UserNotification.objects.create(
+                            user=attendee.user,
+                            notification=notification,
+                            state=UserNotification.State.DELIVERED
+                        )
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def favorite(self, request, pk=None):
+        """
+        Marca un evento como favorito para el usuario autenticado.
+        Ruta: POST /api/event/events/{pk}/favorite/
+        """
+        event = self.get_object()
+        attendee, created = EventAttendee.objects.get_or_create(
             event=event,
-            type=Notification.NotificationType.REMINDER,
-            message=f"¡Recordatorio! Tu evento '{event.title}' es mañana a las {event.start_date.strftime('%H:%M')}.",
-            visible_at=reminder_date
+            user=request.user,
+            defaults={'status': 'FAVORITE'}
         )
+        if not created and attendee.status != 'FAVORITE':
+            attendee.status = 'FAVORITE'
+            attendee.save(update_fields=['status', 'updated_at'])
 
-        # Suscribir al creador al recordatorio
-        UserNotification.objects.create(
-            user=event.creator,
-            notification=notification,
-            state=UserNotification.State.DELIVERED
-        )
-
+        serializer = EventAttendeeSerializer(attendee, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def unfavorite(self, request, pk=None):
+        """
+        Quita un evento de favoritos del usuario autenticado.
+        Ruta: POST /api/event/events/{pk}/unfavorite/
+        """
+        event = self.get_object()
+        try:
+            attendee = EventAttendee.objects.get(event=event, user=request.user)
+            # Si estaba en favoritos, eliminar la relación o cambiar estado
+            if attendee.status == 'FAVORITE':
+                attendee.delete()
+            else:
+                # Opcional: si no era FAVORITE, no hacemos nada
+                return Response({'detail': 'Not favorite'}, status=status.HTTP_200_OK)
+            return Response({'detail': 'Removed from favorites'}, status=status.HTTP_204_NO_CONTENT)
+        except EventAttendee.DoesNotExist:
+            return Response({'detail': 'Not favorite'}, status=status.HTTP_200_OK)
+        
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def attend(self, request, pk=None):
         """
@@ -164,35 +333,62 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-    @action(detail=True, methods=['put', 'patch'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=True, methods=['put', 'patch', 'delete'], permission_classes=[permissions.IsAuthenticated])
     def confirm_attendance(self, request, pk=None):
         """
         Actualiza el status del EventAttendee del usuario autenticado a 'CONFIRMED'.
         Recibe el nuevo status en el body (opcional, por defecto 'CONFIRMED').
+        Si se usa DELETE, elimina el registro del EventAttendee.
         """
         event = self.get_object()
         user = request.user
-        new_status = request.data.get('status', 'CONFIRMED')
-        
-        # Validar que el status sea válido
-        valid_statuses = [choice[0] for choice in EventAttendee.STATUS_CHOICES]
-        if new_status not in valid_statuses:
-            return Response(
-                {'detail': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         
         try:
             attendee = EventAttendee.objects.get(event=event, user=user)
+            
+            # Si el método es DELETE, eliminar el attendee
+            if request.method == 'DELETE':
+                attendee.delete()
+                return Response(
+                    {'detail': 'Successfully unregistered from the event'},
+                    status=status.HTTP_204_NO_CONTENT
+                )
+            
+            # Para PUT y PATCH, actualizar el status
+            new_status = request.data.get('status', 'CONFIRMED')
+            
+            # Validar que el status sea válido
+            valid_statuses = [choice[0] for choice in EventAttendee.STATUS_CHOICES]
+            if new_status not in valid_statuses:
+                return Response(
+                    {'detail': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             attendee.status = new_status
             attendee.save()
             serializer = EventAttendeeSerializer(attendee, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
+            
         except EventAttendee.DoesNotExist:
             return Response(
                 {'detail': 'You are not registered to this event'},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def attendees(self, request, pk=None):
+        """
+        GET /api/event/events/{pk}/attendees/ -> lista de usuarios inscritos al evento {pk}, osea a la id
+        """
+        event = self.get_object()
+        qs = (
+            EventAttendee.objects
+            .select_related('user')
+            .filter(event=event)
+        )
+        serializer = EventAttendeeSerializer(qs, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -203,6 +399,28 @@ class EventAttendeeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EventAttendeeSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+class RegisteredAttendeesList(generics.ListAPIView):
+    """
+    /api/event/registered/  -> devuelve solo los EventAttendee registrados del usuario autenticado
+    Solo incluye eventos activos cuya fecha de finalización sea mayor a la fecha actual.
+    """
+    serializer_class = EventAttendeeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        now = timezone.now()
+        return (
+            EventAttendee.objects
+            .select_related('user', 'event')
+            .filter(
+                user=user,
+                status='REGISTERED',
+                event__status=Event.ACTIVE,
+                event__end_date__gt=now  # Solo eventos cuya fecha de finalización sea mayor a la fecha actual
+            )
+        )
+
 class ConfirmedAttendeesList(generics.ListAPIView):
     """
     /api/event/confirmed/  -> devuelve solo los EventAttendee confirmados del usuario autenticado
@@ -212,11 +430,10 @@ class ConfirmedAttendeesList(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        # Ajusta el valor 'CONFIRMED' si en tu modelo usas constantes (e.g. EventAttendee.Status.CONFIRMED)
         return (
             EventAttendee.objects
             .select_related('user', 'event')
-            .filter(user=user, status='REGISTERED', event__status=Event.ACTIVE)
+            .filter(user=user, status='CONFIRMED', event__status=Event.ACTIVE)
         )
 
 class PendingAttendeesList(generics.ListAPIView):
@@ -251,15 +468,22 @@ class  ActiveEventsList(generics.ListAPIView):
     """
     /api/event/active/ -> eventos con status ACTIVE, permisos AllowAny,
     y si el usuario está autenticado excluye los eventos cuyo creador sea el mismo usuario.
+    También excluye eventos donde el usuario tiene status REGISTERED o FAVORITE,
+    y solo muestra eventos futuros (start_date > fecha actual).
+    Excluye eventos donde la capacidad ya se alcanzó (attendees_count >= capacity).
     """
     serializer_class = EventListSerializer
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         user = self.request.user
+        now = timezone.now()
         qs = (
             Event.objects
-                 .filter(status=Event.ACTIVE)
+                 .filter(
+                     status=Event.ACTIVE,
+                     start_date__gt=now  # Solo eventos futuros
+                 )
                  .select_related('creator', 'category')
                  .prefetch_related(
                      'images',
@@ -268,13 +492,27 @@ class  ActiveEventsList(generics.ListAPIView):
                          queryset=EventAttendee.objects.select_related('user')
                      )
                  )
-                 .annotate(attendees_count=Count('attendees'))
+                 # Contar solo los asistentes con status REGISTERED o CONFIRMED (los que ocupan lugar)
+                 .annotate(
+                     attendees_count=Count(
+                         'eventattendee',
+                         filter=Q(eventattendee__status__in=['REGISTERED', 'CONFIRMED'])
+                     )
+                 )
+                 # Excluir eventos donde la capacidad ya se alcanzó
+                 .exclude(attendees_count__gte=F('capacity'))
                  .order_by('-start_date')
         )
 
-        # Si el usuario está autenticado, excluimos los eventos que él creó
+        # Si el usuario está autenticado, excluimos:
+        # 1. Los eventos que él creó
+        # 2. Los eventos donde tiene status REGISTERED o FAVORITE
         if user and user.is_authenticated:
             qs = qs.exclude(creator=user)
+            qs = qs.exclude(
+                eventattendee__user=user,
+                eventattendee__status__in=['REGISTERED', 'FAVORITE']
+            )
 
         return qs
 
@@ -304,33 +542,209 @@ class AllCreatedEventsList(generics.ListAPIView):
         user = self.request.user
         return Event.objects.filter(creator=user)
 
+
+class PopularUpcomingEventsView(generics.ListAPIView):
+    """Retorna los eventos próximos con mayor número de inscritos."""
+    serializer_class = EventListSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminAttributeUser]
+
+    def get_queryset(self):
+        now = timezone.now()
+        try:
+            limit = int(self.request.query_params.get('limit', 5))
+        except (TypeError, ValueError):
+            limit = 5
+
+        limit = max(1, min(limit, 10))
+
+        return (
+            Event.objects
+            .filter(start_date__gte=now, status=Event.ACTIVE)
+            .select_related('creator', 'category')
+            .prefetch_related('images')
+            .annotate(popular_attendees=Count('attendees', distinct=True))
+            .order_by('-popular_attendees', 'start_date')[:limit]
+        )
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        results = serializer.data
+        payload = {
+            'results': results,
+            'count': len(results),
+        }
+
+        if not results:
+            payload['message'] = 'No hay eventos populares próximos disponibles.'
+
+        return Response(payload)
+
+
+class EventDailyCreatedCountView(APIView):
+    """Devuelve conteos diarios de eventos creados entre dos fechas para Analytics."""
+    permission_classes = [permissions.IsAuthenticated, IsAdminAttributeUser]
+
+    def get(self, request):
+        start_param = request.query_params.get('start_date')
+        end_param = request.query_params.get('end_date')
+
+        if not start_param or not end_param:
+            raise ValidationError({'detail': 'start_date y end_date son obligatorios (ISO 8601).'})
+
+        start_dt = parse_datetime(start_param)
+        end_dt = parse_datetime(end_param)
+        if not start_dt or not end_dt:
+            raise ValidationError({'detail': 'Formato de fecha inválido. Usa ISO 8601, ej: 2024-11-01T00:00:00Z.'})
+
+        tz = timezone.get_current_timezone()
+        if timezone.is_naive(start_dt):
+            start_dt = timezone.make_aware(start_dt, tz)
+        if timezone.is_naive(end_dt):
+            end_dt = timezone.make_aware(end_dt, tz)
+
+        if end_dt < start_dt:
+            raise ValidationError({'detail': 'end_date debe ser mayor o igual a start_date.'})
+
+        daily_counts = (
+            Event.objects
+            .filter(
+                created_at__range=(start_dt, end_dt),
+                status=Event.ACTIVE,
+            )
+            .annotate(day=TruncDate('created_at'))
+            .values('day')
+            .order_by('day')
+            .annotate(count=Count('id'))
+        )
+
+        counts_map = {entry['day']: entry['count'] for entry in daily_counts}
+
+        current_day = start_dt.date()
+        end_day = end_dt.date()
+        data = []
+        total = 0
+        while current_day <= end_day:
+            count = counts_map.get(current_day, 0)
+            total += count
+            data.append({
+                'label': current_day.strftime('%d %b'),
+                'date': current_day.isoformat(),
+                'value': count,
+            })
+            current_day += timedelta(days=1)
+
+        now = timezone.now()
+
+        finished_period_end = end_dt if end_dt <= now else now
+
+        finished_events_qs = (
+            Event.objects
+            .filter(
+                end_date__gte=start_dt,
+                end_date__lte=finished_period_end
+            )
+            .select_related('category', 'creator')
+        )
+
+        finished_events = [
+            {
+                'id': event.id,
+                'title': event.title,
+                'start_date': event.start_date.isoformat(),
+                'end_date': event.end_date.isoformat(),
+                'category': event.category.name if event.category else None,
+                'creator_id': event.creator_id,
+            }
+            for event in finished_events_qs
+        ]
+
+        ongoing_events_total = (
+            Event.objects
+            .exclude(status=Event.CANCELLED)
+            .filter(end_date__gte=now)
+            .count()
+        )
+
+        return Response({
+            'start_date': start_dt.isoformat(),
+            'end_date': end_dt.isoformat(),
+            'total_events': total,
+            'series': data,
+            'finished_events_count': len(finished_events),
+            'ongoing_events_total': ongoing_events_total,
+        })
+
 class ConfirmEventRegistrationView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, event_id):
         event = get_object_or_404(Event, pk=event_id)
+
+        attendee = EventAttendee.objects.filter(event=event, user=request.user).first()
         
-        # Verificar si el usuario ya está inscrito
-        existing_attendee = EventAttendee.objects.filter(
+        # Verificar capacidad antes de registrar
+        # Contar solo asistentes con estado REGISTERED o CONFIRMED (los que ocupan lugar)
+        current_attendees = EventAttendee.objects.filter(
             event=event,
-            user=request.user
-        ).first()
+            status__in=['REGISTERED', 'CONFIRMED']
+        ).count()
         
-        if existing_attendee:
+        # Si el usuario ya está registrado/confirmado, no necesita verificar capacidad
+        # (ya está contado en current_attendees)
+        if attendee and attendee.status in ('REGISTERED', 'CONFIRMED'):
+            return Response({"detail": "Ya estás inscrito en este evento."}, status=status.HTTP_200_OK)
+        
+        # Si la capacidad está llena y el usuario no está registrado, rechazar
+        if current_attendees >= event.capacity:
             return Response(
-                {"detail": "Ya estás inscrito en este evento."},
+                {"detail": "El evento ha alcanzado su capacidad máxima. No se pueden aceptar más registros."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Crear nueva inscripción
-        attendee = EventAttendee.objects.create(
-            event=event,
-            user=request.user,
-            status='REGISTERED'
-        )
-        
+        if attendee:
+            # Si viene de FAVORITE, cambia a REGISTERED
+            if attendee.status == 'FAVORITE':
+                attendee.status = 'REGISTERED'
+                attendee.save(update_fields=['status'])
+                serializer = EventAttendeeSerializer(attendee, context={'request': request})
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            # Cualquier otro estado, llevar a REGISTERED
+            attendee.status = 'REGISTERED'
+            attendee.save(update_fields=['status'])
+            serializer = EventAttendeeSerializer(attendee, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # No existe relación: crear como REGISTERED
+        attendee = EventAttendee.objects.create(event=event, user=request.user, status='REGISTERED')
         serializer = EventAttendeeSerializer(attendee, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class FinishEventView(APIView):
+    """
+    Cambia el estado de un evento a FINISHED.
+    Solo el creador del evento puede realizar esta acción.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, event_id):
+        event = get_object_or_404(Event, pk=event_id)
+        
+        # Verificar que el usuario sea el creador del evento
+        if event.creator != request.user:
+            return Response(
+                {"detail": "No tienes permiso para finalizar este evento."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Cambiar el estado a FINISHED
+        event.status = Event.FINISHED
+        event.save()
+        
+        serializer = EventListSerializer(event, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 load_dotenv()

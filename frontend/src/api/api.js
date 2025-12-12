@@ -10,8 +10,20 @@ const USER_URL = `${BASE_URL}user/users/me/`
 // Forzando actualización de git
 
 export const login = async (email, password) => {
-	const response = await axios.post(LOGIN_URL, { email: email, password: password }, { withCredentials: true });
-	return response.data.success;
+	try {
+		const response = await axios.post(
+			LOGIN_URL,
+			{ email, password },
+			{ withCredentials: true }
+		);
+		return { success: response.data.success === true };
+	} catch (error) {
+		const detail =
+			error?.response?.data?.detail ||
+			error?.message ||
+			"No pudimos contactar al servidor. Inténtalo más tarde.";
+		throw new Error(detail);
+	}
 }
 
 export const refresh_token = async () => {
@@ -97,7 +109,68 @@ export const updateUser = async (userData) => {
 	}
 }
 
+export const updateEvent = async (eventId, eventData) => {
+	console.log("🚀 updateEvent called with eventId:", eventId, "and eventData:", eventData);
+	try {
+		// Determine if eventData is FormData or regular object
+		const isFormData = eventData instanceof FormData;
+
+		const response = await axios.put(
+			`${BASE_URL}event/events/${eventId}/`,
+			eventData,
+			{
+				withCredentials: true,
+				headers: isFormData ? {
+					'Content-Type': 'multipart/form-data',
+				} : undefined
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error updating event:", error);
+		throw error;
+	}
+}
+
+export const cancelEvent = async (eventId) => {
+	try {
+		const response = await axios.patch(
+			`${BASE_URL}event/events/${eventId}/`,
+			{ status: "CANCELLED" },
+			{
+				withCredentials: true
+			}
+		);
+
+		return response.data;
+	} catch (error) {
+		console.error("Error canceling event:", error);
+		throw error;
+	}
+}
+
+export const cancelAttendee = async (eventId, userId) => {
+	console.log("🚀 cancelAttendee called with eventId:", eventId, "and userId:", userId);
+	try {
+		const response = await axios.delete(
+			`${BASE_URL}event/events/${eventId}/confirm_attendance/`,
+			{
+				withCredentials: true
+			}
+		);
+
+		return response.data;
+	} catch (error) {
+		console.error("Error canceling attendee:", error);
+		throw error;
+	}
+}
+
 export const getEventRegisteredUser = () => {
+	return axios.get(`${BASE_URL}event/registered/`, { withCredentials: true });
+}
+
+export const getEventConfirmedUser = () => {
 	return axios.get(`${BASE_URL}event/confirmed/`, { withCredentials: true });
 }
 
@@ -120,6 +193,16 @@ export const getCategories = async () => {
 	} catch (error) {
 		console.error("Error en getCategories:", error);
 		return [];
+	}
+}
+//Nuevoo
+export const getEventById = async (eventId) => {
+	try {
+		const response = await axios.get(`${BASE_URL}event/events/${eventId}/`, { withCredentials: true });
+		return response.data;
+	} catch (error) {
+		console.error("Error en getEventById:", error);
+		return null;
 	}
 }
 
@@ -158,18 +241,32 @@ export const confirmAttendance = async (eventId, status = 'CONFIRMED') => {
 }
 
 export const confirmEventRegistration = async (eventId) => {
-  try {
-    // Enviar cuerpo vacío y configuración aparte
-    const response = await axios.post(
-      `${BASE_URL}event/register/confirm/${eventId}/`,
-      {},                       // cuerpo (vacío)
-      { withCredentials: true } // configuración (cookies)
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error confirmando registro:", error);
-    throw error.response?.data ?? error;
-  }
+	try {
+		// Enviar cuerpo vacío y configuración aparte
+		const response = await axios.post(
+			`${BASE_URL}event/register/confirm/${eventId}/`,
+			{},                       // cuerpo (vacío)
+			{ withCredentials: true } // configuración (cookies)
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error confirmando registro:", error);
+		throw error.response?.data ?? error;
+	}
+};
+
+export const finishEvent = async (eventId) => {
+	try {
+		const response = await axios.post(
+			`${BASE_URL}event/events/${eventId}/finish/`,
+			{},
+			{ withCredentials: true }
+		);
+		return response.data;
+	} catch (error) {
+		console.error("Error finalizando evento:", error);
+		throw error.response?.data ?? error;
+	}
 };
 
 export const getUserNotifications = async () => {
@@ -211,3 +308,103 @@ export const markNotificationAsRead = async (notificationId) => {
 		return false;
 	}
 }
+
+export const getEventAttendees = async (eventId) => {
+	try {
+		const response = await axios.get(
+			`${BASE_URL}event/events/${eventId}/attendees/`,
+			{ withCredentials: true }
+		);
+		return response.data; // Array de EventAttendee
+	} catch (error) {
+		console.error("Error obteniendo inscritos del evento:", error);
+		throw error;
+	}
+};
+
+/* LLAMADAS PARA ESTADISTICAS EN ADMIN */
+
+export const getDailyEventsCreated = (startDate, endDate) => {
+	return axios.get(`${BASE_URL}event/analytics/events-per-day/`, {
+		params: { start_date: startDate, end_date: endDate },
+		withCredentials: true,
+	});
+}
+
+export const getDailyRegisteredUsers = (startDate, endDate) => {
+	return axios.get(`${BASE_URL}user/users/analytics/daily-registrations/`, {
+		params: { start_date: startDate, end_date: endDate },
+		withCredentials: true,
+	});
+}
+
+export const getTotalUsersCount = () => {
+	return axios.get(`${BASE_URL}user/users/analytics/total-users/`, {
+		withCredentials: true,
+	});
+}
+
+/* LLAMA A LOS 5 EVENTOS ACTIVOS MAS POPULARES */
+
+export const getPopularUpcomingEvents = (limit = 5) => {
+	return axios.get(`${BASE_URL}event/analytics/popular-upcoming/`, {
+		params: { limit },
+		withCredentials: true,
+	});
+}
+
+/* LLAMADAS RELACIONADAS CON ADMINISTRACION DE USUARIOS */
+
+export const promoteAdminByCedula = (cedula) => {
+	return axios.post(
+		`${BASE_URL}user/users/admin/promote-by-cedula/`,
+		{ cedula },
+		{ withCredentials: true }
+	);
+}
+
+export const removeAdminByCedula = (cedula) => {
+	return axios.post(
+		`${BASE_URL}user/users/admin/remove-by-cedula/`,
+		{ cedula },
+		{ withCredentials: true }
+	);
+}
+
+export const getUserByCedula = (cedula) => {
+	return axios.get(`${BASE_URL}user/users/lookup/by-cedula/`, {
+		params: { cedula },
+		withCredentials: true,
+	});
+}
+
+export const setEventFavorite = async (eventId) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}event/events/${eventId}/favorite/`,
+      {},
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error marcando favorito:", error);
+    throw error;
+  }
+};
+
+export const unsetEventFavorite = async (eventId) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}event/events/${eventId}/unfavorite/`,
+      {},
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error quitando favorito:", error);
+    throw error;
+  }
+};
+
+
+

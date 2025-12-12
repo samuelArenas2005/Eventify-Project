@@ -72,7 +72,7 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
     )
     category = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),
-        required=True
+        required=False
     )
 
     class Meta:
@@ -91,7 +91,8 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "end_date": "End date must be after start date"
                 })
-        if not data.get('category'):
+        # Solo validar category en creación (no en actualización parcial)
+        if not self.instance and not data.get('category'):
             raise serializers.ValidationError({
                 "category": "A category must be specified"
             })
@@ -113,7 +114,11 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
         images_data = validated_data.pop('images', [])
         event = super().update(instance, validated_data)
         
-        # Add new images
+        # Always delete all existing images and replace with new ones
+        # The frontend sends all images (old + new), so we replace everything
+        EventImage.objects.filter(event=event).delete()
+        
+        # Add all images sent from frontend
         for image in images_data:
             EventImage.objects.create(event=event, image=image)
             
