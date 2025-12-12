@@ -1,26 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
-from django.conf import settings
-
-# Importar CloudinaryField condicionalmente
-try:
-    from cloudinary_storage.storage import MediaCloudinaryStorage
-    from cloudinary.models import CloudinaryField
-    CLOUDINARY_AVAILABLE = True
-except ImportError:
-    CLOUDINARY_AVAILABLE = False
-    CloudinaryField = None
-
-def get_image_field(upload_to, **kwargs):
-    """
-    Retorna CloudinaryField si no está en DEBUG y Cloudinary está disponible,
-    de lo contrario retorna ImageField normal.
-    """
-    if not settings.DEBUG and CLOUDINARY_AVAILABLE and CloudinaryField:
-        return CloudinaryField(upload_to=upload_to, **kwargs)
-    else:
-        return models.ImageField(upload_to=upload_to, **kwargs)
 
 
 class User(AbstractUser):
@@ -105,8 +85,8 @@ class User(AbstractUser):
         },
     )
     
-    # Usar ImageField o CloudinaryField para el avatar según el entorno
-    avatar = get_image_field(
+    # Usar ImageField - django-cloudinary-storage maneja Cloudinary automáticamente
+    avatar = models.ImageField(
         upload_to='avatars/',
         blank=True,
         null=True
